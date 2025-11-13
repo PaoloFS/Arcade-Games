@@ -1,0 +1,1468 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Arcade Zone - Multiplayer Games</title>
+	<style>
+		@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap');
+		
+		* {
+			box-sizing: border-box;
+			margin: 0;
+			padding: 0;
+		}
+
+		:root {
+			--neon-cyan: #00fff9;
+			--neon-pink: #ff006e;
+			--neon-yellow: #ffbe0b;
+			--neon-purple: #8338ec;
+			--dark-bg: #0a0e27;
+			--darker-bg: #050812;
+			--card-bg: rgba(15, 23, 42, 0.9);
+		}
+
+		body {
+			min-height: 100vh;
+			background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 50%, #0a0e27 100%);
+			font-family: 'Orbitron', sans-serif;
+			color: #fff;
+			overflow-x: hidden;
+			position: relative;
+		}
+
+		/* Animated Background */
+		.animated-bg {
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 0;
+			overflow: hidden;
+		}
+
+		.grid-lines {
+			position: absolute;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background-image: 
+				linear-gradient(rgba(0, 255, 249, 0.1) 1px, transparent 1px),
+				linear-gradient(90deg, rgba(0, 255, 249, 0.1) 1px, transparent 1px);
+			background-size: 50px 50px;
+			animation: gridMove 20s linear infinite;
+		}
+
+		@keyframes gridMove {
+			0% { transform: perspective(500px) rotateX(60deg) translateY(0); }
+			100% { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+		}
+
+		.stars {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+		}
+
+		.star {
+			position: absolute;
+			width: 2px;
+			height: 2px;
+			background: white;
+			border-radius: 50%;
+			animation: twinkle 3s infinite;
+		}
+
+		@keyframes twinkle {
+			0%, 100% { opacity: 0.3; }
+			50% { opacity: 1; }
+		}
+
+		.container {
+			position: relative;
+			z-index: 1;
+			max-width: 1400px;
+			margin: 0 auto;
+			padding: 2rem;
+		}
+
+		/* Header */
+		.header {
+			text-align: center;
+			margin-bottom: 3rem;
+			position: relative;
+		}
+
+		.header h1 {
+			font-family: 'Press Start 2P', cursive;
+			font-size: 3rem;
+			background: linear-gradient(45deg, var(--neon-cyan), var(--neon-pink), var(--neon-yellow));
+			-webkit-background-clip: text;
+			-webkit-text-fill-color: transparent;
+			background-clip: text;
+			text-shadow: 0 0 30px rgba(0, 255, 249, 0.5);
+			animation: glowPulse 2s ease-in-out infinite;
+			margin-bottom: 1rem;
+		}
+
+		@keyframes glowPulse {
+			0%, 100% { filter: drop-shadow(0 0 20px rgba(0, 255, 249, 0.5)); }
+			50% { filter: drop-shadow(0 0 40px rgba(255, 0, 110, 0.8)); }
+		}
+
+		.header p {
+			font-size: 1.1rem;
+			color: var(--neon-cyan);
+			letter-spacing: 2px;
+		}
+
+		/* User Section */
+		.user-panel {
+			background: var(--card-bg);
+			border: 2px solid var(--neon-cyan);
+			border-radius: 15px;
+			padding: 1.5rem;
+			margin-bottom: 3rem;
+			backdrop-filter: blur(10px);
+			box-shadow: 0 0 30px rgba(0, 255, 249, 0.3);
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			flex-wrap: wrap;
+			gap: 1rem;
+		}
+
+		.user-info {
+			display: flex;
+			align-items: center;
+			gap: 1rem;
+		}
+
+		.user-avatar {
+			width: 50px;
+			height: 50px;
+			background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+			border-radius: 50%;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 1.5rem;
+			border: 3px solid var(--neon-cyan);
+		}
+
+		.user-name {
+			font-size: 1.3rem;
+			font-weight: 700;
+			color: var(--neon-yellow);
+		}
+
+		.input-group {
+			display: flex;
+			gap: 1rem;
+			align-items: center;
+		}
+
+		.arcade-input {
+			padding: 0.8rem 1.2rem;
+			background: rgba(0, 0, 0, 0.5);
+			border: 2px solid var(--neon-cyan);
+			border-radius: 8px;
+			color: white;
+			font-family: 'Orbitron', sans-serif;
+			font-size: 1rem;
+			min-width: 200px;
+			transition: all 0.3s ease;
+		}
+
+		.arcade-input:focus {
+			outline: none;
+			border-color: var(--neon-pink);
+			box-shadow: 0 0 20px rgba(255, 0, 110, 0.5);
+		}
+
+		.arcade-btn {
+			padding: 0.8rem 1.8rem;
+			background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
+			border: 2px solid var(--neon-cyan);
+			color: white;
+			font-family: 'Orbitron', sans-serif;
+			font-weight: 700;
+			font-size: 0.9rem;
+			border-radius: 8px;
+			cursor: pointer;
+			transition: all 0.3s ease;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			position: relative;
+			overflow: hidden;
+		}
+
+		.arcade-btn:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 0 30px rgba(255, 0, 110, 0.8);
+		}
+
+		.arcade-btn:active {
+			transform: translateY(0);
+		}
+
+		.arcade-btn:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+
+		/* Game Cards */
+		.games-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+			gap: 2rem;
+			margin-bottom: 3rem;
+		}
+
+		.game-card {
+			background: var(--card-bg);
+			border: 2px solid transparent;
+			border-radius: 20px;
+			padding: 2rem;
+			cursor: pointer;
+			transition: all 0.4s ease;
+			position: relative;
+			overflow: hidden;
+			backdrop-filter: blur(10px);
+		}
+
+		.game-card::before {
+			content: '';
+			position: absolute;
+			top: -50%;
+			left: -50%;
+			width: 200%;
+			height: 200%;
+			background: linear-gradient(45deg, transparent, rgba(0, 255, 249, 0.1), transparent);
+			transform: rotate(45deg);
+			transition: all 0.5s ease;
+		}
+
+		.game-card:hover::before {
+			animation: shimmer 1.5s infinite;
+		}
+
+		@keyframes shimmer {
+			0% { transform: translateX(-100%) translateY(-100%) rotate(45deg); }
+			100% { transform: translateX(100%) translateY(100%) rotate(45deg); }
+		}
+
+		.game-card:hover {
+			border-color: var(--neon-cyan);
+			transform: translateY(-10px);
+			box-shadow: 0 20px 50px rgba(0, 255, 249, 0.4);
+		}
+
+		.game-icon {
+			font-size: 4rem;
+			text-align: center;
+			margin-bottom: 1rem;
+			filter: drop-shadow(0 0 10px currentColor);
+		}
+
+		.game-card:nth-child(1) .game-icon { color: var(--neon-yellow); }
+		.game-card:nth-child(2) .game-icon { color: var(--neon-pink); }
+
+		.game-title {
+			font-family: 'Press Start 2P', cursive;
+			font-size: 1.3rem;
+			text-align: center;
+			margin-bottom: 0.5rem;
+			color: var(--neon-cyan);
+		}
+
+		.game-description {
+			text-align: center;
+			opacity: 0.8;
+			margin-bottom: 1.5rem;
+			font-size: 0.9rem;
+		}
+
+		.game-stats-preview {
+			display: flex;
+			justify-content: space-around;
+			padding: 1rem;
+			background: rgba(0, 0, 0, 0.3);
+			border-radius: 10px;
+			margin-bottom: 1rem;
+		}
+
+		.stat-preview {
+			text-align: center;
+		}
+
+		.stat-preview-value {
+			font-size: 1.5rem;
+			font-weight: 700;
+			color: var(--neon-yellow);
+		}
+
+		.stat-preview-label {
+			font-size: 0.7rem;
+			opacity: 0.7;
+			text-transform: uppercase;
+		}
+
+		/* Modal */
+		.modal {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			width: 100%;
+			height: 100%;
+			background: rgba(0, 0, 0, 0.9);
+			z-index: 1000;
+			backdrop-filter: blur(5px);
+		}
+
+		.modal.active {
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			animation: fadeIn 0.3s ease;
+		}
+
+		@keyframes fadeIn {
+			from { opacity: 0; }
+			to { opacity: 1; }
+		}
+
+		.modal-content {
+			background: var(--dark-bg);
+			border: 3px solid var(--neon-cyan);
+			border-radius: 20px;
+			padding: 2rem;
+			max-width: 900px;
+			width: 90%;
+			max-height: 90vh;
+			overflow-y: auto;
+			position: relative;
+			box-shadow: 0 0 50px rgba(0, 255, 249, 0.5);
+			animation: slideUp 0.4s ease;
+		}
+
+		@keyframes slideUp {
+			from { transform: translateY(50px); opacity: 0; }
+			to { transform: translateY(0); opacity: 1; }
+		}
+
+		.modal-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 2rem;
+			padding-bottom: 1rem;
+			border-bottom: 2px solid var(--neon-cyan);
+		}
+
+		.modal-title {
+			font-family: 'Press Start 2P', cursive;
+			font-size: 1.5rem;
+			color: var(--neon-yellow);
+		}
+
+		.close-btn {
+			background: transparent;
+			border: 2px solid var(--neon-pink);
+			color: var(--neon-pink);
+			width: 40px;
+			height: 40px;
+			border-radius: 50%;
+			cursor: pointer;
+			font-size: 1.5rem;
+			transition: all 0.3s ease;
+		}
+
+		.close-btn:hover {
+			background: var(--neon-pink);
+			color: white;
+			transform: rotate(90deg);
+		}
+
+		/* Catch Game Styles */
+		.game-stats {
+			display: flex;
+			justify-content: space-around;
+			margin-bottom: 2rem;
+			padding: 1rem;
+			background: rgba(0, 0, 0, 0.3);
+			border-radius: 10px;
+		}
+
+		.stat {
+			text-align: center;
+		}
+
+		.stat-value {
+			font-size: 2rem;
+			font-weight: 700;
+			color: var(--neon-yellow);
+			font-family: 'Press Start 2P', cursive;
+		}
+
+		.stat-label {
+			font-size: 0.8rem;
+			opacity: 0.7;
+			text-transform: uppercase;
+			margin-top: 0.3rem;
+		}
+
+		.catch-game-area {
+			position: relative;
+			width: 100%;
+			height: 500px;
+			background: linear-gradient(180deg, #0a0e27 0%, #1a1035 100%);
+			border: 3px solid var(--neon-cyan);
+			border-radius: 15px;
+			overflow: hidden;
+			margin-bottom: 1.5rem;
+			box-shadow: inset 0 0 50px rgba(0, 255, 249, 0.2);
+		}
+
+		.catcher {
+			position: absolute;
+			bottom: 20px;
+			width: 80px;
+			height: 80px;
+			font-size: 3rem;
+			transition: left 0.05s linear;
+			cursor: move;
+			filter: drop-shadow(0 0 10px rgba(255, 190, 11, 0.8));
+			z-index: 10;
+		}
+
+		.falling-item {
+			position: absolute;
+			font-size: 2.5rem;
+			pointer-events: none;
+			filter: drop-shadow(0 0 10px currentColor);
+		}
+
+		.powerup {
+			animation: pulse 0.5s ease-in-out infinite;
+		}
+
+		@keyframes pulse {
+			0%, 100% { transform: scale(1); }
+			50% { transform: scale(1.2); }
+		}
+
+		/* Memory Game Styles */
+		.memory-grid {
+			display: grid;
+			grid-template-columns: repeat(4, 1fr);
+			gap: 1rem;
+			margin-bottom: 2rem;
+		}
+
+		.memory-card {
+			aspect-ratio: 1;
+			background: linear-gradient(135deg, rgba(0, 255, 249, 0.1), rgba(131, 56, 236, 0.1));
+			border: 3px solid var(--neon-cyan);
+			border-radius: 15px;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			font-size: 3rem;
+			transition: all 0.4s ease;
+			position: relative;
+			transform-style: preserve-3d;
+		}
+
+		.memory-card:hover:not(.flipped):not(.matched) {
+			transform: scale(1.05);
+			border-color: var(--neon-pink);
+			box-shadow: 0 0 30px rgba(255, 0, 110, 0.5);
+		}
+
+		.memory-card.flipped {
+			background: linear-gradient(135deg, rgba(255, 0, 110, 0.3), rgba(131, 56, 236, 0.3));
+			border-color: var(--neon-pink);
+			transform: rotateY(180deg);
+		}
+
+		.memory-card.matched {
+			background: linear-gradient(135deg, rgba(0, 255, 249, 0.3), rgba(255, 190, 11, 0.3));
+			border-color: var(--neon-yellow);
+			cursor: default;
+			animation: matchPulse 0.5s ease;
+		}
+
+		@keyframes matchPulse {
+			0%, 100% { transform: scale(1); }
+			50% { transform: scale(1.1); }
+		}
+
+		/* Leaderboard */
+		.leaderboard-section {
+			background: var(--card-bg);
+			border: 2px solid var(--neon-purple);
+			border-radius: 20px;
+			padding: 2rem;
+			backdrop-filter: blur(10px);
+		}
+
+		.leaderboard-title {
+			font-family: 'Press Start 2P', cursive;
+			font-size: 1.5rem;
+			text-align: center;
+			margin-bottom: 2rem;
+			color: var(--neon-yellow);
+		}
+
+		.leaderboard-grid {
+			display: grid;
+			grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+			gap: 2rem;
+		}
+
+		.leaderboard-box {
+			background: rgba(0, 0, 0, 0.3);
+			border: 2px solid var(--neon-cyan);
+			border-radius: 15px;
+			padding: 1.5rem;
+		}
+
+		.leaderboard-box h3 {
+			text-align: center;
+			color: var(--neon-pink);
+			margin-bottom: 1.5rem;
+			font-size: 1.2rem;
+		}
+
+		.leaderboard-list {
+			list-style: none;
+		}
+
+		.leaderboard-item {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 1rem;
+			margin-bottom: 0.8rem;
+			background: rgba(0, 255, 249, 0.05);
+			border: 1px solid rgba(0, 255, 249, 0.2);
+			border-radius: 10px;
+			transition: all 0.3s ease;
+		}
+
+		.leaderboard-item:hover {
+			background: rgba(0, 255, 249, 0.1);
+			transform: translateX(5px);
+			border-color: var(--neon-cyan);
+		}
+
+		.leaderboard-item.top-1 {
+			background: linear-gradient(135deg, rgba(255, 215, 0, 0.2), rgba(255, 190, 11, 0.1));
+			border: 2px solid gold;
+		}
+
+		.leaderboard-item.top-2 {
+			background: linear-gradient(135deg, rgba(192, 192, 192, 0.2), rgba(169, 169, 169, 0.1));
+			border: 2px solid silver;
+		}
+
+		.leaderboard-item.top-3 {
+			background: linear-gradient(135deg, rgba(205, 127, 50, 0.2), rgba(184, 115, 51, 0.1));
+			border: 2px solid #cd7f32;
+		}
+
+		.leaderboard-rank {
+			font-size: 1.3rem;
+			font-weight: 700;
+			min-width: 50px;
+		}
+
+		.leaderboard-name {
+			flex: 1;
+			margin: 0 1rem;
+			font-weight: 600;
+		}
+
+		.leaderboard-score {
+			font-size: 1.2rem;
+			font-weight: 700;
+			color: var(--neon-yellow);
+		}
+
+		.no-scores {
+			text-align: center;
+			opacity: 0.5;
+			padding: 2rem;
+			font-style: italic;
+		}
+
+		/* Game Over Alert */
+		.game-over-alert {
+			position: fixed;
+			top: 50%;
+			left: 50%;
+			transform: translate(-50%, -50%) scale(0);
+			background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
+			padding: 3rem;
+			border-radius: 20px;
+			border: 3px solid var(--neon-cyan);
+			box-shadow: 0 0 100px rgba(0, 255, 249, 0.8);
+			text-align: center;
+			z-index: 2000;
+			transition: transform 0.3s ease;
+		}
+
+		.game-over-alert.active {
+			transform: translate(-50%, -50%) scale(1);
+		}
+
+		.game-over-alert h2 {
+			font-family: 'Press Start 2P', cursive;
+			font-size: 2rem;
+			margin-bottom: 1rem;
+			color: var(--neon-yellow);
+		}
+
+		.final-score-display {
+			font-size: 4rem;
+			font-weight: 900;
+			color: white;
+			margin: 1rem 0;
+			text-shadow: 0 0 30px rgba(255, 255, 255, 0.8);
+		}
+
+		@media (max-width: 768px) {
+			.header h1 {
+				font-size: 1.8rem;
+			}
+
+			.games-grid {
+				grid-template-columns: 1fr;
+			}
+
+			.modal-content {
+				width: 95%;
+				padding: 1rem;
+			}
+
+			.memory-grid {
+				gap: 0.5rem;
+			}
+
+			.memory-card {
+				font-size: 2rem;
+			}
+		}
+	</style>
+	<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+    
+    <script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+	<div class="animated-bg">
+		<div class="grid-lines"></div>
+		<div class="stars" id="starsContainer"></div>
+	</div>
+
+	<div class="container">
+		<div class="header">
+			<h1>ARCADE ZONE</h1>
+			<p>◆ MULTIPLAYER GAMES ◆</p>
+		</div>
+
+		<!-- User Panel -->
+		<div class="user-panel">
+		    
+		    <div id="loginView">
+		        <button class="arcade-btn" onclick="loginWithGoogle()">
+		            ⭐ SIGN IN WITH GOOGLE TO PLAY ⭐
+		        </button>
+		    </div>
+
+		    <div id="userView" style="display: none;">
+		        </div>
+		</div>
+
+		<!-- Games Grid -->
+		<div class="games-grid">
+			<!-- Star Catcher Card -->
+			<div class="game-card" onclick="openGame('catch')">
+				<div class="game-icon">⭐</div>
+				<h3 class="game-title">STAR CATCHER</h3>
+				<p class="game-description">Catch stars and power-ups while avoiding bombs!</p>
+				<div class="game-stats-preview">
+					<div class="stat-preview">
+						<div class="stat-preview-value" id="catchBestPreview">-</div>
+						<div class="stat-preview-label">Your Best</div>
+					</div>
+					<div class="stat-preview">
+						<div class="stat-preview-value" id="catchWorldPreview">-</div>
+						<div class="stat-preview-label">World Record</div>
+					</div>
+				</div>
+				<div style="text-align: center; margin-top: 1rem;">
+					<button class="arcade-btn" onclick="event.stopPropagation(); openGame('catch')">PLAY NOW</button>
+				</div>
+			</div>
+
+			<!-- Memory Game Card -->
+			<div class="game-card" onclick="openGame('memory')">
+				<div class="game-icon">🧠</div>
+				<h3 class="game-title">MEMORY MASTER</h3>
+				<p class="game-description">Match all pairs in the fewest moves!</p>
+				<div class="game-stats-preview">
+					<div class="stat-preview">
+						<div class="stat-preview-value" id="memoryBestPreview">-</div>
+						<div class="stat-preview-label">Your Best</div>
+					</div>
+					<div class="stat-preview">
+						<div class="stat-preview-value" id="memoryWorldPreview">-</div>
+						<div class="stat-preview-label">World Record</div>
+					</div>
+				</div>
+				<div style="text-align: center; margin-top: 1rem;">
+					<button class="arcade-btn" onclick="event.stopPropagation(); openGame('memory')">PLAY NOW</button>
+				</div>
+			</div>
+		</div>
+
+		<!-- Leaderboard Section -->
+		<div class="leaderboard-section">
+			<h2 class="leaderboard-title">◆ GLOBAL LEADERBOARD ◆</h2>
+			<div class="leaderboard-grid">
+				<div class="leaderboard-box">
+					<h3>⭐ STAR CATCHER</h3>
+					<ul class="leaderboard-list" id="catchLeaderboard">
+						<li class="no-scores">Loading...</li>
+					</ul>
+				</div>
+				<div class="leaderboard-box">
+					<h3>🧠 MEMORY MASTER</h3>
+					<ul class="leaderboard-list" id="memoryLeaderboard">
+						<li class="no-scores">Loading...</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Catch Game Modal -->
+	<div class="modal" id="catchModal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title">⭐ STAR CATCHER</h2>
+				<button class="close-btn" onclick="closeGame('catch')">×</button>
+			</div>
+
+			<div class="game-stats">
+				<div class="stat">
+					<div class="stat-value" id="catchScore">0</div>
+					<div class="stat-label">Score</div>
+				</div>
+				<div class="stat">
+					<div class="stat-value" id="catchTime">30</div>
+					<div class="stat-label">Time</div>
+				</div>
+				<div class="stat">
+					<div class="stat-value" id="catchMultiplier">x1</div>
+					<div class="stat-label">Multiplier</div>
+				</div>
+			</div>
+
+			<div class="catch-game-area" id="catchGameArea">
+				<div class="catcher" id="catcher">🎯</div>
+			</div>
+
+			<div style="text-align: center;">
+				<button class="arcade-btn" onclick="startCatchGame()" id="catchStartBtn">START GAME</button>
+			</div>
+
+			<div style="margin-top: 2rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 10px; font-size: 0.9rem;">
+				<strong>POWER-UPS:</strong><br>
+				⚡ Speed Boost | 🌟 Double Points | ⏰ Time Extension | 🛡️ Shield
+			</div>
+		</div>
+	</div>
+
+	<!-- Memory Game Modal -->
+	<div class="modal" id="memoryModal">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title">🧠 MEMORY MASTER</h2>
+				<button class="close-btn" onclick="closeGame('memory')">×</button>
+			</div>
+
+			<div class="game-stats">
+				<div class="stat">
+					<div class="stat-value" id="memoryMoves">0</div>
+					<div class="stat-label">Moves</div>
+				</div>
+				<div class="stat">
+					<div class="stat-value" id="memoryPairs">0/8</div>
+					<div class="stat-label">Pairs</div>
+				</div>
+				<div class="stat">
+					<div class="stat-value" id="memoryTime">0s</div>
+					<div class="stat-label">Time</div>
+				</div>
+			</div>
+
+			<div class="memory-grid" id="memoryGrid"></div>
+
+			<div style="text-align: center;">
+				<button class="arcade-btn" onclick="initMemoryGame()">NEW GAME</button>
+			</div>
+		</div>
+	</div>
+
+	<!-- Game Over Alert -->
+	<div class="game-over-alert" id="gameOverAlert">
+		<div style="font-size: 4rem;">🏆</div>
+		<h2>GAME OVER!</h2>
+		<p style="opacity: 0.8; margin-bottom: 0.5rem;">FINAL SCORE</p>
+		<div class="final-score-display" id="finalScore">0</div>
+		<button class="arcade-btn" onclick="closeGameOverAlert()" style="margin-top: 1rem;">CONTINUE</button>
+	</div>
+
+	<script>
+		// Initialize stars
+		const starsContainer = document.getElementById('starsContainer');
+		for (let i = 0; i < 100; i++) {
+			const star = document.createElement('div');
+			star.className = 'star';
+			star.style.left = Math.random() * 100 + '%';
+			star.style.top = Math.random() * 100 + '%';
+			star.style.animationDelay = Math.random() * 3 + 's';
+			starsContainer.appendChild(star);
+		}
+
+		// ===== AÑADE ESTO: INICIALIZACIÓN DE FIREBASE =====
+    
+	    // Pega aquí tu objeto de configuración que copiaste
+	    const firebaseConfig = {
+	      apiKey: "AIzaSyDipUw7d4av0JwfudVDdECNjZXdjy3OGyw",
+	      authDomain: "juego-arcade-scores.firebaseapp.com",
+	      projectId: "juego-arcade-scores",
+	      storageBucket: "juego-arcade-scores.firebasestorage.app",
+	      messagingSenderId: "33838418828",
+	      appId: "1:33838418828:web:5aa1579a7f645992c2a4a9",
+	      measurementId: "G-47JPGCPBM0"
+	    };
+
+	    // Inicializa Firebase y Firestore
+	    firebase.initializeApp(firebaseConfig);
+	    const db = firebase.firestore();
+	    
+	    // ===== FIN DE LA INICIALIZACIÓN DE FIREBASE =====
+
+// ===== USER MANAGEMENT & FIRESTORE LOGIC =====
+// 1. Define la variable 'auth'
+        const auth = firebase.auth();
+		let currentUser = null; // Esto ahora será un objeto de Firebase, no un string
+
+		// 2. Nueva función: Iniciar sesión con Google
+		async function loginWithGoogle() {
+			try {
+                // Crea un "proveedor" de Google
+				const provider = new firebase.auth.GoogleAuthProvider();
+                // Abre una ventana emergente para iniciar sesión
+				await auth.signInWithPopup(provider);
+                // El 'observer' (initAuth) se encargará del resto
+                
+			} catch (error) {
+				console.error("Error al iniciar sesión con Google:", error);
+                alert("Hubo un error al iniciar sesión.");
+			}
+		}
+
+		// 3. Nueva función: Salir
+		async function logout() {
+			try {
+                // Le dice a Firebase que cierre la sesión
+				await auth.signOut();
+                // El 'observer' (initAuth) se encargará del resto
+			} catch (error) {
+				console.error("Error al cerrar sesión:", error);
+			}
+		}
+
+        // 4. Nueva función: El "Observador"
+        // Esta función se ejecuta CADA VEZ que el estado de login cambia
+        function initAuth() {
+            auth.onAuthStateChanged(user => {
+                if (user) {
+                    // *** EL USUARIO ESTÁ CONECTADO ***
+                    console.log("Usuario conectado:", user.displayName, user.uid);
+                    currentUser = user; // Guardamos el objeto de usuario COMPLETO
+                    
+                    document.getElementById('loginView').style.display = 'none';
+                    document.getElementById('userView').style.display = 'flex';
+                    // Mostramos su nombre real de Google
+                    document.getElementById('displayUsername').textContent = user.displayName;
+                    
+                    loadUserStats();
+                    loadLeaderboards();
+                
+                } else {
+                    // *** EL USUARIO ESTÁ DESCONECTADO ***
+                    console.log("Usuario desconectado.");
+                    currentUser = null;
+                    
+                    document.getElementById('loginView').style.display = 'block';
+                    document.getElementById('userView').style.display = 'none';
+                    
+                    closeGame('catch');
+                    closeGame('memory');
+                    
+                    // Limpiar vistas previas y leaderboards
+                    document.getElementById('catchBestPreview').textContent = '-';
+                    document.getElementById('memoryBestPreview').textContent = '-';
+                    document.getElementById('memoryLeaderboard').innerHTML = '<li class="no-scores">Conéctate para ver</li>';
+                    document.getElementById('catchLeaderboard').innerHTML = '<li class="no-scores">Conéctate para ver</li>';
+                    
+                    // No cargamos los leaderboards globales si el usuario no está logueado
+                    document.getElementById('catchWorldPreview').textContent = '-';
+                    document.getElementById('memoryWorldPreview').textContent = '-';
+                }
+            });
+        }
+
+        // 5. Llama al observador cuando la página cargue
+        document.addEventListener('DOMContentLoaded', initAuth);
+
+		function isStorageAvailable() {
+			// Esta función ahora comprueba si 'db' (nuestra base de datos) existe.
+			return typeof db !== 'undefined' && db !== null;
+		}
+
+		async function loadUserStats() {
+            // Ahora currentUser es un objeto, por eso chequeamos 'currentUser.uid'
+			if (!currentUser || !currentUser.uid || !isStorageAvailable()) return;
+			
+			try {
+                // Usamos el UID, no el nombre
+				const docId = currentUser.uid; 
+				
+				// Cargar mejor puntaje de Catch
+				const catchDoc = await db.collection('user_best_catch').doc(docId).get();
+				if (catchDoc.exists) {
+					document.getElementById('catchBestPreview').textContent = catchDoc.data().score;
+				}
+
+				// Cargar mejor puntaje de Memory
+				const memoryDoc = await db.collection('user_best_memory').doc(docId).get();
+				if (memoryDoc.exists) {
+					document.getElementById('memoryBestPreview').textContent = memoryDoc.data().score;
+				}
+			} catch (error) {
+				console.error('Error loading user stats:', error);
+			}
+		}
+
+		async function saveScore(game, score) {
+			if (!currentUser || !currentUser.uid || !isStorageAvailable()) {
+                console.log('User not logged in or DB not available. Score not saved.');
+                return;
+            }
+			
+            const isCatchGame = game === 'catch';
+            const collectionName = isCatchGame ? 'user_best_catch' : 'user_best_memory';
+            
+            // ⬇️ ESTE ES EL CAMBIO MÁS IMPORTANTE ⬇️
+            // El ID del documento ahora es el UID del usuario
+            const docId = currentUser.uid;
+            const docRef = db.collection(collectionName).doc(docId);
+            // ⬆️ FIN DEL CAMBIO IMPORTANTE ⬆️
+
+			try {
+                const doc = await docRef.get();
+                let shouldSave = false;
+
+                if (!doc.exists) {
+                    shouldSave = true;
+                } else {
+                    const existingScore = doc.data().score;
+                    if (isCatchGame) {
+                        if (score > existingScore) shouldSave = true;
+                    } else {
+                        if (score < existingScore) shouldSave = true;
+                    }
+                }
+
+                if (shouldSave) {
+                    console.log(`Saving new best score for ${game}: ${score}`);
+                    await docRef.set({
+                        // También guardamos el nombre (displayName) para mostrarlo en el leaderboard
+                        username: currentUser.displayName, 
+                        score: score,
+                        timestamp: new Date()
+                    });
+                    
+                    await loadUserStats();
+                    await loadLeaderboards();
+                } else {
+                    console.log(`Score ${score} is not better than existing. Not saving.`);
+                }
+			} catch (error) {
+				console.error('Error saving score:', error);
+			}
+		}
+
+		async function loadLeaderboards() {
+			if (!isStorageAvailable()) {
+				document.getElementById('catchLeaderboard').innerHTML = '<li class="no-scores">Database not available</li>';
+				document.getElementById('memoryLeaderboard').innerHTML = '<li class="no-scores">Database not available</li>';
+				return;
+			}
+			await loadCatchLeaderboard();
+			await loadMemoryLeaderboard();
+		}
+
+		async function loadCatchLeaderboard() {
+			if (!isStorageAvailable()) return;
+			
+            const leaderboardEl = document.getElementById('catchLeaderboard');
+            leaderboardEl.innerHTML = '<li class="no-scores">Loading...</li>';
+            
+			try {
+                // Pedir a Firestore los 10 mejores, ordenados por 'score' descendente
+                const snapshot = await db.collection('user_best_catch')
+                                         .orderBy('score', 'desc')
+                                         .limit(10)
+                                         .get();
+
+				if (snapshot.empty) {
+					leaderboardEl.innerHTML = '<li class="no-scores">No scores yet. Be the first!</li>';
+					document.getElementById('catchWorldPreview').textContent = '-';
+					return;
+				}
+
+                const sortedScores = snapshot.docs.map(doc => doc.data());
+
+                // Actualizar el "World Record"
+				document.getElementById('catchWorldPreview').textContent = sortedScores[0].score;
+
+				leaderboardEl.innerHTML = sortedScores.map((score, index) => {
+					const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+					const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+					return `
+						<li class="leaderboard-item ${rankClass}">
+							<span class="leaderboard-rank">${medal}</span>
+							<span class="leaderboard-name">${score.username}</span>
+							<span class="leaderboard-score">${score.score}</span>
+						</li>
+					`;
+				}).join('');
+			} catch (error) {
+				console.error('Error loading catch leaderboard:', error);
+                leaderboardEl.innerHTML = '<li class="no-scores">Error loading scores</li>';
+			}
+		}
+
+		async function loadMemoryLeaderboard() {
+            if (!isStorageAvailable()) return;
+            
+            const leaderboardEl = document.getElementById('memoryLeaderboard');
+            leaderboardEl.innerHTML = '<li class="no-scores">Loading...</li>';
+            
+			try {
+                // Pedir a Firestore los 10 mejores, ordenados por 'score' ascendente (menos movimientos es mejor)
+                const snapshot = await db.collection('user_best_memory')
+                                         .orderBy('score', 'asc')
+                                         .limit(10)
+                                         .get();
+                
+				if (snapshot.empty) {
+					leaderboardEl.innerHTML = '<li class="no-scores">No scores yet. Be the first!</li>';
+					document.getElementById('memoryWorldPreview').textContent = '-';
+					return;
+				}
+
+                const sortedScores = snapshot.docs.map(doc => doc.data());
+
+                // Actualizar el "World Record"
+				document.getElementById('memoryWorldPreview').textContent = sortedScores[0].score;
+
+				leaderboardEl.innerHTML = sortedScores.map((score, index) => {
+					const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+					const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+					return `
+						<li class="leaderboard-item ${rankClass}">
+							<span class="leaderboard-rank">${medal}</span>
+							<span class="leaderboard-name">${score.username}</span>
+							<span class="leaderboard-score">${score.score}</span>
+						</li>
+					`;
+				}).join('');
+			} catch (error)
+            {
+				console.error('Error loading memory leaderboard:', error);
+                leaderboardEl.innerHTML = '<li class="no-scores">Error loading scores</li>';
+			}
+		}
+
+		// ===== MODAL MANAGEMENT =====
+
+		// ===== MODAL MANAGEMENT =====
+		function openGame(game) {
+			if (!currentUser) {
+				alert('Please login first!');
+				return;
+			}
+
+			if (game === 'catch') {
+				document.getElementById('catchModal').classList.add('active');
+			} else if (game === 'memory') {
+				document.getElementById('memoryModal').classList.add('active');
+				initMemoryGame();
+			}
+		}
+
+		function closeGame(game) {
+			if (game === 'catch') {
+				stopCatchGame();
+				document.getElementById('catchModal').classList.remove('active');
+			} else if (game === 'memory') {
+				document.getElementById('memoryModal').classList.remove('active');
+			}
+		}
+
+		// ===== CATCH GAME =====
+		let catchGameActive = false;
+		let catchScore = 0;
+		let catchTime = 30;
+		let catchMultiplier = 1;
+		let catchInterval;
+		let catchTimer;
+		let itemCheckIntervals = [];
+		let hasShield = false;
+		let catcherSpeed = 1;
+
+		function startCatchGame() {
+			if (catchGameActive || !currentUser) return;
+			
+			document.getElementById('gameOverAlert').classList.remove('active');
+			
+			catchGameActive = true;
+			catchScore = 0;
+			catchTime = 30;
+			catchMultiplier = 1;
+			hasShield = false;
+			catcherSpeed = 1;
+			
+			document.getElementById('catchScore').textContent = catchScore;
+			document.getElementById('catchTime').textContent = catchTime;
+			document.getElementById('catchMultiplier').textContent = 'x' + catchMultiplier;
+			document.getElementById('catcher').style.filter = 'drop-shadow(0 0 10px rgba(255, 190, 11, 0.8))';
+			
+			document.querySelectorAll('.falling-item').forEach(item => item.remove());
+			
+			document.getElementById('catchStartBtn').disabled = true;
+			
+			catchInterval = setInterval(createFallingItem, 700);
+			catchTimer = setInterval(() => {
+				catchTime--;
+				document.getElementById('catchTime').textContent = catchTime;
+				if (catchTime <= 0) {
+					stopCatchGame();
+					showGameOverAlert();
+				}
+			}, 1000);
+		}
+
+		function stopCatchGame() {
+			catchGameActive = false;
+			clearInterval(catchInterval);
+			clearInterval(catchTimer);
+			
+			itemCheckIntervals.forEach(interval => clearInterval(interval));
+			itemCheckIntervals = [];
+			
+			document.querySelectorAll('.falling-item').forEach(item => item.remove());
+			
+			document.getElementById('catchStartBtn').disabled = false;
+		}
+
+		function createFallingItem() {
+			if (!catchGameActive) return;
+			
+			const item = document.createElement('div');
+			item.className = 'falling-item';
+			
+			const rand = Math.random();
+			let itemType;
+			
+			if (rand < 0.15) {
+				itemType = 'bomb';
+				item.textContent = '💣';
+			} else if (rand < 0.25) {
+				// Power-ups
+				const powerups = ['⚡', '🌟', '⏰', '🛡️'];
+				const powerup = powerups[Math.floor(Math.random() * powerups.length)];
+				item.textContent = powerup;
+				itemType = 'powerup';
+				item.dataset.powerup = powerup;
+				item.classList.add('powerup');
+			} else {
+				itemType = 'star';
+				item.textContent = '⭐';
+			}
+			
+			item.dataset.type = itemType;
+			
+			const gameWidth = document.getElementById('catchGameArea').offsetWidth;
+			item.style.left = Math.random() * (gameWidth - 60) + 'px';
+			item.style.top = '-50px';
+			
+			const duration = Math.random() * 2 + 2.5;
+			item.style.animation = `fall ${duration}s linear`;
+			
+			document.getElementById('catchGameArea').appendChild(item);
+			
+			let hasCollided = false;
+			
+			const checkCollision = setInterval(() => {
+				if (!catchGameActive || !item.parentElement || hasCollided) {
+					clearInterval(checkCollision);
+					const index = itemCheckIntervals.indexOf(checkCollision);
+					if (index > -1) itemCheckIntervals.splice(index, 1);
+					return;
+				}
+				
+				const itemRect = item.getBoundingClientRect();
+				const catcherRect = document.getElementById('catcher').getBoundingClientRect();
+				
+				if (itemRect.bottom >= catcherRect.top &&
+					itemRect.top <= catcherRect.bottom &&
+					itemRect.right >= catcherRect.left &&
+					itemRect.left <= catcherRect.right) {
+					
+					hasCollided = true;
+					
+					if (item.dataset.type === 'star') {
+						catchScore += 10 * catchMultiplier;
+						document.getElementById('catchScore').textContent = catchScore;
+						item.style.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
+						item.style.transform = 'scale(2)';
+						item.style.opacity = '0';
+					} else if (item.dataset.type === 'powerup') {
+						applyPowerup(item.dataset.powerup);
+						item.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+						item.style.transform = 'scale(2) rotate(360deg)';
+						item.style.opacity = '0';
+					} else if (item.dataset.type === 'bomb') {
+						if (!hasShield) {
+							catchScore = Math.max(0, catchScore - 30);
+							document.getElementById('catchScore').textContent = catchScore;
+							
+							const catcher = document.getElementById('catcher');
+							catcher.style.animation = 'shake 0.3s ease-in-out';
+							setTimeout(() => catcher.style.animation = '', 300);
+						} else {
+							hasShield = false;
+							document.getElementById('catcher').style.filter = 'drop-shadow(0 0 10px rgba(255, 190, 11, 0.8))';
+						}
+					}
+					
+					setTimeout(() => {
+						if (item.parentElement) item.remove();
+					}, 300);
+					
+					clearInterval(checkCollision);
+					const index = itemCheckIntervals.indexOf(checkCollision);
+					if (index > -1) itemCheckIntervals.splice(index, 1);
+				}
+			}, 30);
+			
+			itemCheckIntervals.push(checkCollision);
+			
+			setTimeout(() => {
+				if (item.parentElement) item.remove();
+				clearInterval(checkCollision);
+				const index = itemCheckIntervals.indexOf(checkCollision);
+				if (index > -1) itemCheckIntervals.splice(index, 1);
+			}, duration * 1000 + 500);
+		}
+
+		function applyPowerup(powerup) {
+			switch(powerup) {
+				case '⚡':
+					catcherSpeed = 1.5;
+					setTimeout(() => catcherSpeed = 1, 5000);
+					break;
+				case '🌟':
+					catchMultiplier = 2;
+					document.getElementById('catchMultiplier').textContent = 'x' + catchMultiplier;
+					setTimeout(() => {
+						catchMultiplier = 1;
+						document.getElementById('catchMultiplier').textContent = 'x' + catchMultiplier;
+					}, 5000);
+					break;
+				case '⏰':
+					catchTime += 10;
+					document.getElementById('catchTime').textContent = catchTime;
+					break;
+				case '🛡️':
+					hasShield = true;
+					document.getElementById('catcher').style.filter = 'drop-shadow(0 0 20px rgba(0, 255, 249, 1))';
+					break;
+			}
+		}
+
+		async function showGameOverAlert() {
+			document.getElementById('finalScore').textContent = catchScore;
+			document.getElementById('gameOverAlert').classList.add('active');
+			await saveScore('catch', catchScore);
+		}
+
+		function closeGameOverAlert() {
+			document.getElementById('gameOverAlert').classList.remove('active');
+		}
+
+		let catcherX = 0;
+		document.getElementById('catchGameArea').addEventListener('mousemove', (e) => {
+			if (!catchGameActive) return;
+			const game = document.getElementById('catchGameArea');
+			const catcher = document.getElementById('catcher');
+			const rect = game.getBoundingClientRect();
+			catcherX = e.clientX - rect.left - 40;
+			catcherX = Math.max(0, Math.min(catcherX, game.offsetWidth - 80));
+			catcher.style.left = catcherX + 'px';
+		});
+
+		// Touch support for mobile
+		document.getElementById('catchGameArea').addEventListener('touchmove', (e) => {
+			if (!catchGameActive) return;
+			e.preventDefault();
+			const game = document.getElementById('catchGameArea');
+			const catcher = document.getElementById('catcher');
+			const rect = game.getBoundingClientRect();
+			const touch = e.touches[0];
+			catcherX = touch.clientX - rect.left - 40;
+			catcherX = Math.max(0, Math.min(catcherX, game.offsetWidth - 80));
+			catcher.style.left = catcherX + 'px';
+		});
+
+		// ===== MEMORY GAME =====
+		const emojis = ['🎮', '🕹️', '👾', '🎯', '🎲', '🃏', '🎰', '🏆'];
+		let memoryCards = [];
+		let flippedCards = [];
+		let moves = 0;
+		let pairs = 0;
+		let memoryGameActive = false;
+		let memoryStartTime = 0;
+		let memoryTimer;
+
+		function initMemoryGame() {
+			if (!currentUser) return;
+			
+			const gameContainer = document.getElementById('memoryGrid');
+			gameContainer.innerHTML = '';
+			memoryCards = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+			flippedCards = [];
+			moves = 0;
+			pairs = 0;
+			memoryGameActive = true;
+			memoryStartTime = Date.now();
+			
+			document.getElementById('memoryMoves').textContent = moves;
+			document.getElementById('memoryPairs').textContent = `${pairs}/8`;
+			document.getElementById('memoryTime').textContent = '0s';
+
+			if (memoryTimer) clearInterval(memoryTimer);
+			memoryTimer = setInterval(() => {
+				const elapsed = Math.floor((Date.now() - memoryStartTime) / 1000);
+				document.getElementById('memoryTime').textContent = elapsed + 's';
+			}, 1000);
+
+			memoryCards.forEach((emoji, index) => {
+				const card = document.createElement('div');
+				card.className = 'memory-card';
+				card.dataset.emoji = emoji;
+				card.dataset.index = index;
+				card.addEventListener('click', flipCard);
+				gameContainer.appendChild(card);
+			});
+		}
+
+		function flipCard() {
+			if (!memoryGameActive) return;
+			if (flippedCards.length === 2 || this.classList.contains('flipped') || this.classList.contains('matched')) {
+				return;
+			}
+
+			this.textContent = this.dataset.emoji;
+			this.classList.add('flipped');
+			flippedCards.push(this);
+
+			if (flippedCards.length === 2) {
+				moves++;
+				document.getElementById('memoryMoves').textContent = moves;
+				
+				setTimeout(async () => {
+					if (flippedCards[0].dataset.emoji === flippedCards[1].dataset.emoji) {
+						flippedCards[0].classList.add('matched');
+						flippedCards[1].classList.add('matched');
+						pairs++;
+						document.getElementById('memoryPairs').textContent = `${pairs}/8`;
+						
+						if (pairs === 8) {
+							memoryGameActive = false;
+							clearInterval(memoryTimer);
+							setTimeout(async () => {
+								alert(`🎉 Congratulations! You completed the game in ${moves} moves!`);
+								await saveScore('memory', moves);
+							}, 300);
+						}
+					} else {
+						flippedCards[0].textContent = '';
+						flippedCards[1].textContent = '';
+						flippedCards[0].classList.remove('flipped');
+						flippedCards[1].classList.remove('flipped');
+					}
+					flippedCards = [];
+				}, 800);
+			}
+		}
+
+		// Add shake and fall animations
+		const style = document.createElement('style');
+		style.textContent = `
+			@keyframes shake {
+				0%, 100% { transform: translateX(0); }
+				25% { transform: translateX(-10px); }
+				75% { transform: translateX(10px); }
+			}
+			@keyframes fall {
+				to { transform: translateY(550px); }
+			}
+		`;
+		document.head.appendChild(style);
+
+		// Load leaderboards on page load
+		window.addEventListener('load', async () => {
+			// Esperar a que storage esté disponible
+			let attempts = 0;
+			const checkStorage = setInterval(async () => {
+				attempts++;
+				if (isStorageAvailable()) {
+					clearInterval(checkStorage);
+					await loadLeaderboards();
+				} else if (attempts > 20) {
+					clearInterval(checkStorage);
+					console.log('Storage not available after 2 seconds');
+					document.getElementById('catchLeaderboard').innerHTML = '<li class="no-scores">Storage not available</li>';
+					document.getElementById('memoryLeaderboard').innerHTML = '<li class="no-scores">Storage not available</li>';
+				}
+			}, 100);
+		});
+	</script>
+	</body>
+</html>
