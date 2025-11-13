@@ -1368,9 +1368,9 @@
 			
 			const gameWidth = document.getElementById('catchGameArea').offsetWidth;
 			item.style.left = Math.random() * (gameWidth - 60) + 'px';
-			item.style.top = '-50px';
-			
-			const baseDuration = Math.random() * 2 + 3.5; 
+			item.style.top = '-80px'; // Más arriba para dar más espacio
+
+			const baseDuration = Math.random() * 1.5 + 4; // Duración más larga y menos aleatoria
 			const duration = baseDuration / catcherSpeed;
 			item.style.animation = `fall ${duration}s linear`;
 			
@@ -1438,7 +1438,7 @@
 				clearInterval(checkCollision);
 				const index = itemCheckIntervals.indexOf(checkCollision);
 				if (index > -1) itemCheckIntervals.splice(index, 1);
-			}, duration * 1000 + 500);
+			}, duration * 1000 + 1000); // Aumentado de 500 a 1000ms extra
 		}
 
 		function applyPowerup(powerup) {
