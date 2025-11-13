@@ -466,12 +466,14 @@
 		.memory-grid {
 			display: grid;
 			grid-template-columns: repeat(4, 1fr);
-			gap: 0.8rem; /* Reducido de 1rem */
-			margin-bottom: 1rem; /* Reducido de 2rem */
-			max-width: 500px; /* Reducido de 600px */
-		    margin-left: auto;
-		    margin-right: auto;
-			flex-shrink: 0; /* Evita que se encoja */
+			gap: 0.8rem;
+			margin-bottom: 1rem;
+			max-width: 500px;
+			margin-left: auto;
+			margin-right: auto;
+			flex-shrink: 0;
+			/* AÑADE ESTO: */
+			min-height: 0; /* Permite que el grid respete el aspect-ratio de las cartas */
 		}
 
 		.memory-card {
@@ -487,6 +489,9 @@
 			transition: all 0.4s ease;
 			position: relative;
 			transform-style: preserve-3d;
+			/* AÑADE ESTAS LÍNEAS PARA EVITAR EL CAMBIO DE TAMAÑO */
+			min-height: 0; /* Importante para que aspect-ratio funcione bien */
+			will-change: transform; /* Optimiza la animación */
 		}
 
 		.memory-card:hover:not(.flipped):not(.matched) {
@@ -498,7 +503,7 @@
 		.memory-card.flipped {
 			background: linear-gradient(135deg, rgba(255, 0, 110, 0.3), rgba(131, 56, 236, 0.3));
 			border-color: var(--neon-pink);
-			transform: rotateY(180deg);
+			transform: rotateY(180deg) scale(1); /* Añadido scale(1) para mantener tamaño */
 		}
 
 		.memory-card.matched {
@@ -506,11 +511,13 @@
 			border-color: var(--neon-yellow);
 			cursor: default;
 			animation: matchPulse 0.5s ease;
+			transform: scale(1); /* Asegura que vuelva a tamaño normal */
 		}
 
 		@keyframes matchPulse {
-			0%, 100% { transform: scale(1); }
+			0% { transform: scale(1); }
 			50% { transform: scale(1.1); }
+			100% { transform: scale(1); }
 		}
 
 		/* Leaderboard */
@@ -699,9 +706,15 @@
 			}
 			.memory-grid {
 				gap: 0.5rem;
+				max-width: 90%; /* Asegura que no sea muy grande */
 			}
 			.memory-card {
 				font-size: 2rem;
+				/* Asegura que las cartas no crezcan en móvil */
+				transform: scale(1) !important;
+			}
+			.memory-card:hover:not(.flipped):not(.matched) {
+				transform: scale(1.02) !important; /* Hover más sutil en móvil */
 			}
 
 			/* Alerta de Game Over */
@@ -795,12 +808,6 @@
 			.catch-game-area {
 				height: 400px;
 			}
-		}
-
-		/* Para tablets y móviles horizontal */
-		@media (max-width: 768px) {
-			.catch-game-area {
-			height: 350px; /* Más pequeño en móvil */
 		}
 	</style>
 	<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
@@ -1554,7 +1561,7 @@
 			
 			document.getElementById('memoryMoves').textContent = moves;
 			document.getElementById('memoryPairs').textContent = `${pairs}/8`;
-			
+
 			memoryCards.forEach((emoji, index) => {
 				const card = document.createElement('div');
 				card.className = 'memory-card';
