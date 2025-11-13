@@ -672,6 +672,7 @@ body {
 	margin-right: auto;
 	flex-shrink: 0;
 	grid-auto-rows: 1fr;
+	contain: layout;
 }
 
 .memory-card {
@@ -690,6 +691,8 @@ body {
 	position: relative;
 	transform-style: preserve-3d;
 	transform: scale(1); 
+	transform-origin: center center;
+	backface-visibility: hidden;
 	user-select: none;
 	box-shadow: 
 		0 0 20px rgba(0, 255, 249, 0.3),
