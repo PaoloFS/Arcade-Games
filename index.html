@@ -343,11 +343,13 @@
 			padding: 2rem;
 			max-width: 900px;
 			width: 90%;
-			max-height: 90vh;
+			max-height: 85vh; /* Cambiado de 90vh a 85vh */
 			overflow-y: auto;
 			position: relative;
 			box-shadow: 0 0 50px rgba(0, 255, 249, 0.5);
 			animation: slideUp 0.4s ease;
+			display: flex;
+			flex-direction: column;
 		}
 
 		@keyframes slideUp {
@@ -419,19 +421,17 @@
 		.catch-game-area {
 		    position: relative;
 		    width: 100%;
-		    
-		    /* --- AÑADE ESTAS 3 LÍNEAS --- */
-		    max-width: 700px; /* Un límite de 700px se ve bien con 500px de alto */
+		    max-width: 700px;
 		    margin-left: auto;
 		    margin-right: auto;
-		    
-		    height: 500px;
+		    height: 400px; /* Reducido de 500px a 400px */
 		    background: linear-gradient(180deg, #0a0e27 0%, #1a1035 100%);
 		    border: 3px solid var(--neon-cyan);
 		    border-radius: 15px;
 		    overflow: hidden;
-		    margin-bottom: 1.5rem;
+		    margin-bottom: 1rem; /* Reducido de 1.5rem a 1rem */
 		    box-shadow: inset 0 0 50px rgba(0, 255, 249, 0.2);
+		    flex-shrink: 0; /* Evita que se encoja */
 		}
 		
 		.catcher {
@@ -466,11 +466,12 @@
 		.memory-grid {
 			display: grid;
 			grid-template-columns: repeat(4, 1fr);
-			gap: 1rem;
-			margin-bottom: 2rem;
-			max-width: 600px;  /* Límite para que las cartas no sean gigantes */
+			gap: 0.8rem; /* Reducido de 1rem */
+			margin-bottom: 1rem; /* Reducido de 2rem */
+			max-width: 500px; /* Reducido de 600px */
 		    margin-left: auto;
 		    margin-right: auto;
+			flex-shrink: 0; /* Evita que se encoja */
 		}
 
 		.memory-card {
@@ -694,7 +695,7 @@
 				font-size: 1.8rem;
 			}
 			.catch-game-area {
-				height: 400px; /* Área de juego más pequeña */
+				height: 350px; /* Más pequeño en móvil */
 			}
 			.memory-grid {
 				gap: 0.5rem;
@@ -767,6 +768,39 @@
 			.falling-item {
 				font-size: 2rem;
 			}
+		}
+		/* Para pantallas grandes (laptops/PC) */
+		@media (min-width: 1200px) {
+			.modal-content {
+				max-width: 800px;
+				max-height: 80vh;
+			}
+			
+			.catch-game-area {
+				height: 450px;
+			}
+			
+			.memory-grid {
+				max-width: 550px;
+			}
+		}
+
+		/* Para tablets y pantallas medianas */
+		@media (min-width: 769px) and (max-width: 1199px) {
+			.modal-content {
+				max-width: 700px;
+				max-height: 85vh;
+			}
+			
+			.catch-game-area {
+				height: 400px;
+			}
+		}
+
+		/* Para tablets y móviles horizontal */
+		@media (max-width: 768px) {
+			.catch-game-area {
+			height: 350px; /* Más pequeño en móvil */
 		}
 	</style>
 	<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
@@ -926,10 +960,6 @@
 				<div class="stat">
 					<div class="stat-value" id="memoryPairs">0/8</div>
 					<div class="stat-label">Pairs</div>
-				</div>
-				<div class="stat">
-					<div class="stat-value" id="memoryTime">0s</div>
-					<div class="stat-label">Time</div>
 				</div>
 			</div>
 
@@ -1524,14 +1554,7 @@
 			
 			document.getElementById('memoryMoves').textContent = moves;
 			document.getElementById('memoryPairs').textContent = `${pairs}/8`;
-			document.getElementById('memoryTime').textContent = '0s';
-
-			if (memoryTimer) clearInterval(memoryTimer);
-			memoryTimer = setInterval(() => {
-				const elapsed = Math.floor((Date.now() - memoryStartTime) / 1000);
-				document.getElementById('memoryTime').textContent = elapsed + 's';
-			}, 1000);
-
+			
 			memoryCards.forEach((emoji, index) => {
 				const card = document.createElement('div');
 				card.className = 'memory-card';
