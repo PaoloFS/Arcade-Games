@@ -672,7 +672,6 @@ body {
 	margin-right: auto;
 	flex-shrink: 0;
 	grid-auto-rows: 1fr;
-	contain: layout;
 }
 
 .memory-card {
@@ -690,9 +689,8 @@ body {
 	transition: all 0.4s ease;
 	position: relative;
 	transform-style: preserve-3d;
-	transform: scale(1); 
-	transform-origin: center center;
-	backface-visibility: hidden;
+	transform: scale(1) translateZ(0);
+	will-change: transform;
 	user-select: none;
 	box-shadow: 
 		0 0 20px rgba(0, 255, 249, 0.3),
@@ -700,7 +698,7 @@ body {
 }
 
 .memory-card:hover:not(.flipped):not(.matched) {
-	transform: scale(1.05);
+	transform: scale(1.05) translateZ(0);
 	border-color: var(--neon-pink);
 	box-shadow: 
 		0 0 30px rgba(255, 0, 110, 0.5),
@@ -710,7 +708,7 @@ body {
 .memory-card.flipped {
 	background: linear-gradient(135deg, rgba(255, 0, 110, 0.4), rgba(131, 56, 236, 0.4));
 	border-color: var(--neon-pink);
-	transform: rotateY(180deg) scale(1);
+	transform: rotateY(180deg) scale(1) translateZ(0);
 	box-shadow: 
 		0 0 30px rgba(255, 0, 110, 0.6),
 		inset 0 0 30px rgba(255, 0, 110, 0.2);
@@ -721,7 +719,7 @@ body {
 	border-color: var(--neon-yellow);
 	cursor: default;
 	animation: matchPulse 0.6s ease;
-	transform: scale(1);
+	transform: scale(1) translateZ(0);
 	box-shadow: 
 		0 0 40px rgba(255, 190, 11, 0.8),
 		inset 0 0 30px rgba(255, 190, 11, 0.3);
