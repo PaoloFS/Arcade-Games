@@ -679,15 +679,25 @@
 
 		<!-- User Panel -->
 		<div class="user-panel">
-		    
-		    <div id="loginView">
-		        <button class="arcade-btn" onclick="loginWithGoogle()">
-		            ⭐ SIGN IN WITH GOOGLE TO PLAY ⭐
-		        </button>
-		    </div>
-
-		    <div id="userView" style="display: none;">
-		        </div>
+		    
+		    <div id="loginView">
+		        <button class="arcade-btn" onclick="loginWithGoogle()">
+		            ⭐ SIGN IN WITH GOOGLE TO PLAY ⭐
+		        </button>
+		    </div>
+		
+		        <div id="userView" style="display: none;">
+		        <div class="user-info">
+		            <div class="user-avatar">🎮</div>
+		            <div>
+		                                <div class="user-name" id="displayUsername"></div> 
+		                
+		                <div style="font-size: 0.8rem; opacity: 0.7;">PLAYER</div>
+		            </div>
+		        </div>
+		        <button class="arcade-btn" onclick="logout()">LOGOUT</button>
+		    </div>
+		
 		</div>
 
 		<!-- Games Grid -->
