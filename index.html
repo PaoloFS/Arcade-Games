@@ -950,6 +950,29 @@
 		<button class="arcade-btn" onclick="closeGameOverAlert()" style="margin-top: 1rem;">CONTINUE</button>
 	</div>
 
+	<!-- Memory Victory Alert -->
+	<div class="game-over-alert" id="memoryVictoryAlert">
+		<div style="font-size: 4rem;">🎉</div>
+		<h2>PERFECT!</h2>
+		<p style="opacity: 0.8; margin-bottom: 0.5rem;">COMPLETED IN</p>
+		<div class="final-score-display" id="finalMoves">0</div>
+		<p style="font-size: 1.2rem; margin-top: 0.5rem;">MOVES</p>
+		<button class="arcade-btn" onclick="closeMemoryVictory()" style="margin-top: 1rem;">PLAY AGAIN</button>
+	</div>
+
+	<!-- Login Required Alert -->
+	<div class="game-over-alert" id="loginAlert">
+		<div style="font-size: 4rem;">🔒</div>
+		<h2 style="font-size: 1.5rem;">LOGIN REQUIRED</h2>
+		<p style="opacity: 0.8; margin: 1.5rem 0; font-size: 1rem;">Sign in with Google to save your scores and compete on the leaderboard!</p>
+		<button class="arcade-btn" onclick="closeLoginAlert(); loginWithGoogle();" style="margin-top: 1rem;">
+			⭐ SIGN IN NOW ⭐
+		</button>
+		<button class="arcade-btn" onclick="closeLoginAlert()" style="margin-top: 0.5rem; background: rgba(255,255,255,0.1);">
+			CANCEL
+		</button>
+	</div>
+
 	<script>
 		// Initialize stars
 		const starsContainer = document.getElementById('starsContainer');
@@ -1227,7 +1250,8 @@
 		// ===== MODAL MANAGEMENT =====
 		function openGame(game) {
 			if (!currentUser) {
-				alert('Please login first!');
+				// En lugar de alert(), mostrar el nuevo modal
+				document.getElementById('loginAlert').classList.add('active');
 				return;
 			}
 
@@ -1246,6 +1270,17 @@
 			} else if (game === 'memory') {
 				document.getElementById('memoryModal').classList.remove('active');
 			}
+		}
+
+		// Función para cerrar la alerta de login
+		function closeLoginAlert() {
+			document.getElementById('loginAlert').classList.remove('active');
+		}
+
+		// Función para cerrar la victoria de Memory
+		function closeMemoryVictory() {
+			document.getElementById('memoryVictoryAlert').classList.remove('active');
+			initMemoryGame(); // Reinicia automáticamente
 		}
 
 		// ===== CATCH GAME =====
@@ -1335,7 +1370,8 @@
 			item.style.left = Math.random() * (gameWidth - 60) + 'px';
 			item.style.top = '-50px';
 			
-			const duration = Math.random() * 2 + 2.5;
+			const baseDuration = Math.random() * 2 + 3.5; 
+			const duration = baseDuration / catcherSpeed;
 			item.style.animation = `fall ${duration}s linear`;
 			
 			document.getElementById('catchGameArea').appendChild(item);
@@ -1531,7 +1567,9 @@
 							memoryGameActive = false;
 							clearInterval(memoryTimer);
 							setTimeout(async () => {
-								alert(`🎉 Congratulations! You completed the game in ${moves} moves!`);
+								// Mostrar el nuevo modal personalizado
+								document.getElementById('finalMoves').textContent = moves;
+								document.getElementById('memoryVictoryAlert').classList.add('active');
 								await saveScore('memory', moves);
 							}, 300);
 						}
