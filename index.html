@@ -177,6 +177,7 @@ body {
 	line-height: 1.4;
 	margin-bottom: var(--spacing-sm);
 	filter: drop-shadow(0 0 25px rgba(0, 255, 249, 0.6)) drop-shadow(0 0 50px rgba(255, 0, 110, 0.4));
+	will-change: filter;
 	animation: gradientShift 3s ease infinite;
 }
 
@@ -522,6 +523,8 @@ body {
 	width: 100%;
 	max-height: 90vh;
 	overflow-y: auto;
+	overflow-x: hidden; /* Prevenir scroll horizontal */
+	box-sizing: border-box;
 	position: relative;
 	box-shadow: 
 		0 0 60px rgba(0, 255, 249, 0.5),
@@ -640,7 +643,7 @@ body {
 	transition: left 0.05s linear;
 	cursor: move;
 	filter: drop-shadow(0 0 12px rgba(255, 190, 11, 0.9));
-	z-index: 10;
+	z-index: 100;
 	user-select: none;
 }
 
@@ -688,7 +691,6 @@ body {
 	font-size: clamp(2rem, 6vw, 3rem);
 	transition: all 0.4s ease;
 	position: relative;
-	transform-style: preserve-3d;
 	transform: scale(1) translateZ(0);
 	will-change: transform;
 	user-select: none;
@@ -867,7 +869,7 @@ body {
 		0 0 60px rgba(255, 0, 110, 0.6),
 		inset 0 0 40px rgba(255, 255, 255, 0.2);
 	text-align: center;
-	z-index: 2000;
+	z-index: 1001;
 	transition: transform 0.3s ease;
 	max-width: min(500px, 90vw);
 }
@@ -995,6 +997,10 @@ body {
 	.memory-card:active:not(.flipped):not(.matched) {
 		transform: scale(0.95);
 	}
+}
+@keyframes fall {
+	from { transform: translateY(0); }
+	to { transform: translateY(calc(100vh - 100px)); }
 }
 	</style>
 	<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
