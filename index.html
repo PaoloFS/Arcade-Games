@@ -1413,6 +1413,41 @@
 .symbol-btn:active {
     transform: scale(0.95);
 }
+
+.site-footer {
+    text-align: center;
+    margin-block-start: var(--space-xl);
+    padding-block: var(--space-md);
+    font-size: var(--fs-sm);
+    color: var(--clr-neon-cyan);
+    opacity: 0.8;
+    
+    /* Línea superior para separarlo, a juego con el tema */
+    border-block-start: 2px solid color-mix(in oklch, var(--clr-neon-cyan), transparent 70%);
+    box-shadow: 0 -10px 25px color-mix(in oklch, var(--clr-neon-cyan), transparent 85%);
+  }
+  
+  .site-footer p {
+    line-height: 1.6;
+  }
+
+  .site-footer a,
+  .site-footer a:visited {
+    color: var(--clr-neon-yellow); /* Color destacado para tu nombre */
+    font-weight: 700;
+    text-decoration: none;
+    transition: all var(--transition-base);
+    text-shadow: 0 0 10px var(--clr-neon-yellow);
+  }
+
+  .site-footer a:hover,
+  .site-footer a:focus {
+    color: white;
+    text-decoration: underline;
+    text-shadow: 
+      0 0 15px var(--clr-neon-yellow),
+      0 0 25px color-mix(in oklch, var(--clr-neon-yellow), transparent 50%);
+  }
 }
 
 
@@ -1895,6 +1930,15 @@
         </div>
     </div>
 </section>
+
+</div>
+    <footer class="site-footer" role="contentinfo">
+      <p>
+        © 2025 Arcade Zone. Designed & Coded by 
+        <a href="https://github.com/PaoloFS" target="_blank" rel="noopener noreferrer">PaoloFS</a>.
+      </p>
+    </footer>
+
 
 	</div>
 
@@ -2530,6 +2574,8 @@
 	        </div>
 	    </div>
 	</div>
+
+
 </body>
 
 	<script>
