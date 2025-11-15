@@ -1,219 +1,2309 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcade - Temporarily Offline</title>
-    
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
-    
-    <style>
-       /* ============================================
- * RESET & DESIGN TOKENS (FLUID + MODERN)
- * ============================================ */
-*, *::before, *::after {
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Arcade Zone - Multiplayer Games</title>
+	<style>
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap');
+
+/* ============================================
+   MODERN CSS ARCHITECTURE 2025
+   - CSS Cascade Layers para organización
+   - Container Queries para responsividad
+   - Custom Properties con fallbacks
+   - Animaciones GPU-optimizadas
+   - Logical Properties para i18n
+============================================ */
+
+@layer reset, tokens, base, components, utilities, animations;
+
+/* ============================================
+   LAYER: RESET
+============================================ */
+@layer reset {
+  *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-}
+  }
 
-:root {
-    /* Neon OKLCH Colors */
-    --neon-cyan: oklch(0.85 0.25 195);
-    --neon-pink: oklch(0.70 0.30 350);
-    --neon-yellow: oklch(0.90 0.20 85);
-    --neon-purple: oklch(0.65 0.22 290);
+  :where(img, picture, video, canvas, svg) {
+    display: block;
+    max-inline-size: 100%;
+  }
 
-    /* Backgrounds */
-    --bg-dark: oklch(0.12 0.02 265);
-    --bg-darker: oklch(0.07 0.01 265);
-    --bg-card: oklch(0.17 0.03 265 / 0.90);
-
-    /* Fluid Spacing */
-    --space-xs: clamp(0.5rem, 0.45rem + 0.5vw, 1rem);
-    --space-sm: clamp(0.75rem, 0.65rem + 0.6vw, 1.25rem);
-    --space-md: clamp(1.25rem, 1.10rem + 0.9vw, 2rem);
-    --space-lg: clamp(2rem, 1.75rem + 1vw, 3rem);
-
-    /* Fluid Typography */
-    --fs-base: clamp(0.95rem, 0.80rem + 0.6vw, 1.25rem);
-    --fs-lg: clamp(1.25rem, 1rem + 1vw, 1.75rem);
-    --fs-2xl: clamp(1.8rem, 1.5rem + 2vw, 3rem);
-
-    /* Radius */
-    --radius-lg: clamp(1rem, 0.7rem + 1vw, 2rem);
-
-    /* Fonts */
-    --font-pixel: "Press Start 2P", monospace;
-    --font-sans: "Space Grotesk", sans-serif;
+  :where(input, button, textarea, select) {
+    font: inherit;
+  }
 }
 
 /* ============================================
- * BASE LAYOUT & BACKGROUND
- * ============================================ */
-html {
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
+   LAYER: DESIGN TOKENS
+============================================ */
+@layer tokens {
+  :root {
+    /* Colors - Neon Palette */
+    --clr-neon-cyan: oklch(90% 0.25 195);
+    --clr-neon-pink: oklch(65% 0.28 350);
+    --clr-neon-yellow: oklch(85% 0.22 90);
+    --clr-neon-purple: oklch(60% 0.25 285);
+    --clr-neon-green: oklch(80% 0.30 145);
+    
+    /* Backgrounds */
+    --clr-bg-dark: oklch(15% 0.05 255);
+    --clr-bg-darker: oklch(10% 0.03 255);
+    --clr-card-bg: oklch(18% 0.04 255 / 0.95);
+    
+    /* Fluid Spacing Scale */
+    --space-3xs: clamp(0.25rem, 0.23rem + 0.11vw, 0.31rem);
+    --space-2xs: clamp(0.5rem, 0.46rem + 0.22vw, 0.63rem);
+    --space-xs: clamp(0.75rem, 0.68rem + 0.33vw, 0.94rem);
+    --space-sm: clamp(1rem, 0.91rem + 0.43vw, 1.25rem);
+    --space-md: clamp(1.5rem, 1.37rem + 0.65vw, 1.88rem);
+    --space-lg: clamp(2rem, 1.83rem + 0.87vw, 2.5rem);
+    --space-xl: clamp(3rem, 2.74rem + 1.3vw, 3.75rem);
+    --space-2xl: clamp(4rem, 3.65rem + 1.74vw, 5rem);
+    
+    /* Fluid Typography Scale */
+    --fs-xs: clamp(0.75rem, 0.71rem + 0.22vw, 0.88rem);
+    --fs-sm: clamp(0.88rem, 0.83rem + 0.24vw, 1rem);
+    --fs-base: clamp(1rem, 0.96rem + 0.22vw, 1.13rem);
+    --fs-md: clamp(1.13rem, 1.08rem + 0.24vw, 1.27rem);
+    --fs-lg: clamp(1.27rem, 1.19rem + 0.38vw, 1.5rem);
+    --fs-xl: clamp(1.5rem, 1.37rem + 0.65vw, 1.88rem);
+    --fs-2xl: clamp(1.88rem, 1.63rem + 1.2vw, 2.5rem);
+    --fs-3xl: clamp(2.5rem, 2.07rem + 2.17vw, 3.75rem);
+    
+    /* Border Radius */
+    --radius-sm: 0.5rem;
+    --radius-md: 1rem;
+    --radius-lg: 1.5rem;
+    --radius-full: 9999px;
+    
+    /* Transitions */
+    --transition-fast: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: 500ms cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    /* Shadows */
+    --shadow-glow-cyan: 0 0 20px color-mix(in oklch, var(--clr-neon-cyan), transparent 40%);
+    --shadow-glow-pink: 0 0 20px color-mix(in oklch, var(--clr-neon-pink), transparent 40%);
+    --shadow-glow-yellow: 0 0 20px color-mix(in oklch, var(--clr-neon-yellow), transparent 40%);
+    
+    /* Z-index Scale */
+    --z-base: 1;
+    --z-elevated: 10;
+    --z-modal: 100;
+    --z-alert: 1000;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+    }
+  }
 }
 
-body {
+/* ============================================
+   LAYER: BASE STYLES
+============================================ */
+@layer base {
+  html {
+    color-scheme: dark;
+    hanging-punctuation: first last;
+  }
+
+  body {
+    min-block-size: 100vh;
     min-block-size: 100dvh;
-    background: radial-gradient(
-        ellipse at top,
-        oklch(0.18 0.05 265),
-        var(--bg-dark) 60%,
-        var(--bg-darker)
+    font-family: 'Orbitron', system-ui, sans-serif;
+    color: white;
+    background: 
+      radial-gradient(ellipse at top, 
+        oklch(25% 0.08 255) 0%, 
+        oklch(15% 0.05 255) 50%, 
+        oklch(5% 0.02 255) 100%);
+    background-attachment: fixed;
+    overflow-x: clip;
+    position: relative;
+    
+    /* Performance optimizations */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Animated Background - Optimized */
+  .animated-bg {
+    position: fixed;
+    inset: 0;
+    z-index: 0;
+    overflow: hidden;
+    pointer-events: none;
+    contain: layout style paint;
+  }
+
+  /* Perspective Grid */
+  .grid-lines {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      linear-gradient(color-mix(in oklch, var(--clr-neon-cyan), transparent 70%) 1px, transparent 1px),
+      linear-gradient(90deg, color-mix(in oklch, var(--clr-neon-cyan), transparent 70%) 1px, transparent 1px);
+    background-size: 50px 50px;
+    opacity: 0.3;
+    transform: perspective(500px) rotateX(60deg);
+    will-change: transform;
+    animation: gridMove 25s linear infinite;
+  }
+
+  /* Floating Particles */
+  .animated-bg::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle, var(--clr-neon-cyan) 1px, transparent 1px),
+      radial-gradient(circle, var(--clr-neon-pink) 1px, transparent 1px),
+      radial-gradient(circle, var(--clr-neon-purple) 1px, transparent 1px);
+    background-size: 300px 300px, 400px 400px, 350px 350px;
+    background-position: 0 0, 100px 100px, 200px 50px;
+    opacity: 0.15;
+    will-change: background-position;
+    animation: particleFloat 30s ease-in-out infinite;
+  }
+
+  /* Light Rays */
+  .animated-bg::after {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    background: 
+      conic-gradient(from 0deg at 50% 50%, 
+        transparent 0deg, 
+        color-mix(in oklch, var(--clr-neon-cyan), transparent 95%) 45deg,
+        transparent 90deg,
+        color-mix(in oklch, var(--clr-neon-pink), transparent 95%) 135deg,
+        transparent 180deg);
+    will-change: transform;
+    animation: lightRotate 40s linear infinite;
+  }
+
+  /* Starfield */
+  .stars {
+    position: absolute;
+    inset: 0;
+  }
+
+  .star {
+    position: absolute;
+    inline-size: 2px;
+    block-size: 2px;
+    background: white;
+    border-radius: var(--radius-full);
+    box-shadow: 
+      0 0 4px color-mix(in oklch, white, transparent 50%),
+      0 0 8px color-mix(in oklch, var(--clr-neon-cyan), transparent 70%);
+    will-change: opacity, transform;
+    animation: twinkle 3s ease-in-out infinite;
+  }
+
+  /* Container */
+  .container {
+    position: relative;
+    z-index: var(--z-base);
+    max-inline-size: min(1400px, 96vw);
+    margin-inline: auto;
+    padding-block: var(--space-md);
+    padding-inline: var(--space-sm);
+  }
+}
+
+/* ============================================
+   LAYER: COMPONENTS
+============================================ */
+@layer components {
+  
+  /* Header */
+  .header {
+    text-align: center;
+    margin-block-end: var(--space-xl);
+    padding-block: var(--space-md);
+    container-type: inline-size;
+  }
+
+  .header h1 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: var(--fs-2xl);
+    line-height: 1.4;
+    margin-block-end: var(--space-sm);
+    
+    background: linear-gradient(
+      90deg,
+      var(--clr-neon-cyan) 0%,
+      var(--clr-neon-pink) 25%,
+      var(--clr-neon-yellow) 50%,
+      var(--clr-neon-purple) 75%,
+      var(--clr-neon-cyan) 100%
     );
-    color: oklch(0.96 0 0);
+    background-size: 200% auto;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    
+    filter: drop-shadow(0 0 20px color-mix(in oklch, var(--clr-neon-cyan), transparent 30%));
+    will-change: background-position;
+    animation: gradientFlow 8s linear infinite;
+  }
+
+  .header p {
+    font-size: var(--fs-base);
+    color: var(--clr-neon-cyan);
+    letter-spacing: 0.1em;
+    text-shadow: 
+      0 0 10px var(--clr-neon-cyan),
+      0 0 20px color-mix(in oklch, var(--clr-neon-cyan), transparent 50%);
+  }
+
+  /* User Panel */
+  .user-panel {
+    position: relative;
+    background: var(--clr-card-bg);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    margin-block-end: var(--space-xl);
+    backdrop-filter: blur(12px);
+    
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-md);
+    
+    container-type: inline-size;
+    contain: layout style paint;
+    isolation: isolate;
+  }
+
+  .user-panel::before {
+    content: '';
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      var(--clr-neon-cyan),
+      var(--clr-neon-pink),
+      var(--clr-neon-yellow),
+      var(--clr-neon-cyan)
+    );
+    background-size: 200% 100%;
+    z-index: -1;
+    will-change: background-position;
+    animation: borderFlow 6s linear infinite;
+    mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    padding: 2px;
+  }
+
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: var(--space-sm);
+  }
+
+  .user-avatar {
+    inline-size: clamp(50px, 10cqi, 70px);
+    block-size: clamp(50px, 10cqi, 70px);
+    background: linear-gradient(135deg, var(--clr-neon-pink), var(--clr-neon-purple));
+    border-radius: var(--radius-full);
+    border: 3px solid var(--clr-neon-cyan);
+    
+    display: grid;
+    place-items: center;
+    font-size: clamp(1.5rem, 5cqi, 2.5rem);
+    
+    box-shadow: 
+      0 0 20px color-mix(in oklch, var(--clr-neon-pink), transparent 40%),
+      inset 0 0 20px color-mix(in oklch, white, transparent 70%);
+    
+    flex-shrink: 0;
+    contain: layout style paint;
+  }
+
+  .user-name {
+    font-size: var(--fs-md);
+    font-weight: 700;
+    color: var(--clr-neon-yellow);
+    text-shadow: 
+      0 0 10px var(--clr-neon-yellow),
+      0 0 20px color-mix(in oklch, var(--clr-neon-yellow), transparent 50%);
+    word-break: break-word;
+    max-inline-size: 30ch;
+  }
+
+  /* Input Group */
+  .input-group {
+    display: flex;
+    gap: var(--space-sm);
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .arcade-input {
+    padding-block: 0.75rem;
+    padding-inline: 1rem;
+    background: oklch(10% 0.03 255 / 0.6);
+    border: 2px solid var(--clr-neon-cyan);
+    border-radius: var(--radius-sm);
+    color: white;
+    font-family: inherit;
+    font-size: var(--fs-sm);
+    min-inline-size: min(180px, 100%);
+    
+    transition: all var(--transition-base);
+    box-shadow: 
+      inset 0 0 15px color-mix(in oklch, var(--clr-neon-cyan), transparent 70%),
+      0 0 10px color-mix(in oklch, var(--clr-neon-cyan), transparent 80%);
+  }
+
+  .arcade-input:focus {
+    outline: none;
+    border-color: var(--clr-neon-pink);
+    background: oklch(10% 0.03 255 / 0.8);
+    box-shadow: 
+      0 0 20px color-mix(in oklch, var(--clr-neon-pink), transparent 50%),
+      inset 0 0 20px color-mix(in oklch, var(--clr-neon-pink), transparent 70%);
+  }
+
+  .arcade-input::placeholder {
+    color: color-mix(in oklch, white, transparent 50%);
+  }
+
+  /* Buttons */
+  .arcade-btn {
+    position: relative;
+    padding-block: 0.75rem;
+    padding-inline: 1.5rem;
+    
+    background: linear-gradient(135deg, var(--clr-neon-pink), var(--clr-neon-purple));
+    border: 2px solid var(--clr-neon-cyan);
+    border-radius: var(--radius-sm);
+    color: white;
+    
+    font-family: inherit;
+    font-weight: 700;
+    font-size: var(--fs-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    
+    cursor: pointer;
+    overflow: hidden;
+    white-space: nowrap;
+    
+    transition: all var(--transition-base);
+    box-shadow: 
+      0 0 15px color-mix(in oklch, var(--clr-neon-pink), transparent 50%),
+      0 4px 15px oklch(10% 0.03 255 / 0.5);
+    
+    contain: layout style paint;
+    z-index: 1;
+  }
+
+	.arcade-btn::before {
+	  content: '';
+	  position: absolute;
+	  top: 50%;
+	  left: 50%;
+	  inline-size: 0;
+	  block-size: 0;
+	  background: color-mix(in oklch, white, transparent 60%);
+	  border-radius: var(--radius-full);
+	  transform: translate(-50%, -50%);
+	  transition: inline-size 800ms ease-out, block-size 800ms ease-out;
+	  pointer-events: none;
+	  z-index: 0;
+	}
+
+  .arcade-btn:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: 
+      0 8px 30px color-mix(in oklch, var(--clr-neon-pink), transparent 30%),
+      0 0 30px color-mix(in oklch, var(--clr-neon-cyan), transparent 50%);
+  }
+
+  .arcade-btn:hover::before {
+	  inline-size: 500px;
+	  block-size: 500px;
+	}
+
+  .arcade-btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .arcade-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .arcade-btn > * {
+	  position: relative;
+	  z-index: 2;
+	}
+
+  /* Game Cards */
+  .games-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
+    gap: var(--space-lg);
+    margin-block-end: var(--space-xl);
+    container-type: inline-size;
+  }
+
+  .game-card {
+    position: relative;
+    background: var(--clr-card-bg);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    
+    cursor: pointer;
+    overflow: hidden;
+    backdrop-filter: blur(12px);
+    
+    transition: all var(--transition-slow);
+    box-shadow: 0 10px 30px oklch(5% 0.02 255 / 0.6);
+    
+    contain: layout style paint;
+    content-visibility: auto;
+    isolation: isolate;
+  }
+
+  .game-card::before {
+    content: '';
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      var(--clr-neon-cyan),
+      var(--clr-neon-pink),
+      var(--clr-neon-purple)
+    );
+    background-size: 200% 200%;
+    z-index: -1;
+    opacity: 0.5;
+    will-change: background-position, opacity;
+    animation: borderGlow 8s ease-in-out infinite;
+    mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    padding: 2px;
+  }
+
+  .game-card:hover {
+    transform: translateY(-8px) scale(1.02);
+    box-shadow: 
+      0 20px 50px color-mix(in oklch, var(--clr-neon-cyan), transparent 50%),
+      0 0 40px color-mix(in oklch, var(--clr-neon-pink), transparent 60%);
+  }
+
+  .game-card:hover::before {
+    opacity: 1;
+  }
+
+  .game-icon {
+    font-size: clamp(3.5rem, 12cqi, 5rem);
+    text-align: center;
+    margin-block-end: var(--space-sm);
+    filter: drop-shadow(0 0 15px currentColor);
+  }
+
+  .game-card:nth-child(1) .game-icon {
+    color: var(--clr-neon-yellow);
+  }
+
+  .game-card:nth-child(2) .game-icon {
+    color: var(--clr-neon-pink);
+  }
+
+  .game-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: var(--fs-md);
+    text-align: center;
+    margin-block-end: var(--space-sm);
+    color: var(--clr-neon-cyan);
+    line-height: 1.6;
+    text-shadow: 
+      0 0 10px var(--clr-neon-cyan),
+      0 0 20px color-mix(in oklch, var(--clr-neon-cyan), transparent 60%);
+    word-wrap: break-word;
+  }
+
+  .game-description {
+    text-align: center;
+    opacity: 0.9;
+    margin-block-end: var(--space-md);
+    font-size: var(--fs-sm);
+    line-height: 1.6;
+    color: color-mix(in oklch, white, transparent 15%);
+  }
+
+  .game-stats-preview {
+    display: flex;
+    justify-content: space-around;
+    padding: var(--space-sm);
+    background: oklch(10% 0.03 255 / 0.5);
+    border-radius: var(--radius-md);
+    margin-block-end: var(--space-sm);
+    gap: var(--space-sm);
+    border: 2px solid color-mix(in oklch, var(--clr-neon-cyan), transparent 70%);
+    box-shadow: 
+      inset 0 0 20px color-mix(in oklch, var(--clr-neon-cyan), transparent 90%),
+      0 0 10px color-mix(in oklch, var(--clr-neon-cyan), transparent 80%);
+  }
+
+  .stat-preview {
+    text-align: center;
+    flex: 1;
+  }
+
+  .stat-preview-value {
+    font-size: var(--fs-lg);
+    font-weight: 700;
+    color: var(--clr-neon-yellow);
+    text-shadow: 
+      0 0 10px var(--clr-neon-yellow),
+      0 0 20px color-mix(in oklch, var(--clr-neon-yellow), transparent 50%);
+  }
+
+  .stat-preview-label {
+    font-size: var(--fs-xs);
+    opacity: 0.7;
+    text-transform: uppercase;
+    margin-block-start: 0.25rem;
+  }
+
+  /* Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: oklch(5% 0.02 255 / 0.95);
+    z-index: var(--z-modal);
+    backdrop-filter: blur(10px);
+  }
+
+  .modal.active {
     display: grid;
     place-items: center;
     padding: var(--space-md);
+    animation: fadeIn 300ms ease;
+  }
+
+  .modal-content {
     position: relative;
-    overflow: hidden;
-    font-family: var(--font-sans);
-}
-
-/* Dynamic grid background */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background-image:
-        linear-gradient(90deg, var(--neon-cyan) 1px, transparent 1px),
-        linear-gradient(0deg, var(--neon-cyan) 1px, transparent 1px);
-    background-size: 55px 55px;
-    opacity: 0.03;
-    animation: gridMove 36s linear infinite;
-    z-index: 0;
-}
-
-/* Holographic glow particles */
-body::after {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background:
-        radial-gradient(circle at 20% 30%, var(--neon-cyan) 2px, transparent 2px),
-        radial-gradient(circle at 80% 60%, var(--neon-pink) 2px, transparent 2px),
-        radial-gradient(circle at 50% 80%, var(--neon-yellow) 2px, transparent 2px);
-    background-size: 250px 250px, 300px 300px, 350px 350px;
-    opacity: 0.07;
-    animation: particlesFloat 50s ease-in-out infinite;
-    z-index: 0;
-}
-
-/* ============================================
- * MAIN CARD
- * ============================================ */
-.message-card {
-    position: relative;
-    z-index: 10;
-    padding: var(--space-lg);
-    background: var(--bg-card);
-    border-radius: var(--radius-lg);
-    backdrop-filter: blur(22px);
-    -webkit-backdrop-filter: blur(22px);
-    border: 2px solid transparent;
-    background-clip: padding-box;
-    box-shadow: 0 0 30px oklch(0 0 0 / 0.55);
-
-    /* Fluid width for PC + iPhone */
-    max-inline-size: clamp(320px, 90vw, 520px);
-
-    animation: fadeSlide 1.4s ease-out both;
-}
-
-/* Animated border */
-.message-card::before {
-    content: "";
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    padding: 2px;
     background: linear-gradient(
-        105deg,
-        var(--neon-cyan),
-        var(--neon-pink),
-        var(--neon-yellow),
-        var(--neon-cyan)
+      135deg,
+      oklch(15% 0.04 255 / 0.98),
+      oklch(20% 0.05 255 / 0.98)
     );
-    background-size: 300% 100%;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box,
-                   linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    animation: borderFlow 6s linear infinite;
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    max-inline-size: min(850px, 96vw);
+    inline-size: 100%;
+    max-block-size: 92vh;
+    max-block-size: 92dvh;
+    
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-md);
+    
+    animation: slideUp 400ms cubic-bezier(0.4, 0, 0.2, 1);
+    contain: layout style paint;
+    isolation: isolate;
+  }
+
+  .modal-content::before {
+    content: '';
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    background: linear-gradient(
+      90deg,
+      var(--clr-neon-cyan),
+      var(--clr-neon-pink),
+      var(--clr-neon-yellow),
+      var(--clr-neon-cyan)
+    );
+    background-size: 200% 100%;
     z-index: -1;
-}
+    will-change: background-position;
+    animation: borderFlow 6s linear infinite;
+    mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    padding: 2px;
+  }
 
-/* ============================================
- * TEXT
- * ============================================ */
-h1 {
-    font-family: var(--font-pixel);
-    font-size: var(--fs-2xl);
-    color: var(--neon-yellow);
-    text-shadow: 0 0 15px var(--neon-yellow);
-    margin-block-end: var(--space-sm);
+  .modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-block-end: var(--space-sm);
+    border-block-end: 2px solid var(--clr-neon-cyan);
+    gap: var(--space-sm);
+    box-shadow: 0 4px 15px color-mix(in oklch, var(--clr-neon-cyan), transparent 70%);
+  }
+
+  .modal-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: var(--fs-lg);
+    color: var(--clr-neon-yellow);
     line-height: 1.5;
-    text-wrap: balance;
-}
+    text-shadow: 
+      0 0 10px var(--clr-neon-yellow),
+      0 0 20px color-mix(in oklch, var(--clr-neon-yellow), transparent 50%);
+    word-wrap: break-word;
+    flex: 1;
+  }
 
-p {
-    font-size: var(--fs-base);
-    color: var(--neon-cyan);
-    text-shadow: 0 0 10px var(--neon-cyan);
-    line-height: 1.7;
-    opacity: 0.92;
-    max-inline-size: 45ch;
+  .close-btn {
+    background: transparent;
+    border: 2px solid var(--clr-neon-pink);
+    color: var(--clr-neon-pink);
+    inline-size: clamp(42px, 10cqi, 50px);
+    block-size: clamp(42px, 10cqi, 50px);
+    border-radius: var(--radius-full);
+    
+    cursor: pointer;
+    font-size: var(--fs-lg);
+    transition: all var(--transition-base);
+    flex-shrink: 0;
+    
+    display: grid;
+    place-items: center;
+    
+    box-shadow: 
+      0 0 15px color-mix(in oklch, var(--clr-neon-pink), transparent 50%),
+      inset 0 0 10px color-mix(in oklch, var(--clr-neon-pink), transparent 80%);
+  }
+
+  .close-btn:hover {
+    background: var(--clr-neon-pink);
+    color: white;
+    transform: rotate(90deg) scale(1.1);
+    box-shadow: 0 0 25px var(--clr-neon-pink);
+  }
+
+  /* Game Stats */
+  .game-stats {
+    display: flex;
+    justify-content: space-around;
+    flex-wrap: wrap;
+    padding: var(--space-md);
+    background: oklch(10% 0.03 255 / 0.5);
+    border-radius: var(--radius-md);
+    gap: var(--space-md);
+    border: 2px solid color-mix(in oklch, var(--clr-neon-cyan), transparent 60%);
+    box-shadow: 
+      inset 0 0 20px color-mix(in oklch, var(--clr-neon-cyan), transparent 85%),
+      0 0 15px color-mix(in oklch, var(--clr-neon-cyan), transparent 70%);
+    flex-shrink: 0;
+  }
+
+  .stat {
+    text-align: center;
+    flex: 1;
+    min-inline-size: min(80px, 100%);
+  }
+
+  .stat-value {
+    font-size: var(--fs-xl);
+    font-weight: 700;
+    color: var(--clr-neon-yellow);
+    font-family: 'Press Start 2P', cursive;
+    text-shadow: 
+      0 0 12px var(--clr-neon-yellow),
+      0 0 24px color-mix(in oklch, var(--clr-neon-yellow), transparent 50%);
+  }
+
+  .stat-label {
+    font-size: var(--fs-xs);
+    opacity: 0.7;
+    text-transform: uppercase;
+    margin-block-start: 0.3rem;
+  }
+
+  /* Catch Game Area */
+  .catch-game-area {
+    position: relative;
+    inline-size: 100%;
+    max-inline-size: min(650px, 100%);
     margin-inline: auto;
-    text-wrap: balance;
+    block-size: clamp(280px, 45vh, 420px);
+    block-size: clamp(280px, 45dvh, 420px);
+    
+    background: linear-gradient(180deg, 
+      oklch(15% 0.05 255) 0%, 
+      oklch(18% 0.06 270) 100%);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    flex-shrink: 0;
+    contain: layout style paint;
+    isolation: isolate;
+  }
+
+  .catch-game-area::before {
+    content: '';
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    background: linear-gradient(
+      45deg,
+      var(--clr-neon-cyan),
+      var(--clr-neon-pink),
+      var(--clr-neon-yellow),
+      var(--clr-neon-cyan)
+    );
+    background-size: 200% 200%;
+    z-index: -1;
+    will-change: background-position;
+    animation: borderGlow 8s ease-in-out infinite;
+    mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    padding: 2px;
+  }
+
+  .catch-game-area::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at center,
+      transparent 0%,
+      color-mix(in oklch, var(--clr-neon-cyan), transparent 90%) 100%
+    );
+    pointer-events: none;
+  }
+
+  .catcher {
+    position: absolute;
+    inset-block-end: clamp(15px, 3vh, 25px);
+    inline-size: clamp(55px, 11vw, 75px);
+    block-size: clamp(55px, 11vw, 75px);
+    font-size: clamp(2.2rem, 5.5vw, 3rem);
+    
+    transition: inset-inline-start 50ms linear;
+    cursor: move;
+    touch-action: none;
+    user-select: none;
+    
+    filter: drop-shadow(0 0 12px var(--clr-neon-yellow));
+    z-index: 100;
+    
+    display: grid;
+    place-items: center;
+    contain: layout style paint;
+  }
+
+  .falling-item {
+    position: absolute;
+    font-size: clamp(1.8rem, 4.5vw, 2.5rem);
+    pointer-events: none;
+    user-select: none;
+    filter: drop-shadow(0 0 8px currentColor);
+    will-change: transform;
+    animation: itemSpin 2s linear infinite;
+  }
+
+  .powerup {
+    animation: itemSpin 2s linear infinite, powerupPulse 1s ease-in-out infinite;
+  }
+
+  /* Memory Game */
+  .memory-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(0.4rem, 2cqi, 0.9rem);
+    max-inline-size: min(480px, 100%);
+    margin-inline: auto;
+    margin-block-end: var(--space-md);
+    flex-shrink: 0;
+    container-type: inline-size;
+  }
+
+  .memory-card {
+    aspect-ratio: 1;
+    min-block-size: clamp(55px, 15cqi, 90px);
+    
+    background: linear-gradient(135deg, 
+      color-mix(in oklch, var(--clr-neon-cyan), transparent 80%),
+      color-mix(in oklch, var(--clr-neon-purple), transparent 80%));
+    border: 3px solid var(--clr-neon-cyan);
+    border-radius: var(--radius-md);
+    
+    cursor: pointer;
+    user-select: none;
+    
+    display: grid;
+    place-items: center;
+    font-size: clamp(1.8rem, 6cqi, 3rem);
+    
+    transition: all var(--transition-slow);
+    box-shadow: 
+      0 0 15px color-mix(in oklch, var(--clr-neon-cyan), transparent 60%),
+      inset 0 0 15px color-mix(in oklch, var(--clr-neon-cyan), transparent 85%);
+    
+    contain: layout style paint;
+  }
+
+  .memory-card:hover:not(.flipped):not(.matched) {
+    transform: scale(1.05);
+    border-color: var(--clr-neon-pink);
+    box-shadow: 
+      0 0 25px color-mix(in oklch, var(--clr-neon-pink), transparent 40%),
+      inset 0 0 20px color-mix(in oklch, var(--clr-neon-pink), transparent 70%);
+  }
+
+  .memory-card.flipped {
+    background: linear-gradient(135deg, 
+      color-mix(in oklch, var(--clr-neon-pink), transparent 50%),
+      color-mix(in oklch, var(--clr-neon-purple), transparent 50%));
+    border-color: var(--clr-neon-pink);
+    transform: rotateY(180deg);
+    box-shadow: 
+      0 0 25px color-mix(in oklch, var(--clr-neon-pink), transparent 40%),
+      inset 0 0 25px color-mix(in oklch, var(--clr-neon-pink), transparent 70%);
+  }
+
+  .memory-card.matched {
+    background: linear-gradient(135deg, 
+      color-mix(in oklch, var(--clr-neon-cyan), transparent 50%),
+      color-mix(in oklch, var(--clr-neon-yellow), transparent 50%));
+    border-color: var(--clr-neon-yellow);
+    cursor: default;
+    animation: matchFlash 600ms ease;
+    box-shadow: 
+      0 0 30px var(--clr-neon-yellow),
+      inset 0 0 25px color-mix(in oklch, var(--clr-neon-yellow), transparent 60%);
+  }
+
+  /* Leaderboard */
+  .leaderboard-section {
+    position: relative;
+    background: var(--clr-card-bg);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    padding: var(--space-lg);
+    backdrop-filter: blur(12px);
+    contain: layout style paint;
+    isolation: isolate;
+  }
+
+  .leaderboard-section::before {
+    content: '';
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    background: linear-gradient(
+      135deg,
+      var(--clr-neon-purple),
+      var(--clr-neon-pink),
+      var(--clr-neon-cyan),
+      var(--clr-neon-purple)
+    );
+    background-size: 200% 200%;
+    z-index: -1;
+    will-change: background-position;
+    animation: borderGlow 10s ease-in-out infinite;
+    mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask: 
+      linear-gradient(#fff 0 0) content-box, 
+      linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    padding: 2px;
+  }
+
+  .leaderboard-title {
+    font-family: 'Press Start 2P', cursive;
+    font-size: var(--fs-lg);
+    text-align: center;
+    margin-block-end: var(--space-lg);
+    color: var(--clr-neon-yellow);
+    line-height: 1.5;
+    text-shadow: 
+      0 0 15px var(--clr-neon-yellow),
+      0 0 30px color-mix(in oklch, var(--clr-neon-yellow), transparent 50%);
+    word-wrap: break-word;
+  }
+
+  .leaderboard-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
+    gap: var(--space-lg);
+  }
+
+  .leaderboard-box {
+    background: oklch(10% 0.03 255 / 0.5);
+    border: 2px solid color-mix(in oklch, var(--clr-neon-cyan), transparent 60%);
+    border-radius: var(--radius-lg);
+    padding: var(--space-md);
+    box-shadow: 
+      0 0 20px color-mix(in oklch, var(--clr-neon-cyan), transparent 70%),
+      inset 0 0 25px color-mix(in oklch, var(--clr-neon-cyan), transparent 90%);
+  }
+
+  .leaderboard-box h3 {
+    text-align: center;
+    color: var(--clr-neon-pink);
+    margin-block-end: var(--space-md);
+    font-size: var(--fs-md);
+    text-shadow: 
+      0 0 12px var(--clr-neon-pink),
+      0 0 24px color-mix(in oklch, var(--clr-neon-pink), transparent 50%);
+    word-wrap: break-word;
+  }
+
+  .leaderboard-list {
+    list-style: none;
+  }
+
+  .leaderboard-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--space-sm);
+    margin-block-end: var(--space-xs);
+    background: color-mix(in oklch, var(--clr-neon-cyan), transparent 92%);
+    border: 2px solid color-mix(in oklch, var(--clr-neon-cyan), transparent 70%);
+    border-radius: var(--radius-md);
+    gap: var(--space-xs);
+    transition: all var(--transition-base);
+    contain: layout style paint;
+  }
+
+  .leaderboard-item:hover {
+    background: color-mix(in oklch, var(--clr-neon-cyan), transparent 80%);
+    transform: translateX(8px) scale(1.02);
+    border-color: var(--clr-neon-cyan);
+    box-shadow: 0 0 20px color-mix(in oklch, var(--clr-neon-cyan), transparent 50%);
+  }
+
+  .leaderboard-item.top-1 {
+    background: linear-gradient(135deg, 
+      oklch(70% 0.15 85 / 0.4),
+      oklch(65% 0.12 85 / 0.3));
+    border: 2px solid oklch(80% 0.15 85);
+    box-shadow: 
+      0 0 25px oklch(80% 0.15 85 / 0.6),
+      inset 0 0 20px oklch(80% 0.15 85 / 0.2);
+  }
+
+  .leaderboard-item.top-2 {
+    background: linear-gradient(135deg, 
+      oklch(75% 0.01 0 / 0.4),
+      oklch(70% 0.01 0 / 0.3));
+    border: 2px solid oklch(80% 0.01 0);
+    box-shadow: 
+      0 0 25px oklch(80% 0.01 0 / 0.6),
+      inset 0 0 20px oklch(80% 0.01 0 / 0.2);
+  }
+
+  .leaderboard-item.top-3 {
+    background: linear-gradient(135deg, 
+      oklch(60% 0.12 55 / 0.4),
+      oklch(55% 0.10 55 / 0.3));
+    border: 2px solid oklch(65% 0.12 55);
+    box-shadow: 
+      0 0 25px oklch(65% 0.12 55 / 0.6),
+      inset 0 0 20px oklch(65% 0.12 55 / 0.2);
+  }
+
+  .leaderboard-rank {
+    font-size: var(--fs-md);
+    font-weight: 700;
+    min-inline-size: clamp(35px, 10cqi, 50px);
+    text-align: center;
+    text-shadow: 0 0 8px currentColor;
+  }
+
+  .leaderboard-name {
+    flex: 1;
+    margin-inline: var(--space-xs);
+    font-weight: 600;
+    font-size: var(--fs-sm);
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .leaderboard-score {
+    font-size: var(--fs-md);
+    font-weight: 700;
+    color: var(--clr-neon-yellow);
+    text-shadow: 
+      0 0 10px var(--clr-neon-yellow),
+      0 0 20px color-mix(in oklch, var(--clr-neon-yellow), transparent 50%);
+  }
+
+  .no-scores {
+    text-align: center;
+    opacity: 0.5;
+    padding: var(--space-lg);
+    font-style: italic;
+    font-size: var(--fs-sm);
+  }
+
+  /* Game Over Alert */
+  .game-over-alert {
+    position: fixed;
+    inset-block-start: 50%;
+    inset-inline-start: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    
+    background: linear-gradient(135deg, 
+      var(--clr-neon-purple), 
+      var(--clr-neon-pink));
+    padding: var(--space-xl);
+    border-radius: var(--radius-lg);
+    border: 3px solid var(--clr-neon-cyan);
+    
+    box-shadow: 
+      0 0 80px color-mix(in oklch, var(--clr-neon-cyan), transparent 20%),
+      0 0 50px color-mix(in oklch, var(--clr-neon-pink), transparent 40%),
+      inset 0 0 30px color-mix(in oklch, white, transparent 70%);
+    
+    text-align: center;
+    z-index: var(--z-alert);
+    max-inline-size: min(480px, 92vw);
+    
+    transition: transform var(--transition-slow);
+    contain: layout style paint;
+  }
+
+  .game-over-alert.active {
+    transform: translate(-50%, -50%) scale(1);
+    animation: alertPulse 1s ease-in-out;
+  }
+
+  .game-over-alert h2 {
+    font-family: 'Press Start 2P', cursive;
+    font-size: var(--fs-xl);
+    margin-block-end: var(--space-sm);
+    color: var(--clr-neon-yellow);
+    line-height: 1.5;
+    text-shadow: 
+      0 0 20px var(--clr-neon-yellow),
+      0 0 40px color-mix(in oklch, white, transparent 20%);
+    word-wrap: break-word;
+  }
+
+  .final-score-display {
+    font-size: var(--fs-3xl);
+    font-weight: 900;
+    color: white;
+    margin-block: var(--space-sm);
+    text-shadow: 
+      0 0 25px white,
+      0 0 50px var(--clr-neon-cyan),
+      0 0 75px color-mix(in oklch, var(--clr-neon-pink), transparent 40%);
+  }
+
+  /* Scrollbar */
+  .modal-content::-webkit-scrollbar {
+    inline-size: 10px;
+  }
+
+  .modal-content::-webkit-scrollbar-track {
+    background: oklch(10% 0.03 255 / 0.4);
+    border-radius: var(--radius-sm);
+    box-shadow: inset 0 0 8px color-mix(in oklch, var(--clr-neon-cyan), transparent 80%);
+  }
+
+  .modal-content::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, 
+      var(--clr-neon-cyan), 
+      var(--clr-neon-purple));
+    border-radius: var(--radius-sm);
+    box-shadow: 0 0 8px color-mix(in oklch, var(--clr-neon-cyan), transparent 40%);
+  }
+
+  .modal-content::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, 
+      var(--clr-neon-pink), 
+      var(--clr-neon-yellow));
+    box-shadow: 0 0 12px var(--clr-neon-pink);
+  }
+
+  /* Scrollbar for Firefox */
+  .modal-content {
+    scrollbar-width: thin;
+    scrollbar-color: var(--clr-neon-cyan) oklch(10% 0.03 255 / 0.4);
+  }
 }
 
 /* ============================================
- * ANIMATIONS
- * ============================================ */
-@keyframes fadeSlide {
-    from { opacity: 0; transform: translateY(25px) scale(0.97); }
-    to   { opacity: 1; transform: translateY(0) scale(1); }
-}
+   LAYER: ANIMATIONS
+============================================ */
+@layer animations {
+  
+  @keyframes gridMove {
+    from { transform: perspective(500px) rotateX(60deg) translateY(0); }
+    to { transform: perspective(500px) rotateX(60deg) translateY(50px); }
+  }
 
-@keyframes borderFlow {
-    to { background-position: 300% center; }
-}
-
-@keyframes gridMove {
-    from { transform: translateY(0); }
-    to   { transform: translateY(80px); }
-}
-
-@keyframes particlesFloat {
-    0%, 100% { background-position: 0% 0%, 100% 100%, 50% 80%; }
-    50%      { background-position: 100% 90%, 0% 30%, 80% 10%; }
-}
-
-/* ============================================
- * ACCESSIBILITY
- * ============================================ */
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        animation: none !important;
+  @keyframes particleFloat {
+    0%, 100% { 
+      background-position: 0% 0%, 100% 100%, 50% 50%; 
     }
+    33% { 
+      background-position: 100% 0%, 0% 50%, 80% 20%; 
+    }
+    66% { 
+      background-position: 0% 100%, 100% 20%, 20% 80%; 
+    }
+  }
+
+  @keyframes lightRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes twinkle {
+    0%, 100% { 
+      opacity: 0.3; 
+      transform: scale(0.9);
+    }
+    50% { 
+      opacity: 1; 
+      transform: scale(1.1);
+    }
+  }
+
+  @keyframes gradientFlow {
+    from { background-position: 0% center; }
+    to { background-position: 200% center; }
+  }
+
+  @keyframes borderFlow {
+    from { background-position: 0% center; }
+    to { background-position: 200% center; }
+  }
+
+  @keyframes borderGlow {
+    0%, 100% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+  }
+
+  @keyframes itemSpin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+  }
+
+  @keyframes powerupPulse {
+    0%, 100% { 
+      transform: scale(1); 
+      filter: drop-shadow(0 0 8px currentColor);
+    }
+    50% { 
+      transform: scale(1.15); 
+      filter: drop-shadow(0 0 16px currentColor);
+    }
+  }
+
+  @keyframes matchFlash {
+    0% { 
+      transform: scale(1); 
+      filter: brightness(1);
+    }
+    25% { 
+      transform: scale(1.15) rotate(5deg); 
+      filter: brightness(1.5);
+    }
+    50% { 
+      transform: scale(1.1) rotate(-5deg); 
+      filter: brightness(2);
+    }
+    75% { 
+      transform: scale(1.15) rotate(3deg); 
+      filter: brightness(1.5);
+    }
+    100% { 
+      transform: scale(1) rotate(0deg); 
+      filter: brightness(1);
+    }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  @keyframes slideUp {
+    from { 
+      transform: translateY(20px); 
+      opacity: 0; 
+    }
+    to { 
+      transform: translateY(0); 
+      opacity: 1; 
+    }
+  }
+
+  @keyframes alertPulse {
+    0% { 
+      transform: translate(-50%, -50%) scale(0) rotate(0deg); 
+    }
+    50% { 
+      transform: translate(-50%, -50%) scale(1.08) rotate(3deg); 
+    }
+    75% { 
+      transform: translate(-50%, -50%) scale(0.96) rotate(-2deg); 
+    }
+    100% { 
+      transform: translate(-50%, -50%) scale(1) rotate(0deg); 
+    }
+  }
 }
 
-    </style>
+/* ============================================
+   LAYER: UTILITIES
+============================================ */
+@layer utilities {
+  
+  .visually-hidden {
+    position: absolute;
+    inline-size: 1px;
+    block-size: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  .skip-to-content {
+    position: absolute;
+    inset-block-start: -100%;
+    inset-inline-start: 50%;
+    transform: translateX(-50%);
+    padding: var(--space-sm) var(--space-md);
+    background: var(--clr-neon-cyan);
+    color: var(--clr-bg-darker);
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    z-index: var(--z-modal);
+    transition: inset-block-start var(--transition-base);
+  }
+
+  .skip-to-content:focus {
+    inset-block-start: var(--space-sm);
+  }
+}
+
+/* ============================================
+   RESPONSIVE & ACCESSIBILITY
+============================================ */
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* High Contrast */
+@media (prefers-contrast: high) {
+  .game-card,
+  .user-panel,
+  .leaderboard-section,
+  .modal-content {
+    border-width: 4px;
+  }
+  
+  .stat-value,
+  .leaderboard-score,
+  .final-score-display {
+    font-weight: 900;
+  }
+}
+
+/* Touch Devices */
+@media (hover: none) and (pointer: coarse) {
+  .game-card,
+  .arcade-btn,
+  .memory-card,
+  .leaderboard-item,
+  .close-btn {
+    transition-duration: 100ms;
+  }
+  
+  .game-card:active {
+    transform: scale(0.98);
+  }
+  
+  .arcade-btn:active {
+    transform: scale(0.96);
+  }
+  
+  .memory-card:active:not(.flipped):not(.matched) {
+    transform: scale(0.95);
+  }
+  
+  .close-btn:active {
+    transform: scale(0.95) rotate(90deg);
+  }
+}
+
+/* Container Queries */
+@container (inline-size < 400px) {
+  .memory-grid {
+    gap: 0.3rem;
+  }
+  
+  .game-stats {
+    flex-direction: column;
+  }
+  
+  .stat {
+    min-inline-size: 100%;
+  }
+}
+
+@container (inline-size > 800px) {
+  .games-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .animated-bg,
+  .arcade-btn,
+  .close-btn {
+    display: none;
+  }
+  
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .game-card,
+  .leaderboard-section {
+    break-inside: avoid;
+  }
+}
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
+
+<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
 </head>
 <body>
+	<!-- Animated Background Layer -->
+	<div class="animated-bg">
+		<div class="grid-lines"></div>
+		<div class="stars" id="starsContainer"></div>
+	</div>
 
-    <main class="message-card">
-        <h1>SYSTEM OFFLINE</h1>
-        <p>
-            Temporarily down for maintenance.
-            I'll be back online soon.
-        </p>
-    </main>
+	<!-- Skip to main content for accessibility -->
+	<a href="#main-content" class="skip-to-content">Skip to main content</a>
 
+	<div class="container">
+		<!-- Header Section -->
+		<header class="header">
+			<h1 data-text="ARCADE ZONE">ARCADE ZONE</h1>
+			<p>◆ ELITE MULTIPLAYER ARENA ◆</p>
+		</header>
+
+		<!-- User Authentication Panel -->
+		<section class="user-panel" aria-label="User authentication">
+			<div id="loginView">
+				<button class="arcade-btn" onclick="loginWithGoogle()" aria-label="Sign in with Google">
+					<span aria-hidden="true">★</span> SIGN IN WITH GOOGLE <span aria-hidden="true">★</span>
+				</button>
+			</div>
+
+			<div id="userView" style="display: none;">
+				<div class="user-info">
+					<div class="user-avatar" aria-hidden="true">🎮</div>
+					<div>
+						<div class="user-name" id="displayUsername"></div>
+						<div style="font-size: 0.8rem; opacity: 0.7;">ACTIVE PLAYER</div>
+					</div>
+				</div>
+				<button class="arcade-btn" onclick="logout()" aria-label="Logout from account">
+					<span aria-hidden="true">⏏</span> LOGOUT
+				</button>
+			</div>
+		</section>
+
+		<!-- Main Games Grid -->
+		<main id="main-content" class="games-grid">
+			<!-- Star Catcher Game Card -->
+			<article class="game-card" onclick="openGame('catch')" tabindex="0" role="button" aria-label="Play Star Catcher game">
+				<div class="game-icon" aria-hidden="true">⭐</div>
+				<h2 class="game-title">STAR CATCHER</h2>
+				<p class="game-description">
+					Catch falling stars and power-ups! Dodge deadly bombs and chase the highest score in this fast-paced arcade challenge.
+				</p>
+				<div class="game-stats-preview" aria-label="Star Catcher statistics">
+					<div class="stat-preview">
+						<div class="stat-preview-value" id="catchBestPreview">-</div>
+						<div class="stat-preview-label">Your Best</div>
+					</div>
+					<div class="stat-preview">
+						<div class="stat-preview-value" id="catchWorldPreview">-</div>
+						<div class="stat-preview-label">World #1</div>
+					</div>
+				</div>
+				<div style="text-align: center; margin-top: 1rem;">
+					<button class="arcade-btn" onclick="event.stopPropagation(); openGame('catch')" aria-label="Start Star Catcher">
+						<span aria-hidden="true">▶</span> PLAY NOW
+					</button>
+				</div>
+			</article>
+
+			<!-- Memory Master Game Card -->
+			<article class="game-card" onclick="openGame('memory')" tabindex="0" role="button" aria-label="Play Memory Master game">
+				<div class="game-icon" aria-hidden="true">🧠</div>
+				<h2 class="game-title">MEMORY MASTER</h2>
+				<p class="game-description">
+					Test your memory skills! Match all emoji pairs with the fewest moves possible. Can you achieve perfection?
+				</p>
+				<div class="game-stats-preview" aria-label="Memory Master statistics">
+					<div class="stat-preview">
+						<div class="stat-preview-value" id="memoryBestPreview">-</div>
+						<div class="stat-preview-label">Your Best</div>
+					</div>
+					<div class="stat-preview">
+						<div class="stat-preview-value" id="memoryWorldPreview">-</div>
+						<div class="stat-preview-label">World #1</div>
+					</div>
+				</div>
+				<div style="text-align: center; margin-top: 1rem;">
+					<button class="arcade-btn" onclick="event.stopPropagation(); openGame('memory')" aria-label="Start Memory Master">
+						<span aria-hidden="true">▶</span> PLAY NOW
+					</button>
+				</div>
+			</article>
+		</main>
+
+		<!-- Global Leaderboard Section -->
+		<section class="leaderboard-section" aria-label="Global leaderboards">
+			<h2 class="leaderboard-title">◆ GLOBAL RANKINGS ◆</h2>
+			<div class="leaderboard-grid">
+				<div class="leaderboard-box">
+					<h3><span aria-hidden="true">⭐</span> STAR CATCHER</h3>
+					<ul class="leaderboard-list" id="catchLeaderboard" role="list" aria-label="Star Catcher top players">
+						<li class="no-scores">Loading rankings...</li>
+					</ul>
+				</div>
+				<div class="leaderboard-box">
+					<h3><span aria-hidden="true">🧠</span> MEMORY MASTER</h3>
+					<ul class="leaderboard-list" id="memoryLeaderboard" role="list" aria-label="Memory Master top players">
+						<li class="no-scores">Loading rankings...</li>
+					</ul>
+				</div>
+			</div>
+		</section>
+	</div>
+
+	<!-- Star Catcher Game Modal -->
+	<div class="modal" id="catchModal" role="dialog" aria-labelledby="catchModalTitle" aria-modal="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title" id="catchModalTitle"><span aria-hidden="true">⭐</span> STAR CATCHER</h2>
+				<button class="close-btn" onclick="closeGame('catch')" aria-label="Close game">×</button>
+			</div>
+
+			<div class="game-stats" role="status" aria-live="polite">
+				<div class="stat">
+					<div class="stat-value" id="catchScore" aria-label="Current score">0</div>
+					<div class="stat-label">Score</div>
+				</div>
+				<div class="stat">
+					<div class="stat-value" id="catchTime" aria-label="Time remaining">30</div>
+					<div class="stat-label">Time</div>
+				</div>
+				<div class="stat">
+					<div class="stat-value" id="catchMultiplier" aria-label="Score multiplier">x1</div>
+					<div class="stat-label">Combo</div>
+				</div>
+			</div>
+
+			<div class="catch-game-area" id="catchGameArea" role="application" aria-label="Game area">
+				<div class="catcher" id="catcher" aria-label="Player catcher">🎯</div>
+			</div>
+
+			<div style="text-align: center;">
+				<button class="arcade-btn" onclick="startCatchGame()" id="catchStartBtn">
+					<span aria-hidden="true">🚀</span> START GAME
+				</button>
+			</div>
+
+			<div style="margin-top: 2rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 10px; font-size: 0.9rem; line-height: 1.6;">
+				<strong style="color: var(--clr-neon-cyan);">💎 POWER-UPS GUIDE:</strong><br>
+				<span aria-hidden="true">⚡</span> <strong>Speed Boost</strong> – Lightning reflexes<br>
+				<span aria-hidden="true">🌟</span> <strong>Double Points</strong> – Score multiplier x2<br>
+				<span aria-hidden="true">⏰</span> <strong>Time Extension</strong> – +5 seconds bonus<br>
+				<span aria-hidden="true">🛡️</span> <strong>Shield</strong> – Bomb protection
+			</div>
+		</div>
+	</div>
+
+	<!-- Memory Master Game Modal -->
+	<div class="modal" id="memoryModal" role="dialog" aria-labelledby="memoryModalTitle" aria-modal="true">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h2 class="modal-title" id="memoryModalTitle"><span aria-hidden="true">🧠</span> MEMORY MASTER</h2>
+				<button class="close-btn" onclick="closeGame('memory')" aria-label="Close game">×</button>
+			</div>
+
+			<div class="game-stats" role="status" aria-live="polite">
+				<div class="stat">
+					<div class="stat-value" id="memoryMoves" aria-label="Total moves">0</div>
+					<div class="stat-label">Moves</div>
+				</div>
+				<div class="stat">
+					<div class="stat-value" id="memoryPairs" aria-label="Pairs matched">0/8</div>
+					<div class="stat-label">Matched</div>
+				</div>
+			</div>
+
+			<div class="memory-grid" id="memoryGrid" role="application" aria-label="Memory game grid"></div>
+
+			<div style="text-align: center;">
+				<button class="arcade-btn" onclick="initMemoryGame()">
+					<span aria-hidden="true">🔄</span> NEW GAME
+				</button>
+			</div>
+
+			<div style="margin-top: 1.5rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 10px; font-size: 0.85rem; text-align: center; opacity: 0.8;">
+				<strong>Pro tip:</strong> Focus on patterns and positions. The fewer moves, the better your score!
+			</div>
+		</div>
+	</div>
+
+	<!-- Game Over Alert -->
+	<div class="game-over-alert" id="gameOverAlert" role="alertdialog" aria-labelledby="gameOverTitle">
+		<div style="font-size: 4rem;" aria-hidden="true">🏆</div>
+		<h2 id="gameOverTitle">GAME OVER!</h2>
+		<p style="opacity: 0.8; margin-bottom: 0.5rem;">YOUR FINAL SCORE</p>
+		<div class="final-score-display" id="finalScore" aria-live="assertive">0</div>
+		<button class="arcade-btn" onclick="closeGameOverAlert()" style="margin-top: 1rem;">
+			<span aria-hidden="true">✓</span> CONTINUE
+		</button>
+	</div>
+
+	<!-- Memory Victory Alert -->
+	<div class="game-over-alert" id="memoryVictoryAlert" role="alertdialog" aria-labelledby="victoryTitle">
+		<div style="font-size: 4rem;" aria-hidden="true">🎉</div>
+		<h2 id="victoryTitle">PERFECT MATCH!</h2>
+		<p style="opacity: 0.8; margin-bottom: 0.5rem;">COMPLETED IN</p>
+		<div class="final-score-display" id="finalMoves" aria-live="assertive">0</div>
+		<p style="font-size: 1.2rem; margin-top: 0.5rem; opacity: 0.9;">MOVES</p>
+		<button class="arcade-btn" onclick="closeMemoryVictory()" style="margin-top: 1rem;">
+			<span aria-hidden="true">🔄</span> PLAY AGAIN
+		</button>
+	</div>
+
+	<!-- Login Required Alert -->
+	<div class="game-over-alert" id="loginAlert" role="alertdialog" aria-labelledby="loginAlertTitle">
+		<div style="font-size: 4rem;" aria-hidden="true">🔒</div>
+		<h2 id="loginAlertTitle" style="font-size: 1.5rem;">AUTHENTICATION REQUIRED</h2>
+		<p style="opacity: 0.85; margin: 1.5rem 0; font-size: 1rem; line-height: 1.5;">
+			Sign in with your Google account to:<br>
+			<strong style="color: var(--clr-neon-cyan);">✓</strong> Save your high scores<br>
+			<strong style="color: var(--clr-neon-cyan);">✓</strong> Compete on global leaderboards<br>
+			<strong style="color: var(--clr-neon-cyan);">✓</strong> Track your progress
+		</p>
+		<button class="arcade-btn" onclick="closeLoginAlert(); loginWithGoogle();" style="margin-top: 1rem;">
+			<span aria-hidden="true">⭐</span> SIGN IN WITH GOOGLE <span aria-hidden="true">⭐</span>
+		</button>
+		<button class="arcade-btn" onclick="closeLoginAlert()" style="margin-top: 0.5rem; background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3);">
+			<span aria-hidden="true">←</span> MAYBE LATER
+		</button>
+	</div>
+</body>
+
+	<script>
+		// Initialize stars
+		const starsContainer = document.getElementById('starsContainer');
+		for (let i = 0; i < 100; i++) {
+			const star = document.createElement('div');
+			star.className = 'star';
+			star.style.left = Math.random() * 100 + '%';
+			star.style.top = Math.random() * 100 + '%';
+			star.style.animationDelay = Math.random() * 3 + 's';
+			starsContainer.appendChild(star);
+		}
+
+		// ===== AÑADE ESTO: INICIALIZACIÓN DE FIREBASE =====
+
+	    // Pega aquí tu objeto de configuración que copiaste
+		const firebaseConfig = {
+			apiKey: "AIzaSyDipUw7d4av0JwfudVDdECNjZXdjy3OGyw",
+			authDomain: "juego-arcade-scores.firebaseapp.com",
+			projectId: "juego-arcade-scores",
+			storageBucket: "juego-arcade-scores.firebasestorage.app",
+			messagingSenderId: "33838418828",
+			appId: "1:33838418828:web:5aa1579a7f645992c2a4a9",
+			measurementId: "G-47JPGCPBM0"
+		};
+
+	    // Inicializa Firebase y Firestore
+		firebase.initializeApp(firebaseConfig);
+		const db = firebase.firestore();
+
+	    // ===== FIN DE LA INICIALIZACIÓN DE FIREBASE =====
+
+// ===== USER MANAGEMENT & FIRESTORE LOGIC =====
+// 1. Define la variable 'auth'
+		const auth = firebase.auth();
+		let currentUser = null; // Esto ahora será un objeto de Firebase, no un string
+
+		// 2. Nueva función: Iniciar sesión con Google
+		async function loginWithGoogle() {
+			try {
+                // Crea un "proveedor" de Google
+				const provider = new firebase.auth.GoogleAuthProvider();
+                // Abre una ventana emergente para iniciar sesión
+				await auth.signInWithPopup(provider);
+                // El 'observer' (initAuth) se encargará del resto
+
+			} catch (error) {
+				console.error("Error al iniciar sesión con Google:", error);
+				alert("Hubo un error al iniciar sesión.");
+			}
+		}
+
+		// 3. Nueva función: Salir
+		async function logout() {
+			try {
+                // Le dice a Firebase que cierre la sesión
+				await auth.signOut();
+                // El 'observer' (initAuth) se encargará del resto
+			} catch (error) {
+				console.error("Error al cerrar sesión:", error);
+			}
+		}
+
+        // 4. Nueva función: El "Observador"
+        // Esta función se ejecuta CADA VEZ que el estado de login cambia
+		function initAuth() {
+			auth.onAuthStateChanged(user => {
+				if (user) {
+                    // *** EL USUARIO ESTÁ CONECTADO ***
+					console.log("Usuario conectado:", user.displayName, user.uid);
+                    currentUser = user; // Guardamos el objeto de usuario COMPLETO
+                    
+                    document.getElementById('loginView').style.display = 'none';
+                    document.getElementById('userView').style.display = 'flex';
+                    // Mostramos su nombre real de Google
+                    document.getElementById('displayUsername').textContent = user.displayName;
+                    
+                    loadUserStats();
+                    loadLeaderboards();
+
+                } else {
+                    // *** EL USUARIO ESTÁ DESCONECTADO ***
+                	console.log("User logged out.");
+                	currentUser = null;
+
+                	document.getElementById('loginView').style.display = 'block';
+                	document.getElementById('userView').style.display = 'none';
+
+                	closeGame('catch');
+                	closeGame('memory');
+
+                    // Limpiar SÓLO las vistas previas PERSONALES
+                	document.getElementById('catchBestPreview').textContent = '-';
+                	document.getElementById('memoryBestPreview').textContent = '-';
+
+                    // CARGAR los leaderboards globales
+                	loadLeaderboards();
+                }
+            });
+		}
+
+        // 5. Llama al observador cuando la página cargue
+		document.addEventListener('DOMContentLoaded', initAuth);
+
+		function isStorageAvailable() {
+			// Esta función ahora comprueba si 'db' (nuestra base de datos) existe.
+			return typeof db !== 'undefined' && db !== null;
+		}
+
+		async function loadUserStats() {
+            // Ahora currentUser es un objeto, por eso chequeamos 'currentUser.uid'
+			if (!currentUser || !currentUser.uid || !isStorageAvailable()) return;
+			
+			try {
+                // Usamos el UID, no el nombre
+				const docId = currentUser.uid; 
+				
+				// Cargar mejor puntaje de Catch
+				const catchDoc = await db.collection('user_best_catch').doc(docId).get();
+				if (catchDoc.exists) {
+					document.getElementById('catchBestPreview').textContent = catchDoc.data().score;
+				}
+
+				// Cargar mejor puntaje de Memory
+				const memoryDoc = await db.collection('user_best_memory').doc(docId).get();
+				if (memoryDoc.exists) {
+					document.getElementById('memoryBestPreview').textContent = memoryDoc.data().score;
+				}
+			} catch (error) {
+				console.error('Error loading user stats:', error);
+			}
+		}
+
+		async function saveScore(game, score) {
+			if (!currentUser || !currentUser.uid || !isStorageAvailable()) {
+				console.log('User not logged in or DB not available. Score not saved.');
+				return;
+			}
+			
+			const isCatchGame = game === 'catch';
+			const collectionName = isCatchGame ? 'user_best_catch' : 'user_best_memory';
+
+            // ⬇️ ESTE ES EL CAMBIO MÁS IMPORTANTE ⬇️
+            // El ID del documento ahora es el UID del usuario
+			const docId = currentUser.uid;
+			const docRef = db.collection(collectionName).doc(docId);
+            // ⬆️ FIN DEL CAMBIO IMPORTANTE ⬆️
+
+			try {
+				const doc = await docRef.get();
+				let shouldSave = false;
+
+				if (!doc.exists) {
+					shouldSave = true;
+				} else {
+					const existingScore = doc.data().score;
+					if (isCatchGame) {
+						if (score > existingScore) shouldSave = true;
+					} else {
+						if (score < existingScore) shouldSave = true;
+					}
+				}
+
+				if (shouldSave) {
+					console.log(`Saving new best score for ${game}: ${score}`);
+					await docRef.set({
+                        // También guardamos el nombre (displayName) para mostrarlo en el leaderboard
+						username: currentUser.displayName, 
+						score: score,
+						timestamp: new Date()
+					});
+
+					await loadUserStats();
+					await loadLeaderboards();
+				} else {
+					console.log(`Score ${score} is not better than existing. Not saving.`);
+				}
+			} catch (error) {
+				console.error('Error saving score:', error);
+			}
+		}
+
+		async function loadLeaderboards() {
+			if (!isStorageAvailable()) {
+				document.getElementById('catchLeaderboard').innerHTML = '<li class="no-scores">Database not available</li>';
+				document.getElementById('memoryLeaderboard').innerHTML = '<li class="no-scores">Database not available</li>';
+				return;
+			}
+			await loadCatchLeaderboard();
+			await loadMemoryLeaderboard();
+		}
+
+		async function loadCatchLeaderboard() {
+			if (!isStorageAvailable()) return;
+			
+			const leaderboardEl = document.getElementById('catchLeaderboard');
+			leaderboardEl.innerHTML = '<li class="no-scores">Loading...</li>';
+
+			try {
+                // Pedir a Firestore los 10 mejores, ordenados por 'score' descendente
+				const snapshot = await db.collection('user_best_catch')
+				.orderBy('score', 'desc')
+				.limit(10)
+				.get();
+
+				if (snapshot.empty) {
+					leaderboardEl.innerHTML = '<li class="no-scores">No scores yet. Be the first!</li>';
+					document.getElementById('catchWorldPreview').textContent = '-';
+					return;
+				}
+
+				const sortedScores = snapshot.docs.map(doc => doc.data());
+
+                // Actualizar el "World Record"
+				document.getElementById('catchWorldPreview').textContent = sortedScores[0].score;
+
+				leaderboardEl.innerHTML = sortedScores.map((score, index) => {
+					const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+					const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+					return `
+						<li class="leaderboard-item ${rankClass}">
+							<span class="leaderboard-rank">${medal}</span>
+							<span class="leaderboard-name">${score.username}</span>
+							<span class="leaderboard-score">${score.score}</span>
+						</li>
+					`;
+				}).join('');
+			} catch (error) {
+				console.error('Error loading catch leaderboard:', error);
+				leaderboardEl.innerHTML = '<li class="no-scores">Error loading scores</li>';
+			}
+		}
+
+		async function loadMemoryLeaderboard() {
+			if (!isStorageAvailable()) return;
+
+			const leaderboardEl = document.getElementById('memoryLeaderboard');
+			leaderboardEl.innerHTML = '<li class="no-scores">Loading...</li>';
+
+			try {
+                // Pedir a Firestore los 10 mejores, ordenados por 'score' ascendente (menos movimientos es mejor)
+				const snapshot = await db.collection('user_best_memory')
+				.orderBy('score', 'asc')
+				.limit(10)
+				.get();
+
+				if (snapshot.empty) {
+					leaderboardEl.innerHTML = '<li class="no-scores">No scores yet. Be the first!</li>';
+					document.getElementById('memoryWorldPreview').textContent = '-';
+					return;
+				}
+
+				const sortedScores = snapshot.docs.map(doc => doc.data());
+
+                // Actualizar el "World Record"
+				document.getElementById('memoryWorldPreview').textContent = sortedScores[0].score;
+
+				leaderboardEl.innerHTML = sortedScores.map((score, index) => {
+					const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+					const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+					return `
+						<li class="leaderboard-item ${rankClass}">
+							<span class="leaderboard-rank">${medal}</span>
+							<span class="leaderboard-name">${score.username}</span>
+							<span class="leaderboard-score">${score.score}</span>
+						</li>
+					`;
+				}).join('');
+			} catch (error)
+			{
+				console.error('Error loading memory leaderboard:', error);
+				leaderboardEl.innerHTML = '<li class="no-scores">Error loading scores</li>';
+			}
+		}
+
+		// ===== MODAL MANAGEMENT =====
+		function openGame(game) {
+			if (!currentUser) {
+				// En lugar de alert(), mostrar el nuevo modal
+				document.getElementById('loginAlert').classList.add('active');
+				return;
+			}
+
+			if (game === 'catch') {
+				document.getElementById('catchModal').classList.add('active');
+			} else if (game === 'memory') {
+				document.getElementById('memoryModal').classList.add('active');
+				initMemoryGame();
+			}
+		}
+
+		function closeGame(game) {
+			if (game === 'catch') {
+				stopCatchGame();
+				document.getElementById('catchModal').classList.remove('active');
+			} else if (game === 'memory') {
+				document.getElementById('memoryModal').classList.remove('active');
+			}
+		}
+
+		// Función para cerrar la alerta de login
+		function closeLoginAlert() {
+			document.getElementById('loginAlert').classList.remove('active');
+		}
+
+		// Función para cerrar la victoria de Memory
+		function closeMemoryVictory() {
+			document.getElementById('memoryVictoryAlert').classList.remove('active');
+			initMemoryGame(); // Reinicia automáticamente
+		}
+
+		// ===== CATCH GAME =====
+		let catchGameActive = false;
+		let catchScore = 0;
+		let catchTime = 30;
+		let catchMultiplier = 1;
+		let catchInterval;
+		let catchTimer;
+		let itemCheckIntervals = [];
+		let hasShield = false;
+		let catcherSpeed = 1;
+
+		function startCatchGame() {
+			if (catchGameActive || !currentUser) return;
+			
+			document.getElementById('gameOverAlert').classList.remove('active');
+			
+			catchGameActive = true;
+			catchScore = 0;
+			catchTime = 30;
+			catchMultiplier = 1;
+			hasShield = false;
+			catcherSpeed = 1;
+			
+			document.getElementById('catchScore').textContent = catchScore;
+			document.getElementById('catchTime').textContent = catchTime;
+			document.getElementById('catchMultiplier').textContent = 'x' + catchMultiplier;
+			document.getElementById('catcher').style.filter = 'drop-shadow(0 0 10px rgba(255, 190, 11, 0.8))';
+			
+			document.querySelectorAll('.falling-item').forEach(item => item.remove());
+			
+			document.getElementById('catchStartBtn').disabled = true;
+			
+			catchInterval = setInterval(createFallingItem, 700);
+			catchTimer = setInterval(() => {
+				catchTime--;
+				document.getElementById('catchTime').textContent = catchTime;
+				if (catchTime <= 0) {
+					stopCatchGame();
+					showGameOverAlert();
+				}
+			}, 1000);
+		}
+
+		function stopCatchGame() {
+			catchGameActive = false;
+			clearInterval(catchInterval);
+			clearInterval(catchTimer);
+			
+			itemCheckIntervals.forEach(interval => clearInterval(interval));
+			itemCheckIntervals = [];
+			
+			document.querySelectorAll('.falling-item').forEach(item => item.remove());
+			
+			document.getElementById('catchStartBtn').disabled = false;
+		}
+
+		function createFallingItem() {
+			if (!catchGameActive) return;
+			
+			const item = document.createElement('div');
+			item.className = 'falling-item';
+			
+			const rand = Math.random();
+			let itemType;
+			
+			if (rand < 0.15) {
+				itemType = 'bomb';
+				item.textContent = '💣';
+			} else if (rand < 0.25) {
+				// Power-ups
+				const powerups = ['⚡', '🌟', '⏰', '🛡️'];
+				const powerup = powerups[Math.floor(Math.random() * powerups.length)];
+				item.textContent = powerup;
+				itemType = 'powerup';
+				item.dataset.powerup = powerup;
+				item.classList.add('powerup');
+			} else {
+				itemType = 'star';
+				item.textContent = '⭐';
+			}
+			
+			item.dataset.type = itemType;
+			
+			const gameWidth = document.getElementById('catchGameArea').offsetWidth;
+			item.style.left = Math.random() * (gameWidth - 60) + 'px';
+			item.style.top = '-80px'; // Más arriba para dar más espacio
+
+			const baseDuration = Math.random() * 1.5 + 4; // Duración más larga y menos aleatoria
+			const duration = baseDuration / catcherSpeed;
+			item.style.animation = `fall ${duration}s linear`;
+			
+			document.getElementById('catchGameArea').appendChild(item);
+			
+			let hasCollided = false;
+			
+			const checkCollision = setInterval(() => {
+				if (!catchGameActive || !item.parentElement || hasCollided) {
+					clearInterval(checkCollision);
+					const index = itemCheckIntervals.indexOf(checkCollision);
+					if (index > -1) itemCheckIntervals.splice(index, 1);
+					return;
+				}
+				
+				const itemRect = item.getBoundingClientRect();
+				const catcherRect = document.getElementById('catcher').getBoundingClientRect();
+				
+				if (itemRect.bottom >= catcherRect.top &&
+					itemRect.top <= catcherRect.bottom &&
+					itemRect.right >= catcherRect.left &&
+					itemRect.left <= catcherRect.right) {
+					
+					hasCollided = true;
+
+				if (item.dataset.type === 'star') {
+					catchScore += 10 * catchMultiplier;
+					document.getElementById('catchScore').textContent = catchScore;
+					item.style.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
+					item.style.transform = 'scale(2)';
+					item.style.opacity = '0';
+				} else if (item.dataset.type === 'powerup') {
+					applyPowerup(item.dataset.powerup);
+					item.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+					item.style.transform = 'scale(2) rotate(360deg)';
+					item.style.opacity = '0';
+				} else if (item.dataset.type === 'bomb') {
+					if (!hasShield) {
+						catchScore = Math.max(0, catchScore - 30);
+						document.getElementById('catchScore').textContent = catchScore;
+
+						const catcher = document.getElementById('catcher');
+						catcher.style.animation = 'shake 0.3s ease-in-out';
+						setTimeout(() => catcher.style.animation = '', 300);
+					} else {
+						hasShield = false;
+						document.getElementById('catcher').style.filter = 'drop-shadow(0 0 10px rgba(255, 190, 11, 0.8))';
+					}
+				}
+
+				setTimeout(() => {
+					if (item.parentElement) item.remove();
+				}, 300);
+
+				clearInterval(checkCollision);
+				const index = itemCheckIntervals.indexOf(checkCollision);
+				if (index > -1) itemCheckIntervals.splice(index, 1);
+			}
+		}, 30);
+			
+			itemCheckIntervals.push(checkCollision);
+			
+			setTimeout(() => {
+				if (item.parentElement) item.remove();
+				clearInterval(checkCollision);
+				const index = itemCheckIntervals.indexOf(checkCollision);
+				if (index > -1) itemCheckIntervals.splice(index, 1);
+			}, duration * 1000 + 1000); // Aumentado de 500 a 1000ms extra
+		}
+
+		function applyPowerup(powerup) {
+			switch(powerup) {
+			case '⚡':
+				catcherSpeed = 1.5;
+				setTimeout(() => catcherSpeed = 1, 5000);
+				break;
+			case '🌟':
+				catchMultiplier = 2;
+				document.getElementById('catchMultiplier').textContent = 'x' + catchMultiplier;
+				setTimeout(() => {
+					catchMultiplier = 1;
+					document.getElementById('catchMultiplier').textContent = 'x' + catchMultiplier;
+				}, 5000);
+				break;
+			case '⏰':
+				catchTime += 10;
+				document.getElementById('catchTime').textContent = catchTime;
+				break;
+			case '🛡️':
+				hasShield = true;
+				document.getElementById('catcher').style.filter = 'drop-shadow(0 0 20px rgba(0, 255, 249, 1))';
+				break;
+			}
+		}
+
+		async function showGameOverAlert() {
+			document.getElementById('finalScore').textContent = catchScore;
+			document.getElementById('gameOverAlert').classList.add('active');
+			await saveScore('catch', catchScore);
+		}
+
+		function closeGameOverAlert() {
+			document.getElementById('gameOverAlert').classList.remove('active');
+		}
+
+		let catcherX = 0;
+		document.getElementById('catchGameArea').addEventListener('mousemove', (e) => {
+			if (!catchGameActive) return;
+			const game = document.getElementById('catchGameArea');
+			const catcher = document.getElementById('catcher');
+			const rect = game.getBoundingClientRect();
+			catcherX = e.clientX - rect.left - 40;
+			catcherX = Math.max(0, Math.min(catcherX, game.offsetWidth - 80));
+			catcher.style.left = catcherX + 'px';
+		});
+
+		// Touch support for mobile
+		document.getElementById('catchGameArea').addEventListener('touchmove', (e) => {
+			if (!catchGameActive) return;
+			e.preventDefault();
+			const game = document.getElementById('catchGameArea');
+			const catcher = document.getElementById('catcher');
+			const rect = game.getBoundingClientRect();
+			const touch = e.touches[0];
+			catcherX = touch.clientX - rect.left - 40;
+			catcherX = Math.max(0, Math.min(catcherX, game.offsetWidth - 80));
+			catcher.style.left = catcherX + 'px';
+		});
+
+		// ===== MEMORY GAME =====
+		const emojis = ['🎮', '🕹️', '👾', '🎯', '🎲', '🃏', '🎰', '🏆'];
+		let memoryCards = [];
+		let flippedCards = [];
+		let moves = 0;
+		let pairs = 0;
+		let memoryGameActive = false;
+		let memoryStartTime = 0;
+		let memoryTimer;
+
+		function initMemoryGame() {
+			if (!currentUser) return;
+			
+			const gameContainer = document.getElementById('memoryGrid');
+			gameContainer.innerHTML = '';
+			memoryCards = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
+			flippedCards = [];
+			moves = 0;
+			pairs = 0;
+			memoryGameActive = true;
+			memoryStartTime = Date.now();
+			
+			document.getElementById('memoryMoves').textContent = moves;
+			document.getElementById('memoryPairs').textContent = `${pairs}/8`;
+
+			memoryCards.forEach((emoji, index) => {
+				const card = document.createElement('div');
+				card.className = 'memory-card';
+				card.dataset.emoji = emoji;
+				card.dataset.index = index;
+				card.addEventListener('click', flipCard);
+				gameContainer.appendChild(card);
+			});
+		}
+
+		function flipCard() {
+			if (!memoryGameActive) return;
+			if (flippedCards.length === 2 || this.classList.contains('flipped') || this.classList.contains('matched')) {
+				return;
+			}
+
+			this.textContent = this.dataset.emoji;
+			this.classList.add('flipped');
+			flippedCards.push(this);
+
+			if (flippedCards.length === 2) {
+				moves++;
+				document.getElementById('memoryMoves').textContent = moves;
+				
+				setTimeout(async () => {
+					if (flippedCards[0].dataset.emoji === flippedCards[1].dataset.emoji) {
+						flippedCards[0].classList.add('matched');
+						flippedCards[1].classList.add('matched');
+						pairs++;
+						document.getElementById('memoryPairs').textContent = `${pairs}/8`;
+						
+						if (pairs === 8) {
+							memoryGameActive = false;
+							clearInterval(memoryTimer);
+							setTimeout(async () => {
+								// Mostrar el nuevo modal personalizado
+								document.getElementById('finalMoves').textContent = moves;
+								document.getElementById('memoryVictoryAlert').classList.add('active');
+								await saveScore('memory', moves);
+							}, 300);
+						}
+					} else {
+						flippedCards[0].textContent = '';
+						flippedCards[1].textContent = '';
+						flippedCards[0].classList.remove('flipped');
+						flippedCards[1].classList.remove('flipped');
+					}
+					flippedCards = [];
+				}, 800);
+			}
+		}
+
+		// Add shake and fall animations
+		const style = document.createElement('style');
+		style.textContent = `
+			@keyframes shake {
+				0%, 100% { transform: translateX(0); }
+				25% { transform: translateX(-10px); }
+				75% { transform: translateX(10px); }
+			}
+			@keyframes fall {
+				to { transform: translateY(550px); }
+			}
+		`;
+		document.head.appendChild(style);
+
+		// Load leaderboards on page load
+		window.addEventListener('load', async () => {
+			// Esperar a que storage esté disponible
+			let attempts = 0;
+			const checkStorage = setInterval(async () => {
+				attempts++;
+				if (isStorageAvailable()) {
+					clearInterval(checkStorage);
+					await loadLeaderboards();
+				} else if (attempts > 20) {
+					clearInterval(checkStorage);
+					console.log('Storage not available after 2 seconds');
+					document.getElementById('catchLeaderboard').innerHTML = '<li class="no-scores">Storage not available</li>';
+					document.getElementById('memoryLeaderboard').innerHTML = '<li class="no-scores">Storage not available</li>';
+				}
+			}, 100);
+		});
+	</script>
 </body>
 </html>
