@@ -854,19 +854,22 @@
   /* Memory Game */
 	.memory-grid {
 	  display: grid;
-	  grid-template-columns: repeat(4, 1fr);
+	  grid-template-columns: repeat(4, minmax(0, 1fr)); /* CAMBIO CLAVE: minmax(0, 1fr) */
 	  gap: clamp(0.4rem, 2cqi, 0.9rem);
-	  max-inline-size: min(480px, 100%);
+	  max-inline-size: min(420px, 95%); /* REDUCIDO de 480px y cambiado a 95% */
+	  inline-size: 100%; /* AÑADIDO */
 	  margin-inline: auto;
 	  margin-block-end: var(--space-md);
+	  padding-inline: var(--space-xs); /* AÑADIDO padding */
 	  flex-shrink: 0;
 	  container-type: inline-size;
-	  justify-items: center; /* AÑADIR */
-	  align-items: center; /* AÑADIR */
+	  place-items: center; /* AÑADIDO */
 	}
 
 	.memory-card {
 	  aspect-ratio: 1;
+	  inline-size: 100%; /* AÑADIDO */
+	  max-inline-size: 90px; /* AÑADIDO límite */
 	  min-block-size: clamp(55px, 15cqi, 90px);
 	  
 	  background: linear-gradient(135deg, 
@@ -888,8 +891,6 @@
 	    inset 0 0 15px color-mix(in oklch, var(--clr-neon-cyan), transparent 85%);
 	  
 	  contain: layout style paint;
-	  justify-self: center; /* AÑADIDO para centrar horizontalmente */
-	  align-self: center; /* AÑADIDO para centrar verticalmente */
 	}
 
   .memory-card:hover:not(.flipped):not(.matched) {
