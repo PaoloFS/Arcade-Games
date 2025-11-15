@@ -1260,6 +1260,8 @@
 	    contain: layout style paint;
 	    will-change: transform;
 	    transition: transform 0.1s ease-out;
+
+	    transform: scaleX(-1);
 	}
 
 	.runner-player.jumping {
@@ -1519,11 +1521,12 @@
 	    to { background-position: 200% center; }
 	}
 
-	@keyframes playerJump {
-	    0% { transform: translateY(0); }
-	    50% { transform: translateY(-120px); }
-	    100% { transform: translateY(0); }
-	}
+@keyframes playerJump {
+
+    0% { transform: translateY(0); }
+    50% { transform: translateY(-120px); }
+    100% { transform: translateY(0); }
+}
 
 	@keyframes obstacleMove {
 	    from { transform: translateX(0); }
@@ -2817,162 +2820,218 @@ async function saveScore(game, score) {
 		`;
 		document.head.appendChild(style);
 
-		// ===== NEON RUNNER GAME =====
-		let runnerGameActive = false;
-		let runnerScore = 0;
-		let runnerSpeed = 1;
-		let runnerObstacles = [];
-		let runnerInterval;
-		let runnerScoreInterval;
-		let isJumping = false;
+// ===== NEON RUNNER GAME =====
+let runnerGameActive = false;
+let runnerScore = 0;
+let runnerSpeed = 1;
+let runnerObstacles = [];
+let runnerInterval;
+let runnerScoreInterval;
+let isJumping = false;
+let jumpHeight = 0;
+let jumpVelocity = 0;
+let gravity = 0.8;
+let jumpPower = -15;
 
-		function startRunnerGame() {
-		    if (runnerGameActive || !currentUser) return;
-		    
-		    document.getElementById('runnerGameOverAlert').classList.remove('active');
-		    
-		    runnerGameActive = true;
-		    runnerScore = 0;
-		    runnerSpeed = 1;
-		    runnerObstacles = [];
-		    isJumping = false;
-		    
-		    document.getElementById('runnerScore').textContent = runnerScore;
-		    document.getElementById('runnerSpeed').textContent = runnerSpeed.toFixed(1) + 'x';
-		    document.getElementById('runnerStartBtn').disabled = true;
-		    
-		    // Limpiar obstáculos anteriores
-		    document.querySelectorAll('.runner-obstacle').forEach(obs => obs.remove());
-		    
-		    // Crear obstáculos
-		    runnerInterval = setInterval(() => {
-		        if (!runnerGameActive) return;
-		        createObstacle();
-		    }, 2000 / runnerSpeed);
-		    
-		    // Incrementar score
-		    runnerScoreInterval = setInterval(() => {
-		        if (!runnerGameActive) return;
-		        runnerScore += Math.floor(runnerSpeed * 10);
-		        document.getElementById('runnerScore').textContent = runnerScore;
-		        
-		        // Aumentar velocidad gradualmente
-		        if (runnerScore % 100 === 0) {
-		            runnerSpeed += 0.1;
-		            document.getElementById('runnerSpeed').textContent = runnerSpeed.toFixed(1) + 'x';
-		            
-		            // Actualizar velocidad de generación de obstáculos
-		            clearInterval(runnerInterval);
-		            runnerInterval = setInterval(() => {
-		                if (!runnerGameActive) return;
-		                createObstacle();
-		            }, 2000 / runnerSpeed);
-		        }
-		    }, 100);
-		}
+function startRunnerGame() {
+    if (runnerGameActive || !currentUser) return;
+    
+    document.getElementById('runnerGameOverAlert').classList.remove('active');
+    
+    runnerGameActive = true;
+    runnerScore = 0;
+    runnerSpeed = 1;
+    runnerObstacles = [];
+    isJumping = false;
+    jumpHeight = 0;
+    jumpVelocity = 0;
+    
+    document.getElementById('runnerScore').textContent = runnerScore;
+    document.getElementById('runnerSpeed').textContent = runnerSpeed.toFixed(1) + 'x';
+    document.getElementById('runnerStartBtn').disabled = true;
+    
+    // Reset player position
+    const player = document.getElementById('runnerPlayer');
+    player.style.transform = 'translateY(0)';
+    
+    // Limpiar obstáculos anteriores
+    document.querySelectorAll('.runner-obstacle').forEach(obs => obs.remove());
+    
+    // Crear obstáculos más espaciados
+    runnerInterval = setInterval(() => {
+        if (!runnerGameActive) return;
+        createObstacle();
+    }, 2500); // Aumentado de 2000 a 2500ms para más espacio
+    
+    // Incrementar score más lento
+    runnerScoreInterval = setInterval(() => {
+        if (!runnerGameActive) return;
+        runnerScore += 1; // Cambiado de Math.floor(runnerSpeed * 10) a solo 1
+        document.getElementById('runnerScore').textContent = runnerScore;
+        
+        // Aumentar velocidad más gradualmente
+        if (runnerScore % 200 === 0 && runnerSpeed < 2) { // Cambiado de 100 a 200
+            runnerSpeed += 0.05; // Cambiado de 0.1 a 0.05
+            document.getElementById('runnerSpeed').textContent = runnerSpeed.toFixed(1) + 'x';
+            
+            // Reducir tiempo entre obstáculos gradualmente
+            clearInterval(runnerInterval);
+            const newInterval = Math.max(1800, 2500 - (runnerScore / 4));
+            runnerInterval = setInterval(() => {
+                if (!runnerGameActive) return;
+                createObstacle();
+            }, newInterval);
+        }
+    }, 100);
+    
+    // Sistema de física de salto
+    const jumpPhysics = setInterval(() => {
+        if (!runnerGameActive) {
+            clearInterval(jumpPhysics);
+            return;
+        }
+        
+        const player = document.getElementById('runnerPlayer');
+        
+        if (isJumping) {
+            jumpVelocity += gravity;
+            jumpHeight += jumpVelocity;
+            
+            // Aterrizar
+            if (jumpHeight >= 0) {
+                jumpHeight = 0;
+                jumpVelocity = 0;
+                isJumping = false;
+                player.classList.remove('jumping');
+            }
+            
+            player.style.transform = `translateY(${jumpHeight}px)`;
+        }
+    }, 16);
+}
 
-		function stopRunnerGame() {
-		    runnerGameActive = false;
-		    clearInterval(runnerInterval);
-		    clearInterval(runnerScoreInterval);
-		    
-		    document.querySelectorAll('.runner-obstacle').forEach(obs => obs.remove());
-		    document.getElementById('runnerStartBtn').disabled = false;
-		}
+function stopRunnerGame() {
+    runnerGameActive = false;
+    clearInterval(runnerInterval);
+    clearInterval(runnerScoreInterval);
+    
+    document.querySelectorAll('.runner-obstacle').forEach(obs => obs.remove());
+    document.getElementById('runnerStartBtn').disabled = false;
+    
+    // Reset player
+    const player = document.getElementById('runnerPlayer');
+    player.style.transform = 'translateY(0)';
+    isJumping = false;
+    jumpHeight = 0;
+    jumpVelocity = 0;
+}
 
-		function createObstacle() {
-		    if (!runnerGameActive) return;
-		    
-		    const obstacle = document.createElement('div');
-		    obstacle.className = 'runner-obstacle';
-		    
-		    const obstacles = ['🌵', '🪨', '⚡', '🔥'];
-		    obstacle.textContent = obstacles[Math.floor(Math.random() * obstacles.length)];
-		    
-		    const gameArea = document.getElementById('runnerGameArea');
-		    obstacle.style.insetInlineStart = gameArea.offsetWidth + 'px';
-		    
-		    const duration = (3 / runnerSpeed);
-		    obstacle.style.animationDuration = duration + 's';
-		    
-		    gameArea.appendChild(obstacle);
-		    runnerObstacles.push(obstacle);
-		    
-		    // Verificar colisiones
-		    let collisionCheckInterval = setInterval(() => {
-		        if (!runnerGameActive || !obstacle.parentElement) {
-		            clearInterval(collisionCheckInterval);
-		            return;
-		        }
-		        
-		        const playerRect = document.getElementById('runnerPlayer').getBoundingClientRect();
-		        const obstacleRect = obstacle.getBoundingClientRect();
-		        
-		        const isColliding = (
-		            playerRect.right > obstacleRect.left &&
-		            playerRect.left < obstacleRect.right &&
-		            playerRect.bottom > obstacleRect.top &&
-		            playerRect.top < obstacleRect.bottom
-		        );
-		        
-		        if (isColliding && !isJumping) {
-		            clearInterval(collisionCheckInterval);
-		            stopRunnerGame();
-		            showRunnerGameOver();
-		        }
-		    }, 10);
-		    
-		    // Remover obstáculo después de que salga de pantalla
-		    setTimeout(() => {
-		        if (obstacle.parentElement) {
-		            obstacle.remove();
-		            runnerObstacles = runnerObstacles.filter(obs => obs !== obstacle);
-		        }
-		        clearInterval(collisionCheckInterval);
-		    }, duration * 1000 + 500);
-		}
+function createObstacle() {
+    if (!runnerGameActive) return;
+    
+    const obstacle = document.createElement('div');
+    obstacle.className = 'runner-obstacle';
+    
+    const obstacles = ['🌵', '🧱', '🚧', '🔥'];
+    obstacle.textContent = obstacles[Math.floor(Math.random() * obstacles.length)];
+    
+    const gameArea = document.getElementById('runnerGameArea');
+    obstacle.style.insetInlineStart = gameArea.offsetWidth + 'px';
+    
+    // Velocidad más controlada
+    const baseDuration = 2.5; // Cambiado de 3 a 2.5
+    const duration = baseDuration / runnerSpeed;
+    obstacle.style.animationDuration = duration + 's';
+    
+    gameArea.appendChild(obstacle);
+    runnerObstacles.push(obstacle);
+    
+    // Verificar colisiones con hitbox más preciso
+    let collisionCheckInterval = setInterval(() => {
+        if (!runnerGameActive || !obstacle.parentElement) {
+            clearInterval(collisionCheckInterval);
+            return;
+        }
+        
+        const playerRect = document.getElementById('runnerPlayer').getBoundingClientRect();
+        const obstacleRect = obstacle.getBoundingClientRect();
+        
+        // Hitbox más pequeño y preciso
+        const playerHitbox = {
+            left: playerRect.left + 8,
+            right: playerRect.right - 8,
+            top: playerRect.top + 8,
+            bottom: playerRect.bottom - 5
+        };
+        
+        const obstacleHitbox = {
+            left: obstacleRect.left + 5,
+            right: obstacleRect.right - 5,
+            top: obstacleRect.top + 5,
+            bottom: obstacleRect.bottom - 2
+        };
+        
+        const isColliding = (
+            playerHitbox.right > obstacleHitbox.left &&
+            playerHitbox.left < obstacleHitbox.right &&
+            playerHitbox.bottom > obstacleHitbox.top &&
+            playerHitbox.top < obstacleHitbox.bottom
+        );
+        
+        if (isColliding) {
+            clearInterval(collisionCheckInterval);
+            stopRunnerGame();
+            showRunnerGameOver();
+        }
+    }, 16); // Más frecuente para mejor precisión
+    
+    // Remover obstáculo después de que salga de pantalla
+    setTimeout(() => {
+        if (obstacle.parentElement) {
+            obstacle.remove();
+            runnerObstacles = runnerObstacles.filter(obs => obs !== obstacle);
+        }
+        clearInterval(collisionCheckInterval);
+    }, duration * 1000 + 500);
+}
 
-		function jump() {
-		    if (!runnerGameActive || isJumping) return;
-		    
-		    isJumping = true;
-		    const player = document.getElementById('runnerPlayer');
-		    player.classList.add('jumping');
-		    
-		    setTimeout(() => {
-		        player.classList.remove('jumping');
-		        isJumping = false;
-		    }, 500);
-		}
+function jump() {
+    if (!runnerGameActive || isJumping) return;
+    
+    isJumping = true;
+    jumpVelocity = jumpPower;
+    const player = document.getElementById('runnerPlayer');
+    player.classList.add('jumping');
+}
 
-		// Controles de salto
-		document.addEventListener('keydown', (e) => {
-		    if (e.code === 'Space' && runnerGameActive) {
-		        e.preventDefault();
-		        jump();
-		    }
-		});
+// Controles de salto
+document.addEventListener('keydown', (e) => {
+    if (e.code === 'Space' && runnerGameActive) {
+        e.preventDefault();
+        jump();
+    }
+});
 
-		document.getElementById('runnerGameArea').addEventListener('click', () => {
-		    if (runnerGameActive) jump();
-		});
+document.getElementById('runnerGameArea').addEventListener('click', () => {
+    if (runnerGameActive) jump();
+});
 
-		document.getElementById('runnerGameArea').addEventListener('touchstart', (e) => {
-		    if (runnerGameActive) {
-		        e.preventDefault();
-		        jump();
-		    }
-		});
+document.getElementById('runnerGameArea').addEventListener('touchstart', (e) => {
+    if (runnerGameActive) {
+        e.preventDefault();
+        jump();
+    }
+});
 
-		async function showRunnerGameOver() {
-		    document.getElementById('runnerFinalScore').textContent = runnerScore;
-		    document.getElementById('runnerGameOverAlert').classList.add('active');
-		    await saveScore('runner', runnerScore);
-		}
+async function showRunnerGameOver() {
+    document.getElementById('runnerFinalScore').textContent = runnerScore;
+    document.getElementById('runnerGameOverAlert').classList.add('active');
+    await saveScore('runner', runnerScore);
+}
 
-		function closeRunnerGameOver() {
-		    document.getElementById('runnerGameOverAlert').classList.remove('active');
-		}
+function closeRunnerGameOver() {
+    document.getElementById('runnerGameOverAlert').classList.remove('active');
+}
 
 		// Cargar stats de Runner
 		async function loadRunnerStats() {
@@ -3030,6 +3089,7 @@ async function loadRunnerLeaderboard() {
 }
 
 		// ===== SPACE INVADERS GAME =====
+// ===== SPACE INVADERS GAME =====
 let invadersGameActive = false;
 let invadersScore = 0;
 let invadersLives = 3;
@@ -3042,6 +3102,8 @@ let invadersGameLoop;
 let invadersShootInterval;
 let lastShotTime = 0;
 const shootCooldown = 300;
+const maxBullets = 3; // Límite de balas en pantalla
+const maxEnemyBullets = 5; // Límite de balas enemigas
 
 function startInvadersGame() {
     if (invadersGameActive || !currentUser) return;
@@ -3073,7 +3135,7 @@ function startInvadersGame() {
     createInvaderWave();
     
     invadersGameLoop = setInterval(updateInvadersGame, 1000 / 60);
-    invadersShootInterval = setInterval(enemyShoot, 1500);
+    invadersShootInterval = setInterval(enemyShoot, 2000); // Aumentado de 1500 a 2000
 }
 
 function stopInvadersGame() {
@@ -3087,8 +3149,13 @@ function stopInvadersGame() {
 
 function createInvaderWave() {
     const gameArea = document.getElementById('invadersGameArea');
-    const rows = 3 + Math.floor(invadersWave / 3);
-    const cols = 5 + Math.floor(invadersWave / 2);
+    
+    // Reducir número de invasores para evitar lag
+    const maxRows = Math.min(4, 3 + Math.floor(invadersWave / 4)); // Máximo 4 filas
+    const maxCols = Math.min(7, 5 + Math.floor(invadersWave / 3)); // Máximo 7 columnas
+    
+    const rows = maxRows;
+    const cols = maxCols;
     const spacing = Math.min(60, gameArea.offsetWidth / (cols + 1));
     
     for (let row = 0; row < rows; row++) {
@@ -3115,17 +3182,21 @@ function createInvaderWave() {
 function updateInvadersGame() {
     if (!invadersGameActive) return;
     
-    // Mover invasores
+    // Mover invasores (optimizado)
     let shouldMoveDown = false;
     const gameArea = document.getElementById('invadersGameArea');
     const maxWidth = gameArea.offsetWidth;
+    const moveSpeed = 0.3 * (1 + invadersWave * 0.05); // Reducido para menos lag
     
+    // Usar requestAnimationFrame para mejor rendimiento
     invadersList.forEach(invader => {
+        if (!invader.parentElement) return;
+        
         let x = parseFloat(invader.dataset.x);
         const y = parseFloat(invader.dataset.y);
         const direction = parseFloat(invader.dataset.direction);
         
-        x += direction * 0.5 * (1 + invadersWave * 0.1);
+        x += direction * moveSpeed;
         
         if (x <= 0 || x >= maxWidth - 50) {
             shouldMoveDown = true;
@@ -3136,8 +3207,11 @@ function updateInvadersGame() {
     });
     
     if (shouldMoveDown) {
-        invadersList.forEach(invader => {let y = parseFloat(invader.dataset.y);
-            y += 20;
+        invadersList.forEach(invader => {
+            if (!invader.parentElement) return;
+            
+            let y = parseFloat(invader.dataset.y);
+            y += 15; // Reducido de 20 a 15
             invader.dataset.y = y;
             invader.style.top = y + 'px';
             invader.dataset.direction *= -1;
@@ -3149,11 +3223,13 @@ function updateInvadersGame() {
         });
     }
     
-    // Mover balas del jugador
-    bulletsList.forEach((bullet, index) => {
-        if (!bullet.parentElement) {
-            bulletsList.splice(index, 1);
-            return;
+    // Mover balas del jugador (optimizado)
+    for (let i = bulletsList.length - 1; i >= 0; i--) {
+        const bullet = bulletsList[i];
+        
+        if (!bullet || !bullet.parentElement) {
+            bulletsList.splice(i, 1);
+            continue;
         }
         
         let y = parseFloat(bullet.style.top);
@@ -3161,43 +3237,58 @@ function updateInvadersGame() {
         bullet.style.top = y + 'px';
         
         // Remover si sale de pantalla
-        if (y < 0) {
+        if (y < -20) {
             bullet.remove();
-            bulletsList.splice(index, 1);
-            return;
+            bulletsList.splice(i, 1);
+            continue;
         }
         
-        // Verificar colisión con invasores
+        // Verificar colisión con invasores (optimizado)
         const bulletRect = bullet.getBoundingClientRect();
-        invadersList.forEach((invader, invIndex) => {
-            if (!invader.parentElement) return;
+        let hitDetected = false;
+        
+        for (let j = invadersList.length - 1; j >= 0; j--) {
+            const invader = invadersList[j];
+            if (!invader || !invader.parentElement) {
+                invadersList.splice(j, 1);
+                continue;
+            }
             
             const invaderRect = invader.getBoundingClientRect();
             if (checkCollision(bulletRect, invaderRect)) {
                 createExplosion(invaderRect.left, invaderRect.top);
                 invader.remove();
-                invadersList.splice(invIndex, 1);
+                invadersList.splice(j, 1);
                 bullet.remove();
-                bulletsList.splice(index, 1);
+                bulletsList.splice(i, 1);
                 
                 invadersScore += 10 * invadersWave;
                 document.getElementById('invadersScore').textContent = invadersScore;
+                
+                hitDetected = true;
                 
                 // Nueva oleada si eliminamos todos
                 if (invadersList.length === 0) {
                     invadersWave++;
                     document.getElementById('invadersWave').textContent = invadersWave;
-                    setTimeout(() => createInvaderWave(), 1000);
+                    setTimeout(() => {
+                        if (invadersGameActive) createInvaderWave();
+                    }, 1000);
                 }
+                break;
             }
-        });
-    });
+        }
+        
+        if (hitDetected) break;
+    }
     
-    // Mover balas enemigas
-    enemyBulletsList.forEach((bullet, index) => {
-        if (!bullet.parentElement) {
-            enemyBulletsList.splice(index, 1);
-            return;
+    // Mover balas enemigas (optimizado)
+    for (let i = enemyBulletsList.length - 1; i >= 0; i--) {
+        const bullet = enemyBulletsList[i];
+        
+        if (!bullet || !bullet.parentElement) {
+            enemyBulletsList.splice(i, 1);
+            continue;
         }
         
         let y = parseFloat(bullet.style.top);
@@ -3205,10 +3296,10 @@ function updateInvadersGame() {
         bullet.style.top = y + 'px';
         
         // Remover si sale de pantalla
-        if (y > gameArea.offsetHeight) {
+        if (y > gameArea.offsetHeight + 20) {
             bullet.remove();
-            enemyBulletsList.splice(index, 1);
-            return;
+            enemyBulletsList.splice(i, 1);
+            continue;
         }
         
         // Verificar colisión con jugador
@@ -3217,10 +3308,10 @@ function updateInvadersGame() {
         
         if (checkCollision(bulletRect, playerRect)) {
             bullet.remove();
-            enemyBulletsList.splice(index, 1);
+            enemyBulletsList.splice(i, 1);
             loseLife();
         }
-    });
+    }
 }
 
 function checkCollision(rect1, rect2) {
@@ -3237,6 +3328,10 @@ function shootBullet() {
     
     const now = Date.now();
     if (now - lastShotTime < shootCooldown) return;
+    
+    // Límite de balas en pantalla
+    if (bulletsList.length >= maxBullets) return;
+    
     lastShotTime = now;
     
     const player = document.getElementById('invadersPlayer');
@@ -3256,8 +3351,19 @@ function shootBullet() {
 function enemyShoot() {
     if (!invadersGameActive || invadersList.length === 0) return;
     
-    // Seleccionar un invasor aleatorio
-    const shooter = invadersList[Math.floor(Math.random() * invadersList.length)];
+    // Límite de balas enemigas
+    if (enemyBulletsList.length >= maxEnemyBullets) return;
+    
+    // Seleccionar un invasor aleatorio de los que están más abajo
+    const bottomInvaders = invadersList.filter(inv => {
+        if (!inv || !inv.parentElement) return false;
+        const y = parseFloat(inv.dataset.y);
+        return y > 100; // Solo los que están más abajo pueden disparar
+    });
+    
+    if (bottomInvaders.length === 0) return;
+    
+    const shooter = bottomInvaders[Math.floor(Math.random() * bottomInvaders.length)];
     if (!shooter || !shooter.parentElement) return;
     
     const bullet = document.createElement('div');
@@ -3279,10 +3385,13 @@ function createExplosion(x, y) {
     explosion.textContent = '💥';
     explosion.style.left = x + 'px';
     explosion.style.top = y + 'px';
+    explosion.style.position = 'fixed'; // Cambiar a fixed para evitar bugs
     
-    document.getElementById('invadersGameArea').appendChild(explosion);
+    document.body.appendChild(explosion); // Agregar al body en vez del gameArea
     
-    setTimeout(() => explosion.remove(), 500);
+    setTimeout(() => {
+        if (explosion.parentElement) explosion.remove();
+    }, 500);
 }
 
 function loseLife() {
