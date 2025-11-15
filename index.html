@@ -1390,7 +1390,31 @@
     animation: explode 0.5s ease-out forwards;
     z-index: 100;
 }
+
+/* Symbol buttons */
+.symbol-btn {
+    padding: 0.3rem 0.6rem;
+    background: rgba(0, 255, 255, 0.1);
+    border: 1px solid rgba(0, 255, 255, 0.3);
+    border-radius: var(--radius-sm);
+    color: var(--clr-neon-cyan);
+    font-size: 1rem;
+    cursor: pointer;
+    transition: all var(--transition-fast);
 }
+
+.symbol-btn:hover {
+    background: rgba(0, 255, 255, 0.2);
+    border-color: var(--clr-neon-cyan);
+    transform: scale(1.1);
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.4);
+}
+
+.symbol-btn:active {
+    transform: scale(0.95);
+}
+}
+
 
 /* ============================================
    LAYER: ANIMATIONS
@@ -2142,6 +2166,68 @@
 	                    style="width: 100%;"
 	                    aria-label="New nickname input"
 	                >
+	                <div style="margin-block-end: var(--space-md);">
+    <label for="nicknameInput" style="display: block; margin-block-end: var(--space-xs); color: var(--clr-neon-cyan); font-weight: 600;">
+        New Nickname:
+    </label>
+    <input 
+        type="text" 
+        id="nicknameInput" 
+        class="arcade-input" 
+        placeholder="Enter your nickname... ༺♰•YourName•♰༻" 
+        maxlength="30"
+        style="width: 100%;"
+        aria-label="New nickname input"
+    >
+    
+    <!-- ✅ NUEVO: Panel de símbolos sugeridos -->
+    <details style="margin-block-start: var(--space-sm); padding: var(--space-sm); background: rgba(0,0,0,0.3); border-radius: var(--radius-sm); border: 1px solid rgba(0,255,255,0.2);">
+        <summary style="cursor: pointer; color: var(--clr-neon-cyan); font-size: 0.85rem; user-select: none;">
+            ✨ Click for fancy symbols
+        </summary>
+        <div style="margin-block-start: var(--space-xs); font-size: 0.9rem; line-height: 1.8; opacity: 0.9;">
+            <div style="margin-block-end: 0.3rem;"><strong>Decorators:</strong></div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.5rem;">
+                <button onclick="insertSymbol('༺')" class="symbol-btn">༺</button>
+                <button onclick="insertSymbol('༻')" class="symbol-btn">༻</button>
+                <button onclick="insertSymbol('꧁')" class="symbol-btn">꧁</button>
+                <button onclick="insertSymbol('꧂')" class="symbol-btn">꧂</button>
+                <button onclick="insertSymbol('【')" class="symbol-btn">【</button>
+                <button onclick="insertSymbol('】')" class="symbol-btn">】</button>
+                <button onclick="insertSymbol('«')" class="symbol-btn">«</button>
+                <button onclick="insertSymbol('»')" class="symbol-btn">»</button>
+            </div>
+            
+            <div style="margin-block-end: 0.3rem;"><strong>Special:</strong></div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.5rem;">
+                <button onclick="insertSymbol('♰')" class="symbol-btn">♰</button>
+                <button onclick="insertSymbol('☠')" class="symbol-btn">☠</button>
+                <button onclick="insertSymbol('҉')" class="symbol-btn">҉</button>
+                <button onclick="insertSymbol('ツ')" class="symbol-btn">ツ</button>
+                <button onclick="insertSymbol('ッ')" class="symbol-btn">ッ</button>
+                <button onclick="insertSymbol('シ')" class="symbol-btn">シ</button>
+                <button onclick="insertSymbol('ϟ')" class="symbol-btn">ϟ</button>
+                <button onclick="insertSymbol('Ω')" class="symbol-btn">Ω</button>
+            </div>
+            
+            <div style="margin-block-end: 0.3rem;"><strong>Stars & Dots:</strong></div>
+            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
+                <button onclick="insertSymbol('•')" class="symbol-btn">•</button>
+                <button onclick="insertSymbol('●')" class="symbol-btn">●</button>
+                <button onclick="insertSymbol('★')" class="symbol-btn">★</button>
+                <button onclick="insertSymbol('☆')" class="symbol-btn">☆</button>
+                <button onclick="insertSymbol('✦')" class="symbol-btn">✦</button>
+                <button onclick="insertSymbol('✧')" class="symbol-btn">✧</button>
+                <button onclick="insertSymbol('◈')" class="symbol-btn">◈</button>
+                <button onclick="insertSymbol('◉')" class="symbol-btn">◉</button>
+            </div>
+        </div>
+    </details>
+    
+    <div id="nicknameError" style="color: var(--clr-neon-pink); margin-block-start: var(--space-xs); font-size: 0.85rem; min-height: 1.5rem;">
+        <!-- Error messages here -->
+    </div>
+</div>
 	                <div id="nicknameError" style="color: var(--clr-neon-pink); margin-block-start: var(--space-xs); font-size: 0.85rem; min-height: 1.5rem;">
 	                    <!-- Error messages here -->
 	                </div>
@@ -2295,6 +2381,21 @@ function openChangeNickname() {
     document.getElementById('nicknameInput').value = userNickname || '';
     document.getElementById('nicknameError').textContent = '';
     document.getElementById('nicknameInput').focus();
+}
+
+// Insertar símbolo en el input
+function insertSymbol(symbol) {
+    const input = document.getElementById('nicknameInput');
+    const cursorPos = input.selectionStart;
+    const textBefore = input.value.substring(0, cursorPos);
+    const textAfter = input.value.substring(cursorPos);
+    
+    input.value = textBefore + symbol + textAfter;
+    
+    // Mover cursor después del símbolo insertado
+    const newPos = cursorPos + symbol.length;
+    input.setSelectionRange(newPos, newPos);
+    input.focus();
 }
 
 // Cerrar modal
