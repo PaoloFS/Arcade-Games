@@ -1695,14 +1695,25 @@
 
 	<script>
 		// Initialize stars
-		const starsContainer = document.getElementById('starsContainer');
-		for (let i = 0; i < 100; i++) {
-			const star = document.createElement('div');
-			star.className = 'star';
-			star.style.left = Math.random() * 100 + '%';
-			star.style.top = Math.random() * 100 + '%';
-			star.style.animationDelay = Math.random() * 3 + 's';
-			starsContainer.appendChild(star);
+		document.addEventListener('DOMContentLoaded', () => {
+		    initAuth();
+		    initializeStars();
+		});
+
+		function initializeStars() {
+		    const starsContainer = document.getElementById('starsContainer');
+		    const fragment = document.createDocumentFragment(); // ✅ Mejor rendimiento
+		    
+		    for (let i = 0; i < 100; i++) {
+		        const star = document.createElement('div');
+		        star.className = 'star';
+		        star.style.left = `${Math.random() * 100}%`;
+		        star.style.top = `${Math.random() * 100}%`;
+		        star.style.animationDelay = `${Math.random() * 3}s`;
+		        fragment.appendChild(star);
+		    }
+		    
+		    starsContainer.appendChild(fragment);
 		}
 
 		// ===== AÑADE ESTO: INICIALIZACIÓN DE FIREBASE =====
@@ -2294,46 +2305,48 @@
 			});
 		}
 
+		let isProcessingFlip = false;
+
 		function flipCard() {
-			if (!memoryGameActive) return;
-			if (flippedCards.length === 2 || this.classList.contains('flipped') || this.classList.contains('matched')) {
-				return;
-			}
-
-			this.textContent = this.dataset.emoji;
-			this.classList.add('flipped');
-			flippedCards.push(this);
-
-			if (flippedCards.length === 2) {
-				moves++;
-				document.getElementById('memoryMoves').textContent = moves;
-				
-				setTimeout(async () => {
-					if (flippedCards[0].dataset.emoji === flippedCards[1].dataset.emoji) {
-						flippedCards[0].classList.add('matched');
-						flippedCards[1].classList.add('matched');
-						pairs++;
-						document.getElementById('memoryPairs').textContent = `${pairs}/8`;
-						
-						if (pairs === 8) {
-							memoryGameActive = false;
-							clearInterval(memoryTimer);
-							setTimeout(async () => {
-								// Mostrar el nuevo modal personalizado
-								document.getElementById('finalMoves').textContent = moves;
-								document.getElementById('memoryVictoryAlert').classList.add('active');
-								await saveScore('memory', moves);
-							}, 300);
-						}
-					} else {
-						flippedCards[0].textContent = '';
-						flippedCards[1].textContent = '';
-						flippedCards[0].classList.remove('flipped');
-						flippedCards[1].classList.remove('flipped');
-					}
-					flippedCards = [];
-				}, 800);
-			}
+		    if (!memoryGameActive || isProcessingFlip) return;
+		    if (flippedCards.length === 2 || this.classList.contains('flipped') || this.classList.contains('matched')) {
+		        return;
+		    }
+		    
+		    this.textContent = this.dataset.emoji;
+		    this.classList.add('flipped');
+		    flippedCards.push(this);
+		    
+		    if (flippedCards.length === 2) {
+		        isProcessingFlip = true; // ✅ Bloquear clicks mientras se procesan las cartas
+		        moves++;
+		        document.getElementById('memoryMoves').textContent = moves;
+		        
+		        setTimeout(async () => {
+		            if (flippedCards[0].dataset.emoji === flippedCards[1].dataset.emoji) {
+		                flippedCards[0].classList.add('matched');
+		                flippedCards[1].classList.add('matched');
+		                pairs++;
+		                document.getElementById('memoryPairs').textContent = `${pairs}/8`;
+		                
+		                if (pairs === 8) {
+		                    memoryGameActive = false;
+		                    setTimeout(async () => {
+		                        document.getElementById('finalMoves').textContent = moves;
+		                        document.getElementById('memoryVictoryAlert').classList.add('active');
+		                        await saveScore('memory', moves);
+		                    }, 300);
+		                }
+		            } else {
+		                flippedCards[0].textContent = '';
+		                flippedCards[1].textContent = '';
+		                flippedCards[0].classList.remove('flipped');
+		                flippedCards[1].classList.remove('flipped');
+		            }
+		            flippedCards = [];
+		            isProcessingFlip = false; // ✅ Desbloquear clicks
+		        }, 800);
+		    }
 		}
 
 		// Add shake and fall animations
