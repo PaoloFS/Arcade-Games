@@ -10,549 +10,455 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* ============================================
-         * RESET & YOUR DESIGN TOKENS (OKLCH)
-         * ============================================ */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-
-        :root {
-            /* Your Neon Arcade Colors */
-            --neon-cyan: oklch(0.85 0.25 195);
-            --neon-pink: oklch(0.65 0.30 350);
-            --neon-yellow: oklch(0.85 0.20 85);
-            --neon-purple: oklch(0.60 0.28 290);
-            --neon-green: oklch(0.80 0.25 145);
-            --neon-red: oklch(0.60 0.30 20); /* Nuevo color para errores */
-            
-            /* Your Backgrounds */
-            --bg-dark: oklch(0.12 0.02 265);
-            --bg-darker: oklch(0.08 0.01 265);
-            --bg-card: oklch(0.15 0.03 265 / 0.95);
-            --bg-glass: oklch(0.18 0.03 265 / 0.7);
-            
-            /* Your Spacing & Radii */
-            --space-3xs: clamp(0.25rem, 0.24rem + 0.05vw, 0.31rem);
-            --space-2xs: clamp(0.5rem, 0.48rem + 0.09vw, 0.63rem);
-            --space-xs: clamp(0.75rem, 0.73rem + 0.14vw, 0.94rem);
-            --space-sm: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
-            --space-md: clamp(1.5rem, 1.45rem + 0.28vw, 1.88rem);
-            --space-lg: clamp(2rem, 1.94rem + 0.37vw, 2.5rem);
-            --space-xl: clamp(3rem, 2.91rem + 0.56vw, 3.75rem);
-            --radius-sm: clamp(0.5rem, 0.48rem + 0.09vw, 0.63rem);
-            --radius-md: clamp(0.75rem, 0.73rem + 0.14vw, 0.94rem);
-            --radius-lg: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
-            --radius-full: 9999px;
-
-            /* Your Fonts */
-            --font-pixel: 'Press Start 2P', monospace;
-            --font-sans: 'Space Grotesk', sans-serif;
-
-            /* Transitions */
-            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-        }
-
-        /* ============================================
-         * BASE STYLES & BACKGROUND
-         * ============================================ */
-        html {
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
-        }
-
-        body {
-            min-block-size: 100vh;
-            min-block-size: 100dvh;
-            background: 
-                radial-gradient(ellipse at top, oklch(0.2 0.05 265) 0%, var(--bg-dark) 40%, var(--bg-darker) 100%);
-            font-family: var(--font-sans);
-            color: oklch(0.95 0 0);
-            overflow: hidden;
-            
-            display: grid;
-            place-items: center;
-            padding: var(--space-md);
-            position: relative;
-        }
-
-        /* Your subtle grid background */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: 
-                linear-gradient(90deg, var(--neon-cyan) 1px, transparent 1px),
-                linear-gradient(0deg, var(--neon-cyan) 1px, transparent 1px);
-            background-size: 60px 60px;
-            opacity: 0.03;
-            pointer-events: none;
-            z-index: 0;
-            animation: gridFloat 30s linear infinite; /* Reuse your animation */
-        }
-        
-        /* Your particle background */
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: 
-                radial-gradient(circle at 20% 30%, var(--neon-cyan) 1px, transparent 1px),
-                radial-gradient(circle at 80% 70%, var(--neon-pink) 1px, transparent 1px),
-                radial-gradient(circle at 50% 50%, var(--neon-purple) 1px, transparent 1px);
-            background-size: 200px 200px, 250px 250px, 300px 300px;
-            opacity: 0.06;
-            animation: particleMove 40s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* ============================================
-         * LOADING SCREEN (New Feature)
-         * ============================================ */
-        .loading-screen {
-            position: fixed;
-            inset: 0;
-            background: var(--bg-darker);
-            z-index: 9999;
-            display: grid;
-            place-items: center;
-            /* CSS controls the fade out */
-            transition: opacity 1s ease-out 2s, visibility 1s ease-out 2s;
-        }
-
-        .loading-screen.hidden {
-            opacity: 0;
-            visibility: hidden;
-        }
-
-        .loader-text {
-            font-family: var(--font-pixel);
-            font-size: clamp(1.2rem, 4vw, 2.5rem);
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px var(--neon-cyan);
-            /* Combines a glitch and a fade in/out */
-            animation: textGlitch 1.5s linear infinite alternate, fadeInOut 2s ease-in-out;
-        }
-        
-        /* ============================================
-         * MAIN MAINTENANCE UI
-         * ============================================ */
-        .maintenance-container {
-            position: relative;
-            z-index: 10;
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-lg);
-            max-inline-size: 1000px;
-            inline-size: 95vw;
-            opacity: 0; /* Hidden until loading screen fades */
-            /* Fades in after the loading screen (2s) starts to fade (2.5s) */
-            transition: opacity 1s ease-in 2.5s;
-        }
-        
-        .maintenance-container.active {
-            opacity: 1;
-        }
-
-        .header-section {
-            text-align: center;
-            padding: var(--space-md);
-            background: var(--bg-card);
-            border: 2px solid transparent;
-            border-radius: var(--radius-lg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 8px 32px oklch(0 0 0 / 0.35);
-            background-clip: padding-box;
-            position: relative;
-        }
-        
-        .header-section::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: inherit;
-            padding: 2px;
-            background: linear-gradient(
-                90deg,
-                var(--neon-cyan),
-                var(--neon-pink),
-                var(--neon-yellow),
-                var(--neon-cyan)
-            );
-            background-size: 200% 100%;
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            animation: borderFlow 8s linear infinite;
-            z-index: -1;
-        }
-
-        h1 {
-            font-family: var(--font-pixel);
-            font-size: clamp(1.8rem, 4vw, 2.8rem);
-            line-height: 1.4;
-            color: var(--neon-yellow);
-            text-shadow: 0 0 20px var(--neon-yellow);
-            margin-block-end: var(--space-sm);
-        }
-
-        .status-message {
-            font-size: clamp(1rem, 2vw, 1.25rem);
-            color: var(--neon-cyan);
-            text-shadow: 0 0 12px var(--neon-cyan);
-            opacity: 0.9;
-            line-height: 1.6;
-            max-inline-size: 60ch;
-            margin-inline: auto;
-        }
-
-        /* Progress Bar (more complex, 'Houdini' style) */
-        .progress-indicator {
-            inline-size: 100%;
-            block-size: var(--space-md);
-            background: oklch(0 0 0 / 0.6);
-            border: 2px solid var(--neon-purple);
-            border-radius: var(--radius-sm);
-            overflow: hidden;
-            position: relative;
-            box-shadow: inset 0 0 15px var(--neon-purple) / 30%;
-            margin-block-start: var(--space-lg);
-            
-            /* Background stripes for a processing look */
-            background-image: repeating-linear-gradient(
-                45deg,
-                oklch(0 0 0 / 0.2),
-                oklch(0 0 0 / 0.2) 10px,
-                transparent 10px,
-                transparent 20px
-            );
-            background-size: 30px 30px;
-            animation: progressStripes 1s linear infinite;
-        }
-
-        .progress-fill {
-            inline-size: 0%; /* Controlled by JS */
-            block-size: 100%;
-            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
-            transition: inline-size 0.5s ease-out; /* Smooth fill */
-            box-shadow: 0 0 15px var(--neon-pink);
-        }
-
-        /* Status Modules Grid */
-        .modules-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: var(--space-md);
-        }
-
-        .module-card {
-            background: var(--bg-card);
-            border: 2px solid transparent;
-            border-radius: var(--radius-md);
-            padding: var(--space-md);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            box-shadow: 0 4px 16px oklch(0 0 0 / 0.25);
-            position: relative;
-            background-clip: padding-box;
-            text-align: center;
-            transition: all var(--transition-base);
-            min-block-size: 100px; /* Min height for modules */
-        }
-        
-        .module-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 8px 24px oklch(0 0 0 / 0.4);
-        }
-
-        .module-card::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: inherit;
-            padding: 2px;
-            background: linear-gradient(
-                135deg,
-                var(--neon-cyan),
-                var(--neon-pink),
-                var(--neon-cyan)
-            );
-            background-size: 200% 200%;
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            animation: borderRotate 10s linear infinite;
-            z-index: -1;
-            opacity: 0.5;
-            transition: opacity var(--transition-base);
-        }
-        
-        .module-card:hover::before {
-            opacity: 1;
-        }
-
-        .module-title {
-            font-family: var(--font-pixel);
-            font-size: 0.9rem;
-            color: var(--neon-yellow);
-            text-shadow: 0 0 8px var(--neon-yellow);
-            margin-block-end: var(--space-2xs);
-            line-height: 1.3;
-        }
-
-        .module-status {
-            font-family: var(--font-sans);
-            font-size: 0.8rem;
-            font-weight: 600;
-            letter-spacing: 0.05em;
-            text-transform: uppercase;
-        }
-        
-        .module-card[data-state="online"] .module-status { color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
-        .module-card[data-state="offline"] .module-status { color: var(--neon-red); text-shadow: 0 0 5px var(--neon-red); }
-        .module-card[data-state="updating"] .module-status { color: var(--neon-cyan); text-shadow: 0 0 5px var(--neon-cyan); animation: pulse 1.5s infinite; }
-        .module-card[data-state="idle"] .module-status { color: oklch(0.7 0 0); } /* Grey */
-
-        /* Detailed Status Log */
-        .status-log-section {
-            background: oklch(0 0 0 / 0.7);
-            border: 1px solid var(--neon-cyan) / 20%;
-            border-radius: var(--radius-md);
-            max-block-size: 300px; /* Taller log */
-            overflow: hidden;
-            padding: var(--space-sm);
-            box-shadow: inset 0 0 20px oklch(0 0 0 / 0.5);
-            -webkit-mask-image: linear-gradient(transparent, black var(--space-lg), black 90%, transparent);
-            mask-image: linear-gradient(transparent, black var(--space-lg), black 90%, transparent);
-            position: relative;
-        }
-        
-        .status-log-section::before { /* Animated scanline on log */
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(
-                transparent 0%, 
-                oklch(1 0 0 / 0.05) 50%, 
-                transparent 100%
-            );
-            background-size: 100% 30px;
-            animation: scanline 8s linear infinite;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        .status-log {
-            list-style: none;
-            animation: scrollLog 60s linear infinite; /* Slower for more content */
-        }
-
-        .status-log li {
-            font-family: 'Space Grotesk', monospace; /* More terminal-like font */
-            font-size: 0.85rem;
-            line-height: 1.6;
-            color: oklch(0.85 0 0);
-            display: flex;
-            gap: var(--space-xs);
-            white-space: nowrap; /* Prevent wrapping for terminal feel */
-        }
-        
-        .status-log li span {
-            opacity: 0.5;
-            flex-shrink: 0;
-            color: oklch(0.7 0 0);
-        }
-        
-        .status-log li::before {
-            flex-shrink: 0;
-            font-weight: 700;
-        }
-
-        .status-log li[data-log-status="ok"]::before { content: '[ OK ]'; color: var(--neon-green); }
-        .status-log li[data-log-status="info"]::before { content: '[ INFO ]'; color: var(--neon-cyan); }
-        .status-log li[data-log-status="warn"]::before { content: '[ WARN ]'; color: var(--neon-yellow); }
-        .status-log li[data-log-status="error"]::before { content: '[ FAIL ]'; color: var(--neon-red); animation: textFlicker 0.5s infinite alternate; }
-        .status-log li[data-log-status="debug"]::before { content: '[ DEBUG ]'; color: var(--neon-purple); opacity: 0.7; }
-
-        /* ============================================
-         * ANIMATIONS (REUSED & NEW)
-         * ============================================ */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
-        @keyframes fadeInOut {
-            0%, 100% { opacity: 0; }
-            50% { opacity: 1; }
-        }
-
-        @keyframes textGlitch {
-            0% { transform: translate(0); text-shadow: 0 0 10px var(--neon-cyan); }
-            20% { transform: translate(-2px, 2px); text-shadow: 0 0 8px var(--neon-cyan), 1px 1px 0 var(--neon-pink); }
-            40% { transform: translate(2px, -2px); text-shadow: 0 0 12px var(--neon-cyan), -1px -1px 0 var(--neon-green); }
-            60% { transform: translate(-1px, 1px); text-shadow: 0 0 10px var(--neon-cyan); }
-            80% { transform: translate(1px, -1px); text-shadow: 0 0 11px var(--neon-cyan), 2px 0 0 var(--neon-yellow); }
-            100% { transform: translate(0); text-shadow: 0 0 10px var(--neon-cyan); }
-        }
-
-        @keyframes borderFlow {
-            to { background-position: 200% center; }
-        }
-
-        @keyframes borderRotate {
-            to { background-position: 200% 200%; }
-        }
-        
-        @keyframes progressStripes {
-            to { background-position: 30px 0; }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.02); opacity: 0.8; }
-        }
-        
-        @keyframes scanline {
-            0% { transform: translateY(-100%); }
-            100% { transform: translateY(100%); }
-        }
-
-        @keyframes scrollLog {
-            0% { transform: translateY(0); }
-            100% { transform: translateY(-50%); } /* Scrolls exactly half the list */
-        }
-        
-        @keyframes gridFloat {
-            from { transform: translateY(0); }
-            to { transform: translateY(60px); }
-        }
-
-        @keyframes particleMove {
-            0%, 100% { background-position: 0% 0%, 100% 100%, 50% 50%; }
-            50% { background-position: 100% 100%, 0% 0%, 80% 20%; }
-        }
-        
-        @keyframes textFlicker {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.7; }
-        }
-
-        /* Responsive adjustments */
-        @media (max-width: 600px) {
-            .modules-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        /* ============================================
- * SUPER RESPONSIVE OPTIMIZATION
+       /* ============================================
+ * RESET & DESIGN TOKENS (Con Clamp)
  * ============================================ */
-
-/* Celulares pequeños (≤ 600px) */
-@media (max-width: 600px) {
-
-    body {
-        overflow-y: auto;               /* Permite scroll */
-        padding: var(--space-sm);
-    }
-
-    .maintenance-container {
-        gap: var(--space-md);
-        inline-size: 100%;
-    }
-
-    .header-section {
-        padding: var(--space-sm);
-    }
-
-    h1 {
-        font-size: clamp(1.2rem, 5vw, 2rem);
-        line-height: 1.3;
-    }
-
-    .status-message {
-        font-size: 0.9rem;
-    }
-
-    .progress-indicator {
-        block-size: 1.2rem;
-    }
-
-    .modules-grid {
-        grid-template-columns: 1fr;     /* Una columna en móvil */
-        gap: var(--space-sm);
-    }
-
-    .module-card {
-        padding: var(--space-sm);
-        min-block-size: auto;
-    }
-
-    .module-title {
-        font-size: 0.75rem;
-    }
-
-    .module-status {
-        font-size: 0.7rem;
-    }
-
-    .status-log-section {
-        max-block-size: 200px;          /* Más pequeño para pantallas chicas */
-        padding: var(--space-xs);
-    }
-
-    .status-log li {
-        font-size: 0.75rem;
-    }
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
-/* Tablets (600px – 900px) */
-@media (max-width: 900px) {
+:root {
+    /* Tus Colores Neon Arcade (OKLCH) */
+    --neon-cyan: oklch(0.85 0.25 195);
+    --neon-pink: oklch(0.65 0.30 350);
+    --neon-yellow: oklch(0.85 0.20 85);
+    --neon-purple: oklch(0.60 0.28 290);
+    --neon-green: oklch(0.80 0.25 145);
+    --neon-red: oklch(0.60 0.30 20); /* Para errores */
+    
+    /* Tus Fondos */
+    --bg-dark: oklch(0.12 0.02 265);
+    --bg-darker: oklch(0.08 0.01 265);
+    --bg-card: oklch(0.15 0.03 265 / 0.95);
+    
+    /* Tu Espaciado Fluido (Clamp) */
+    --space-3xs: clamp(0.25rem, 0.24rem + 0.05vw, 0.31rem);
+    --space-2xs: clamp(0.5rem, 0.48rem + 0.09vw, 0.63rem);
+    --space-xs: clamp(0.75rem, 0.73rem + 0.14vw, 0.94rem);
+    --space-sm: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
+    --space-md: clamp(1.5rem, 1.45rem + 0.28vw, 1.88rem);
+    --space-lg: clamp(2rem, 1.94rem + 0.37vw, 2.5rem);
+    --space-xl: clamp(3rem, 2.91rem + 0.56vw, 3.75rem);
+    
+    /* Tu Tipografía Fluida (Clamp) */
+    --fs-xs: clamp(0.75rem, 0.73rem + 0.14vw, 0.94rem);
+    --fs-sm: clamp(0.875rem, 0.85rem + 0.16vw, 1.09rem);
+    --fs-base: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
+    --fs-md: clamp(1.125rem, 1.09rem + 0.21vw, 1.41rem);
+    --fs-lg: clamp(1.25rem, 1.21rem + 0.23vw, 1.56rem);
+    --fs-xl: clamp(1.5rem, 1.45rem + 0.28vw, 1.88rem);
+    --fs-2xl: clamp(2rem, 1.94rem + 0.37vw, 2.5rem);
+    --fs-3xl: clamp(2.5rem, 2.42rem + 0.47vw, 3.13rem);
+    
+    /* Tus Radios */
+    --radius-sm: clamp(0.5rem, 0.48rem + 0.09vw, 0.63rem);
+    --radius-md: clamp(0.75rem, 0.73rem + 0.14vw, 0.94rem);
+    --radius-lg: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
 
-    body {
-        padding: var(--space-md);
-        overflow-y: auto;
-    }
+    /* Tus Fuentes */
+    --font-pixel: 'Press Start 2P', monospace;
+    --font-sans: 'Space Grotesk', sans-serif;
 
-    .modules-grid {
-        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    }
-
-    .header-section {
-        padding: var(--space-md);
-    }
+    /* Tus Transiciones */
+    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Ultra Small Screens (≤ 380px) */
-@media (max-width: 380px) {
-    h1 {
-        font-size: 1.1rem;
-    }
-
-    .loader-text {
-        font-size: 1rem;
-    }
-
-    .module-title {
-        font-size: 0.7rem;
-    }
-
-    .module-status {
-        font-size: 0.65rem;
-    }
-
-    .status-log li {
-        font-size: 0.7rem;
-    }
+/* ============================================
+ * ESTILOS BASE & FONDO
+ * ============================================ */
+html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
 }
 
+body {
+    min-block-size: 100vh;
+    min-block-size: 100dvh;
+    background: 
+        radial-gradient(ellipse at top, oklch(0.2 0.05 265) 0%, var(--bg-dark) 40%, var(--bg-darker) 100%);
+    font-family: var(--font-sans);
+    color: oklch(0.95 0 0);
+    overflow: hidden;
+    
+    display: grid;
+    place-items: center;
+    padding: var(--space-md);
+    position: relative;
+}
 
+/* Fondo de grid sutil */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: 
+        linear-gradient(90deg, var(--neon-cyan) 1px, transparent 1px),
+        linear-gradient(0deg, var(--neon-cyan) 1px, transparent 1px);
+    background-size: 60px 60px;
+    opacity: 0.03;
+    pointer-events: none;
+    z-index: 0;
+    animation: gridFloat 30s linear infinite;
+}
+
+/* Fondo de partículas sutil */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: 
+        radial-gradient(circle at 20% 30%, var(--neon-cyan) 1px, transparent 1px),
+        radial-gradient(circle at 80% 70%, var(--neon-pink) 1px, transparent 1px),
+        radial-gradient(circle at 50% 50%, var(--neon-purple) 1px, transparent 1px);
+    background-size: 200px 200px, 250px 250px, 300px 300px;
+    opacity: 0.06;
+    animation: particleMove 40s ease-in-out infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* ============================================
+ * PANTALLA DE CARGA
+ * ============================================ */
+.loading-screen {
+    position: fixed;
+    inset: 0;
+    background: var(--bg-darker);
+    z-index: 9999;
+    display: grid;
+    place-items: center;
+    transition: opacity 1s ease-out 2s, visibility 1s ease-out 2s;
+}
+
+.loading-screen.hidden {
+    opacity: 0;
+    visibility: hidden;
+}
+
+.loader-text {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-2xl); /* Usando tu variable clamp */
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px var(--neon-cyan);
+    animation: textGlitch 1.5s linear infinite alternate, fadeInOut 2s ease-in-out;
+}
+
+/* ============================================
+ * UI PRINCIPAL DE MANTENIMIENTO
+ * ============================================ */
+.maintenance-container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-lg); /* Usando tu variable clamp */
+    max-inline-size: 1000px;
+    inline-size: 95vw;
+    opacity: 0;
+    transition: opacity 1s ease-in 2.5s;
+}
+
+.maintenance-container.active {
+    opacity: 1;
+}
+
+.header-section {
+    text-align: center;
+    padding: var(--space-md); /* Usando tu variable clamp */
+    background: var(--bg-card);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    box-shadow: 0 8px 32px oklch(0 0 0 / 0.35);
+    background-clip: padding-box;
+    position: relative;
+}
+
+/* Borde animado */
+.header-section::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(
+        90deg,
+        var(--neon-cyan),
+        var(--neon-pink),
+        var(--neon-yellow),
+        var(--neon-cyan)
+    );
+    background-size: 200% 100%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: borderFlow 8s linear infinite;
+    z-index: -1;
+}
+
+h1 {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-2xl); /* Usando tu variable clamp */
+    line-height: 1.4;
+    color: var(--neon-yellow);
+    text-shadow: 0 0 20px var(--neon-yellow);
+    margin-block-end: var(--space-sm); /* Usando tu variable clamp */
+}
+
+.status-message {
+    font-size: var(--fs-base); /* Usando tu variable clamp */
+    color: var(--neon-cyan);
+    text-shadow: 0 0 12px var(--neon-cyan);
+    opacity: 0.9;
+    line-height: 1.6;
+    max-inline-size: 60ch;
+    margin-inline: auto;
+}
+
+/* Barra de Progreso */
+.progress-indicator {
+    inline-size: 100%;
+    block-size: var(--space-md); /* Usando tu variable clamp */
+    background: oklch(0 0 0 / 0.6);
+    border: 2px solid var(--neon-purple);
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 0 15px var(--neon-purple) / 30%;
+    margin-block-start: var(--space-lg); /* Usando tu variable clamp */
+    
+    background-image: repeating-linear-gradient(
+        45deg,
+        oklch(0 0 0 / 0.2),
+        oklch(0 0 0 / 0.2) 10px,
+        transparent 10px,
+        transparent 20px
+    );
+    background-size: 30px 30px;
+    animation: progressStripes 1s linear infinite;
+}
+
+.progress-fill {
+    inline-size: 0%; /* Controlado por JS */
+    block-size: 100%;
+    background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+    transition: inline-size 0.5s ease-out;
+    box-shadow: 0 0 15px var(--neon-pink);
+}
+
+/* Grid de Módulos (Responsivo por naturaleza) */
+.modules-grid {
+    display: grid;
+    /* Usa auto-fit y minmax para responsiveness automático */
+    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
+    gap: var(--space-md); /* Usando tu variable clamp */
+}
+
+.module-card {
+    background: var(--bg-card);
+    border: 2px solid transparent;
+    border-radius: var(--radius-md);
+    padding: var(--space-md); /* Usando tu variable clamp */
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 4px 16px oklch(0 0 0 / 0.25);
+    position: relative;
+    background-clip: padding-box;
+    text-align: center;
+    transition: all var(--transition-base);
+    min-block-size: 100px;
+}
+        
+.module-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px oklch(0 0 0 / 0.4);
+}
+
+.module-card::before {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(
+        135deg,
+        var(--neon-cyan),
+        var(--neon-pink),
+        var(--neon-cyan)
+    );
+    background-size: 200% 200%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: borderRotate 10s linear infinite;
+    z-index: -1;
+    opacity: 0.5;
+    transition: opacity var(--transition-base);
+}
+        
+.module-card:hover::before {
+    opacity: 1;
+}
+
+.module-title {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-sm); /* Usando tu variable clamp */
+    color: var(--neon-yellow);
+    text-shadow: 0 0 8px var(--neon-yellow);
+    margin-block-end: var(--space-2xs); /* Usando tu variable clamp */
+    line-height: 1.3;
+}
+
+.module-status {
+    font-family: var(--font-sans);
+    font-size: var(--fs-xs); /* Usando tu variable clamp */
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+}
+        
+.module-card[data-state="online"] .module-status { color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
+.module-card[data-state="offline"] .module-status { color: var(--neon-red); text-shadow: 0 0 5px var(--neon-red); }
+.module-card[data-state="updating"] .module-status { color: var(--neon-cyan); text-shadow: 0 0 5px var(--neon-cyan); animation: pulse 1.5s infinite; }
+.module-card[data-state="idle"] .module-status { color: oklch(0.7 0 0); } /* Grey */
+
+/* Log de Estado Detallado */
+.status-log-section {
+    background: oklch(0 0 0 / 0.7);
+    border: 1px solid var(--neon-cyan) / 20%;
+    border-radius: var(--radius-md);
+    max-block-size: 300px;
+    overflow: hidden;
+    padding: var(--space-sm); /* Usando tu variable clamp */
+    box-shadow: inset 0 0 20px oklch(0 0 0 / 0.5);
+    -webkit-mask-image: linear-gradient(transparent, black var(--space-lg), black 90%, transparent);
+    mask-image: linear-gradient(transparent, black var(--space-lg), black 90%, transparent);
+    position: relative;
+}
+        
+.status-log-section::before { /* Scanline animado en el log */
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+        transparent 0%, 
+        oklch(1 0 0 / 0.05) 50%, 
+        transparent 100%
+    );
+    background-size: 100% 30px;
+    animation: scanline 8s linear infinite;
+    pointer-events: none;
+    z-index: 1;
+}
+
+.status-log {
+    list-style: none;
+    animation: scrollLog 60s linear infinite; /* Más lento para más contenido */
+}
+
+.status-log li {
+    font-family: 'Space Grotesk', monospace;
+    font-size: var(--fs-sm); /* Usando tu variable clamp */
+    line-height: 1.6;
+    color: oklch(0.85 0 0);
+    display: flex;
+    gap: var(--space-xs); /* Usando tu variable clamp */
+    white-space: nowrap;
+}
+        
+.status-log li span {
+    opacity: 0.5;
+    flex-shrink: 0;
+    color: oklch(0.7 0 0);
+}
+        
+.status-log li::before {
+    flex-shrink: 0;
+    font-weight: 700;
+}
+
+.status-log li[data-log-status="ok"]::before { content: '[ OK ]'; color: var(--neon-green); }
+.status-log li[data-log-status="info"]::before { content: '[ INFO ]'; color: var(--neon-cyan); }
+.status-log li[data-log-status="warn"]::before { content: '[ WARN ]'; color: var(--neon-yellow); }
+.status-log li[data-log-status="error"]::before { content: '[ FAIL ]'; color: var(--neon-red); animation: textFlicker 0.5s infinite alternate; }
+.status-log li[data-log-status="debug"]::before { content: '[ DEBUG ]'; color: var(--neon-purple); opacity: 0.7; }
+
+/* ============================================
+ * ANIMACIONES
+ * ============================================ */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes fadeInOut {
+    0%, 100% { opacity: 0; }
+    50% { opacity: 1; }
+}
+
+@keyframes textGlitch {
+    0% { transform: translate(0); text-shadow: 0 0 10px var(--neon-cyan); }
+    20% { transform: translate(-2px, 2px); text-shadow: 0 0 8px var(--neon-cyan), 1px 1px 0 var(--neon-pink); }
+    40% { transform: translate(2px, -2px); text-shadow: 0 0 12px var(--neon-cyan), -1px -1px 0 var(--neon-green); }
+    60% { transform: translate(-1px, 1px); text-shadow: 0 0 10px var(--neon-cyan); }
+    80% { transform: translate(1px, -1px); text-shadow: 0 0 11px var(--neon-cyan), 2px 0 0 var(--neon-yellow); }
+    100% { transform: translate(0); text-shadow: 0 0 10px var(--neon-cyan); }
+}
+
+@keyframes borderFlow {
+    to { background-position: 200% center; }
+}
+
+@keyframes borderRotate {
+    to { background-position: 200% 200%; }
+}
+
+@keyframes progressStripes {
+    to { background-position: 30px 0; }
+}
+
+@keyframes pulse {
+    0%, 100% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.02); opacity: 0.8; }
+}
+
+@keyframes scanline {
+    0% { transform: translateY(-100%); }
+    100% { transform: translateY(100%); }
+}
+
+@keyframes scrollLog {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-50%); }
+}
+
+@keyframes gridFloat {
+    from { transform: translateY(0); }
+    to { transform: translateY(60px); }
+}
+
+@keyframes particleMove {
+    0%, 100% { background-position: 0% 0%, 100% 100%, 50% 50%; }
+    50% { background-position: 100% 100%, 0% 0%, 80% 20%; }
+}
+
+@keyframes textFlicker {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* ============================================
+ * ACCESIBILIDAD
+ * ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+        transition: none !important;
+    }
+}
     </style>
 </head>
 <body>
