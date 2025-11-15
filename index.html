@@ -1265,7 +1265,6 @@
 	}
 
 	.runner-player.jumping {
-	    animation: playerJump 0.5s ease-out;
 	}
 
 	.runner-obstacle {
@@ -1522,10 +1521,10 @@
 	}
 
 @keyframes playerJump {
-
-    0% { transform: translateY(0); }
-    50% { transform: translateY(-120px); }
-    100% { transform: translateY(0); }
+    /* Ya no se usa, pero la dejamos por compatibilidad */
+    0% { transform: scaleX(-1) translateY(0); }
+    50% { transform: scaleX(-1) translateY(-120px); }
+    100% { transform: scaleX(-1) translateY(0); }
 }
 
 	@keyframes obstacleMove {
@@ -2852,7 +2851,8 @@ function startRunnerGame() {
     
     // Reset player position
     const player = document.getElementById('runnerPlayer');
-    player.style.transform = 'translateY(0)';
+    player.style.transform = 'scaleX(-1)'; // ✅ Solo voltear
+    player.style.transition = 'none'; // ✅ Sin transition
     
     // Limpiar obstáculos anteriores
     document.querySelectorAll('.runner-obstacle').forEach(obs => obs.remove());
@@ -2861,17 +2861,17 @@ function startRunnerGame() {
     runnerInterval = setInterval(() => {
         if (!runnerGameActive) return;
         createObstacle();
-    }, 2500); // Aumentado de 2000 a 2500ms para más espacio
+    }, 2500);
     
     // Incrementar score más lento
     runnerScoreInterval = setInterval(() => {
         if (!runnerGameActive) return;
-        runnerScore += 1; // Cambiado de Math.floor(runnerSpeed * 10) a solo 1
+        runnerScore += 1;
         document.getElementById('runnerScore').textContent = runnerScore;
         
         // Aumentar velocidad más gradualmente
-        if (runnerScore % 200 === 0 && runnerSpeed < 2) { // Cambiado de 100 a 200
-            runnerSpeed += 0.05; // Cambiado de 0.1 a 0.05
+        if (runnerScore % 200 === 0 && runnerSpeed < 2) {
+            runnerSpeed += 0.05;
             document.getElementById('runnerSpeed').textContent = runnerSpeed.toFixed(1) + 'x';
             
             // Reducir tiempo entre obstáculos gradualmente
@@ -2905,7 +2905,11 @@ function startRunnerGame() {
                 player.classList.remove('jumping');
             }
             
-            player.style.transform = `translateY(${jumpHeight}px)`;
+            // ✅ Mantener scaleX(-1) SIEMPRE
+            player.style.transform = `scaleX(-1) translate(0, ${jumpHeight}px)`;
+        } else {
+            // ✅ Cuando no está saltando, solo voltear
+            player.style.transform = 'scaleX(-1)';
         }
     }, 16);
 }
@@ -2920,7 +2924,8 @@ function stopRunnerGame() {
     
     // Reset player
     const player = document.getElementById('runnerPlayer');
-    player.style.transform = 'translateY(0)';
+    player.style.transform = 'scaleX(-1)';
+
     isJumping = false;
     jumpHeight = 0;
     jumpVelocity = 0;
