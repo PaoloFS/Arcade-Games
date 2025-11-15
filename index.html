@@ -2166,62 +2166,344 @@
 	                    style="width: 100%;"
 	                    aria-label="New nickname input"
 	                >
-	                <div style="margin-block-end: var(--space-md);">
-    <label for="nicknameInput" style="display: block; margin-block-end: var(--space-xs); color: var(--clr-neon-cyan); font-weight: 600;">
-        New Nickname:
-    </label>
-    <input 
-        type="text" 
-        id="nicknameInput" 
-        class="arcade-input" 
-        placeholder="Enter your nickname... ༺♰•YourName•♰༻" 
-        maxlength="30"
-        style="width: 100%;"
-        aria-label="New nickname input"
-    >
-    
+	               
     <!-- ✅ NUEVO: Panel de símbolos sugeridos -->
     <details style="margin-block-start: var(--space-sm); padding: var(--space-sm); background: rgba(0,0,0,0.3); border-radius: var(--radius-sm); border: 1px solid rgba(0,255,255,0.2);">
         <summary style="cursor: pointer; color: var(--clr-neon-cyan); font-size: 0.85rem; user-select: none;">
             ✨ Click for fancy symbols
         </summary>
-        <div style="margin-block-start: var(--space-xs); font-size: 0.9rem; line-height: 1.8; opacity: 0.9;">
-            <div style="margin-block-end: 0.3rem;"><strong>Decorators:</strong></div>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.5rem;">
-                <button onclick="insertSymbol('༺')" class="symbol-btn">༺</button>
-                <button onclick="insertSymbol('༻')" class="symbol-btn">༻</button>
-                <button onclick="insertSymbol('꧁')" class="symbol-btn">꧁</button>
-                <button onclick="insertSymbol('꧂')" class="symbol-btn">꧂</button>
-                <button onclick="insertSymbol('【')" class="symbol-btn">【</button>
-                <button onclick="insertSymbol('】')" class="symbol-btn">】</button>
-                <button onclick="insertSymbol('«')" class="symbol-btn">«</button>
-                <button onclick="insertSymbol('»')" class="symbol-btn">»</button>
-            </div>
-            
-            <div style="margin-block-end: 0.3rem;"><strong>Special:</strong></div>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.5rem;">
-                <button onclick="insertSymbol('♰')" class="symbol-btn">♰</button>
-                <button onclick="insertSymbol('☠')" class="symbol-btn">☠</button>
-                <button onclick="insertSymbol('҉')" class="symbol-btn">҉</button>
-                <button onclick="insertSymbol('ツ')" class="symbol-btn">ツ</button>
-                <button onclick="insertSymbol('ッ')" class="symbol-btn">ッ</button>
-                <button onclick="insertSymbol('シ')" class="symbol-btn">シ</button>
-                <button onclick="insertSymbol('ϟ')" class="symbol-btn">ϟ</button>
-                <button onclick="insertSymbol('Ω')" class="symbol-btn">Ω</button>
-            </div>
-            
-            <div style="margin-block-end: 0.3rem;"><strong>Stars & Dots:</strong></div>
-            <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;">
-                <button onclick="insertSymbol('•')" class="symbol-btn">•</button>
-                <button onclick="insertSymbol('●')" class="symbol-btn">●</button>
-                <button onclick="insertSymbol('★')" class="symbol-btn">★</button>
-                <button onclick="insertSymbol('☆')" class="symbol-btn">☆</button>
-                <button onclick="insertSymbol('✦')" class="symbol-btn">✦</button>
-                <button onclick="insertSymbol('✧')" class="symbol-btn">✧</button>
-                <button onclick="insertSymbol('◈')" class="symbol-btn">◈</button>
-                <button onclick="insertSymbol('◉')" class="symbol-btn">◉</button>
-            </div>
-        </div>
+        <div style="margin-block-start: var(--space-xs); font-size: 0.9rem; line-height: 1.8; opacity: 0.9; max-height: 400px; overflow-y: auto; padding-right: 0.5rem;">
+    
+    <!-- DECORADORES -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-cyan);">Decorators:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('༺')" class="symbol-btn">༺</button>
+        <button onclick="insertSymbol('༻')" class="symbol-btn">༻</button>
+        <button onclick="insertSymbol('꧁')" class="symbol-btn">꧁</button>
+        <button onclick="insertSymbol('꧂')" class="symbol-btn">꧂</button>
+        <button onclick="insertSymbol('【')" class="symbol-btn">【</button>
+        <button onclick="insertSymbol('】')" class="symbol-btn">】</button>
+        <button onclick="insertSymbol('「')" class="symbol-btn">「</button>
+        <button onclick="insertSymbol('」')" class="symbol-btn">」</button>
+        <button onclick="insertSymbol('『')" class="symbol-btn">『</button>
+        <button onclick="insertSymbol('』')" class="symbol-btn">』</button>
+        <button onclick="insertSymbol('«')" class="symbol-btn">«</button>
+        <button onclick="insertSymbol('»')" class="symbol-btn">»</button>
+        <button onclick="insertSymbol('‹')" class="symbol-btn">‹</button>
+        <button onclick="insertSymbol('›')" class="symbol-btn">›</button>
+        <button onclick="insertSymbol('《')" class="symbol-btn">《</button>
+        <button onclick="insertSymbol('》')" class="symbol-btn">》</button>
+        <button onclick="insertSymbol('〈')" class="symbol-btn">〈</button>
+        <button onclick="insertSymbol('〉')" class="symbol-btn">〉</button>
+        <button onclick="insertSymbol('〖')" class="symbol-btn">〖</button>
+        <button onclick="insertSymbol('〗')" class="symbol-btn">〗</button>
+    </div>
+
+    <!-- ESTRELLAS Y BRILLOS -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-yellow);">Stars & Sparkles:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('★')" class="symbol-btn">★</button>
+        <button onclick="insertSymbol('☆')" class="symbol-btn">☆</button>
+        <button onclick="insertSymbol('✦')" class="symbol-btn">✦</button>
+        <button onclick="insertSymbol('✧')" class="symbol-btn">✧</button>
+        <button onclick="insertSymbol('✩')" class="symbol-btn">✩</button>
+        <button onclick="insertSymbol('✪')" class="symbol-btn">✪</button>
+        <button onclick="insertSymbol('✫')" class="symbol-btn">✫</button>
+        <button onclick="insertSymbol('✬')" class="symbol-btn">✬</button>
+        <button onclick="insertSymbol('✭')" class="symbol-btn">✭</button>
+        <button onclick="insertSymbol('✮')" class="symbol-btn">✮</button>
+        <button onclick="insertSymbol('✯')" class="symbol-btn">✯</button>
+        <button onclick="insertSymbol('✰')" class="symbol-btn">✰</button>
+        <button onclick="insertSymbol('⭐')" class="symbol-btn">⭐</button>
+        <button onclick="insertSymbol('🌟')" class="symbol-btn">🌟</button>
+        <button onclick="insertSymbol('💫')" class="symbol-btn">💫</button>
+        <button onclick="insertSymbol('✨')" class="symbol-btn">✨</button>
+        <button onclick="insertSymbol('⚡')" class="symbol-btn">⚡</button>
+        <button onclick="insertSymbol('☄')" class="symbol-btn">☄</button>
+    </div>
+
+    <!-- PUNTOS Y CÍRCULOS -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-pink);">Dots & Circles:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('•')" class="symbol-btn">•</button>
+        <button onclick="insertSymbol('●')" class="symbol-btn">●</button>
+        <button onclick="insertSymbol('○')" class="symbol-btn">○</button>
+        <button onclick="insertSymbol('◉')" class="symbol-btn">◉</button>
+        <button onclick="insertSymbol('◌')" class="symbol-btn">◌</button>
+        <button onclick="insertSymbol('◍')" class="symbol-btn">◍</button>
+        <button onclick="insertSymbol('◎')" class="symbol-btn">◎</button>
+        <button onclick="insertSymbol('◐')" class="symbol-btn">◐</button>
+        <button onclick="insertSymbol('◑')" class="symbol-btn">◑</button>
+        <button onclick="insertSymbol('◒')" class="symbol-btn">◒</button>
+        <button onclick="insertSymbol('◓')" class="symbol-btn">◓</button>
+        <button onclick="insertSymbol('◔')" class="symbol-btn">◔</button>
+        <button onclick="insertSymbol('◕')" class="symbol-btn">◕</button>
+        <button onclick="insertSymbol('◖')" class="symbol-btn">◖</button>
+        <button onclick="insertSymbol('◗')" class="symbol-btn">◗</button>
+        <button onclick="insertSymbol('⚫')" class="symbol-btn">⚫</button>
+        <button onclick="insertSymbol('⚪')" class="symbol-btn">⚪</button>
+        <button onclick="insertSymbol('🔴')" class="symbol-btn">🔴</button>
+        <button onclick="insertSymbol('🔵')" class="symbol-btn">🔵</button>
+    </div>
+
+    <!-- FORMAS GEOMÉTRICAS -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-purple);">Geometric Shapes:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('◆')" class="symbol-btn">◆</button>
+        <button onclick="insertSymbol('◇')" class="symbol-btn">◇</button>
+        <button onclick="insertSymbol('◈')" class="symbol-btn">◈</button>
+        <button onclick="insertSymbol('◊')" class="symbol-btn">◊</button>
+        <button onclick="insertSymbol('♦')" class="symbol-btn">♦</button>
+        <button onclick="insertSymbol('▲')" class="symbol-btn">▲</button>
+        <button onclick="insertSymbol('△')" class="symbol-btn">△</button>
+        <button onclick="insertSymbol('▼')" class="symbol-btn">▼</button>
+        <button onclick="insertSymbol('▽')" class="symbol-btn">▽</button>
+        <button onclick="insertSymbol('■')" class="symbol-btn">■</button>
+        <button onclick="insertSymbol('□')" class="symbol-btn">□</button>
+        <button onclick="insertSymbol('▪')" class="symbol-btn">▪</button>
+        <button onclick="insertSymbol('▫')" class="symbol-btn">▫</button>
+        <button onclick="insertSymbol('◘')" class="symbol-btn">◘</button>
+        <button onclick="insertSymbol('◙')" class="symbol-btn">◙</button>
+        <button onclick="insertSymbol('◚')" class="symbol-btn">◚</button>
+        <button onclick="insertSymbol('◛')" class="symbol-btn">◛</button>
+        <button onclick="insertSymbol('◜')" class="symbol-btn">◜</button>
+        <button onclick="insertSymbol('◝')" class="symbol-btn">◝</button>
+        <button onclick="insertSymbol('◞')" class="symbol-btn">◞</button>
+        <button onclick="insertSymbol('◟')" class="symbol-btn">◟</button>
+    </div>
+
+    <!-- SÍMBOLOS ESPECIALES -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-cyan);">Special Symbols:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('♰')" class="symbol-btn">♰</button>
+        <button onclick="insertSymbol('☠')" class="symbol-btn">☠</button>
+        <button onclick="insertSymbol('҉')" class="symbol-btn">҉</button>
+        <button onclick="insertSymbol('ϟ')" class="symbol-btn">ϟ</button>
+        <button onclick="insertSymbol('Ω')" class="symbol-btn">Ω</button>
+        <button onclick="insertSymbol('∞')" class="symbol-btn">∞</button>
+        <button onclick="insertSymbol('†')" class="symbol-btn">†</button>
+        <button onclick="insertSymbol('‡')" class="symbol-btn">‡</button>
+        <button onclick="insertSymbol('§')" class="symbol-btn">§</button>
+        <button onclick="insertSymbol('¶')" class="symbol-btn">¶</button>
+        <button onclick="insertSymbol('™')" class="symbol-btn">™</button>
+        <button onclick="insertSymbol('©')" class="symbol-btn">©</button>
+        <button onclick="insertSymbol('®')" class="symbol-btn">®</button>
+        <button onclick="insertSymbol('℗')" class="symbol-btn">℗</button>
+        <button onclick="insertSymbol('℠')" class="symbol-btn">℠</button>
+        <button onclick="insertSymbol('Ⓐ')" class="symbol-btn">Ⓐ</button>
+        <button onclick="insertSymbol('℃')" class="symbol-btn">℃</button>
+        <button onclick="insertSymbol('℉')" class="symbol-btn">℉</button>
+        <button onclick="insertSymbol('№')" class="symbol-btn">№</button>
+        <button onclick="insertSymbol('℮')" class="symbol-btn">℮</button>
+    </div>
+
+    <!-- FLECHAS -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-yellow);">Arrows:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('→')" class="symbol-btn">→</button>
+        <button onclick="insertSymbol('←')" class="symbol-btn">←</button>
+        <button onclick="insertSymbol('↑')" class="symbol-btn">↑</button>
+        <button onclick="insertSymbol('↓')" class="symbol-btn">↓</button>
+        <button onclick="insertSymbol('↔')" class="symbol-btn">↔</button>
+        <button onclick="insertSymbol('↕')" class="symbol-btn">↕</button>
+        <button onclick="insertSymbol('⇒')" class="symbol-btn">⇒</button>
+        <button onclick="insertSymbol('⇐')" class="symbol-btn">⇐</button>
+        <button onclick="insertSymbol('⇑')" class="symbol-btn">⇑</button>
+        <button onclick="insertSymbol('⇓')" class="symbol-btn">⇓</button>
+        <button onclick="insertSymbol('⇔')" class="symbol-btn">⇔</button>
+        <button onclick="insertSymbol('➔')" class="symbol-btn">➔</button>
+        <button onclick="insertSymbol('➜')" class="symbol-btn">➜</button>
+        <button onclick="insertSymbol('➙')" class="symbol-btn">➙</button>
+        <button onclick="insertSymbol('➛')" class="symbol-btn">➛</button>
+        <button onclick="insertSymbol('➝')" class="symbol-btn">➝</button>
+        <button onclick="insertSymbol('⟶')" class="symbol-btn">⟶</button>
+        <button onclick="insertSymbol('⟹')" class="symbol-btn">⟹</button>
+    </div>
+
+    <!-- CARACTERES JAPONESES/ASIÁTICOS -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-pink);">Japanese/Asian:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('ツ')" class="symbol-btn">ツ</button>
+        <button onclick="insertSymbol('ッ')" class="symbol-btn">ッ</button>
+        <button onclick="insertSymbol('シ')" class="symbol-btn">シ</button>
+        <button onclick="insertSymbol('ㄜ')" class="symbol-btn">ㄜ</button>
+        <button onclick="insertSymbol('ㅎ')" class="symbol-btn">ㅎ</button>
+        <button onclick="insertSymbol('ㄱ')" class="symbol-btn">ㄱ</button>
+        <button onclick="insertSymbol('ㅋ')" class="symbol-btn">ㅋ</button>
+        <button onclick="insertSymbol('ㅅ')" class="symbol-btn">ㅅ</button>
+        <button onclick="insertSymbol('龍')" class="symbol-btn">龍</button>
+        <button onclick="insertSymbol('鬼')" class="symbol-btn">鬼</button>
+        <button onclick="insertSymbol('影')" class="symbol-btn">影</button>
+        <button onclick="insertSymbol('闇')" class="symbol-btn">闇</button>
+        <button onclick="insertSymbol('夜')" class="symbol-btn">夜</button>
+        <button onclick="insertSymbol('死')" class="symbol-btn">死</button>
+        <button onclick="insertSymbol('魂')" class="symbol-btn">魂</button>
+        <button onclick="insertSymbol('王')" class="symbol-btn">王</button>
+    </div>
+
+    <!-- CORONAS Y SÍMBOLOS REALES -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-purple);">Crowns & Royal:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('♔')" class="symbol-btn">♔</button>
+        <button onclick="insertSymbol('♕')" class="symbol-btn">♕</button>
+        <button onclick="insertSymbol('♖')" class="symbol-btn">♖</button>
+        <button onclick="insertSymbol('♗')" class="symbol-btn">♗</button>
+        <button onclick="insertSymbol('♘')" class="symbol-btn">♘</button>
+        <button onclick="insertSymbol('♙')" class="symbol-btn">♙</button>
+        <button onclick="insertSymbol('♚')" class="symbol-btn">♚</button>
+        <button onclick="insertSymbol('♛')" class="symbol-btn">♛</button>
+        <button onclick="insertSymbol('♜')" class="symbol-btn">♜</button>
+        <button onclick="insertSymbol('♝')" class="symbol-btn">♝</button>
+        <button onclick="insertSymbol('♞')" class="symbol-btn">♞</button>
+        <button onclick="insertSymbol('♟')" class="symbol-btn">♟</button>
+        <button onclick="insertSymbol('👑')" class="symbol-btn">👑</button>
+        <button onclick="insertSymbol('💎')" class="symbol-btn">💎</button>
+        <button onclick="insertSymbol('🏆')" class="symbol-btn">🏆</button>
+        <button onclick="insertSymbol('⚔')" class="symbol-btn">⚔</button>
+    </div>
+
+    <!-- CORAZONES Y SÍMBOLOS DE CARTAS -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-cyan);">Hearts & Cards:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('♥')" class="symbol-btn">♥</button>
+        <button onclick="insertSymbol('♡')" class="symbol-btn">♡</button>
+        <button onclick="insertSymbol('❤')" class="symbol-btn">❤</button>
+        <button onclick="insertSymbol('❥')" class="symbol-btn">❥</button>
+        <button onclick="insertSymbol('♠')" class="symbol-btn">♠</button>
+        <button onclick="insertSymbol('♣')" class="symbol-btn">♣</button>
+        <button onclick="insertSymbol('♦')" class="symbol-btn">♦</button>
+        <button onclick="insertSymbol('🖤')" class="symbol-btn">🖤</button>
+        <button onclick="insertSymbol('💜')" class="symbol-btn">💜</button>
+        <button onclick="insertSymbol('💙')" class="symbol-btn">💙</button>
+        <button onclick="insertSymbol('💚')" class="symbol-btn">💚</button>
+        <button onclick="insertSymbol('💛')" class="symbol-btn">💛</button>
+        <button onclick="insertSymbol('🧡')" class="symbol-btn">🧡</button>
+    </div>
+
+    <!-- MÚSICA -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-yellow);">Music:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('♪')" class="symbol-btn">♪</button>
+        <button onclick="insertSymbol('♫')" class="symbol-btn">♫</button>
+        <button onclick="insertSymbol('♬')" class="symbol-btn">♬</button>
+        <button onclick="insertSymbol('♭')" class="symbol-btn">♭</button>
+        <button onclick="insertSymbol('♮')" class="symbol-btn">♮</button>
+        <button onclick="insertSymbol('♯')" class="symbol-btn">♯</button>
+        <button onclick="insertSymbol('🎵')" class="symbol-btn">🎵</button>
+        <button onclick="insertSymbol('🎶')" class="symbol-btn">🎶</button>
+        <button onclick="insertSymbol('🎸')" class="symbol-btn">🎸</button>
+        <button onclick="insertSymbol('🎹')" class="symbol-btn">🎹</button>
+        <button onclick="insertSymbol('🎤')" class="symbol-btn">🎤</button>
+        <button onclick="insertSymbol('🎧')" class="symbol-btn">🎧</button>
+    </div>
+
+    <!-- SIGNOS ZODIACALES -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-pink);">Zodiac:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('♈')" class="symbol-btn">♈</button>
+        <button onclick="insertSymbol('♉')" class="symbol-btn">♉</button>
+        <button onclick="insertSymbol('♊')" class="symbol-btn">♊</button>
+        <button onclick="insertSymbol('♋')" class="symbol-btn">♋</button>
+        <button onclick="insertSymbol('♌')" class="symbol-btn">♌</button>
+        <button onclick="insertSymbol('♍')" class="symbol-btn">♍</button>
+        <button onclick="insertSymbol('♎')" class="symbol-btn">♎</button>
+        <button onclick="insertSymbol('♏')" class="symbol-btn">♏</button>
+        <button onclick="insertSymbol('♐')" class="symbol-btn">♐</button>
+        <button onclick="insertSymbol('♑')" class="symbol-btn">♑</button>
+        <button onclick="insertSymbol('♒')" class="symbol-btn">♒</button>
+        <button onclick="insertSymbol('♓')" class="symbol-btn">♓</button>
+    </div>
+
+    <!-- WEATHER & NATURE -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-purple);">Weather & Nature:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('☀')" class="symbol-btn">☀</button>
+        <button onclick="insertSymbol('☁')" class="symbol-btn">☁</button>
+        <button onclick="insertSymbol('☂')" class="symbol-btn">☂</button>
+        <button onclick="insertSymbol('☃')" class="symbol-btn">☃</button>
+        <button onclick="insertSymbol('☄')" class="symbol-btn">☄</button>
+        <button onclick="insertSymbol('★')" class="symbol-btn">☆</button>
+        <button onclick="insertSymbol('☼')" class="symbol-btn">☼</button>
+        <button onclick="insertSymbol('☽')" class="symbol-btn">☽</button>
+        <button onclick="insertSymbol('☾')" class="symbol-btn">☾</button>
+        <button onclick="insertSymbol('🌙')" class="symbol-btn">🌙</button>
+        <button onclick="insertSymbol('🌟')" class="symbol-btn">🌟</button>
+        <button onclick="insertSymbol('🌠')" class="symbol-btn">🌠</button>
+        <button onclick="insertSymbol('🔥')" class="symbol-btn">🔥</button>
+        <button onclick="insertSymbol('💧')" class="symbol-btn">💧</button>
+        <button onclick="insertSymbol('⚡')" class="symbol-btn">⚡</button>
+        <button onclick="insertSymbol('❄')" class="symbol-btn">❄</button>
+    </div>
+
+    <!-- GAMING -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-cyan);">Gaming:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('🎮')" class="symbol-btn">🎮</button>
+        <button onclick="insertSymbol('🕹')" class="symbol-btn">🕹</button>
+        <button onclick="insertSymbol('👾')" class="symbol-btn">👾</button>
+        <button onclick="insertSymbol('🎯')" class="symbol-btn">🎯</button>
+        <button onclick="insertSymbol('🎲')" class="symbol-btn">🎲</button>
+        <button onclick="insertSymbol('🃏')" class="symbol-btn">🃏</button>
+        <button onclick="insertSymbol('🎰')" class="symbol-btn">🎰</button>
+        <button onclick="insertSymbol('🏆')" class="symbol-btn">🏆</button>
+        <button onclick="insertSymbol('🥇')" class="symbol-btn">🥇</button>
+        <button onclick="insertSymbol('🥈')" class="symbol-btn">🥈</button>
+        <button onclick="insertSymbol('🥉')" class="symbol-btn">🥉</button>
+        <button onclick="insertSymbol('🏅')" class="symbol-btn">🏅</button>
+        <button onclick="insertSymbol('🎖')" class="symbol-btn">🎖</button>
+    </div>
+
+    <!-- EMOJIS OSCUROS -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-yellow);">Dark & Cool:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('💀')" class="symbol-btn">💀</button>
+        <button onclick="insertSymbol('☠')" class="symbol-btn">☠</button>
+        <button onclick="insertSymbol('👻')" class="symbol-btn">👻</button>
+        <button onclick="insertSymbol('👹')" class="symbol-btn">👹</button>
+        <button onclick="insertSymbol('👺')" class="symbol-btn">👺</button>
+        <button onclick="insertSymbol('😈')" class="symbol-btn">😈</button>
+        <button onclick="insertSymbol('👿')" class="symbol-btn">👿</button>
+        <button onclick="insertSymbol('🦇')" class="symbol-btn">🦇</button>
+        <button onclick="insertSymbol('🕷')" class="symbol-btn">🕷</button>
+        <button onclick="insertSymbol('🐉')" class="symbol-btn">🐉</button>
+        <button onclick="insertSymbol('🐲')" class="symbol-btn">🐲</button>
+        <button onclick="insertSymbol('🗡')" class="symbol-btn">🗡</button>
+        <button onclick="insertSymbol('⚔')" class="symbol-btn">⚔</button>
+        <button onclick="insertSymbol('🛡')" class="symbol-btn">🛡</button>
+    </div>
+
+    <!-- LETRAS ESPECIALES -->
+    <div style="margin-block-end: 0.3rem;"><strong style="color: var(--clr-neon-pink);">Special Letters:</strong></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 0.5rem; margin-block-end: 0.8rem;">
+        <button onclick="insertSymbol('Ⓐ')" class="symbol-btn">Ⓐ</button>
+        <button onclick="insertSymbol('Ⓑ')" class="symbol-btn">Ⓑ</button>
+        <button onclick="insertSymbol('Ⓒ')" class="symbol-btn">Ⓒ</button>
+        <button onclick="insertSymbol('Ⓓ')" class="symbol-btn">Ⓓ</button>
+        <button onclick="insertSymbol('Ⓔ')" class="symbol-btn">Ⓔ</button>
+        <button onclick="insertSymbol('Ⓕ')" class="symbol-btn">Ⓕ</button>
+        <button onclick="insertSymbol('Ⓖ')" class="symbol-btn">Ⓖ</button>
+        <button onclick="insertSymbol('Ⓗ')" class="symbol-btn">Ⓗ</button>
+        <button onclick="insertSymbol('Ⓘ')" class="symbol-btn">Ⓘ</button>
+        <button onclick="insertSymbol('Ⓙ')" class="symbol-btn">Ⓙ</button>
+        <button onclick="insertSymbol('Ⓚ')" class="symbol-btn">Ⓚ</button>
+        <button onclick="insertSymbol('Ⓛ')" class="symbol-btn">Ⓛ</button>
+        <button onclick="insertSymbol('Ⓜ')" class="symbol-btn">Ⓜ</button>
+        <button onclick="insertSymbol('Ⓝ')" class="symbol-btn">Ⓝ</button>
+        <button onclick="insertSymbol('Ⓞ')" class="symbol-btn">Ⓞ</button>
+        <button onclick="insertSymbol('Ⓟ')" class="symbol-btn">Ⓟ</button>
+        <button onclick="insertSymbol('Ⓠ')" class="symbol-btn">Ⓠ</button>
+        <button onclick="insertSymbol('Ⓡ')" class="symbol-btn">Ⓡ</button>
+        <button onclick="insertSymbol('Ⓢ')" class="symbol-btn">Ⓢ</button>
+        <button onclick="insertSymbol('Ⓣ')" class="symbol-btn">Ⓣ</button>
+        <button onclick="insertSymbol('Ⓤ')" class="symbol-btn">Ⓤ</button>
+        <button onclick="insertSymbol('Ⓥ')" class="symbol-btn">Ⓥ</button>
+        <button onclick="insertSymbol('Ⓦ')" class="symbol-btn">Ⓦ</button>
+        <button onclick="insertSymbol('Ⓧ')" class="symbol-btn">Ⓧ</button>
+        <button onclick="insertSymbol('Ⓨ')" class="symbol-btn">Ⓨ</button>
+        <button onclick="insertSymbol('Ⓩ')" class="symbol-btn">Ⓩ</button>
+     </div>
+
+</div>
     </details>
     
     <div id="nicknameError" style="color: var(--clr-neon-pink); margin-block-start: var(--space-xs); font-size: 0.85rem; min-height: 1.5rem;">
