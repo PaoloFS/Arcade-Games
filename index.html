@@ -1731,28 +1731,50 @@
 
 		// 2. Nueva función: Iniciar sesión con Google
 		async function loginWithGoogle() {
-			try {
-                // Crea un "proveedor" de Google
-				const provider = new firebase.auth.GoogleAuthProvider();
-                // Abre una ventana emergente para iniciar sesión
-				await auth.signInWithPopup(provider);
-                // El 'observer' (initAuth) se encargará del resto
-
-			} catch (error) {
-				console.error("Error al iniciar sesión con Google:", error);
-				alert("Hubo un error al iniciar sesión.");
-			}
+		    try {
+		        const loginBtn = document.querySelector('#loginView .arcade-btn');
+		        loginBtn.disabled = true;
+		        loginBtn.textContent = '⏳ SIGNING IN...';
+		        
+		        const provider = new firebase.auth.GoogleAuthProvider();
+		        await auth.signInWithPopup(provider);
+		        
+		    } catch (error) {
+		        console.error("Error al iniciar sesión con Google:", error);
+		        
+		        // Mensajes de error más específicos
+		        let errorMessage = "There was an error signing in.";
+		        if (error.code === 'auth/popup-closed-by-user') {
+		            errorMessage = "Sign-in cancelled. Please try again.";
+		        } else if (error.code === 'auth/popup-blocked') {
+		            errorMessage = "Pop-up blocked! Please allow pop-ups for this site.";
+		        }
+		        
+		        alert(errorMessage);
+		        
+		        // Restaurar el botón
+		        const loginBtn = document.querySelector('#loginView .arcade-btn');
+		        loginBtn.disabled = false;
+		        loginBtn.innerHTML = '<span aria-hidden="true">★</span> SIGN IN WITH GOOGLE <span aria-hidden="true">★</span>';
+		    }
 		}
 
-		// 3. Nueva función: Salir
 		async function logout() {
-			try {
-                // Le dice a Firebase que cierre la sesión
-				await auth.signOut();
-                // El 'observer' (initAuth) se encargará del resto
-			} catch (error) {
-				console.error("Error al cerrar sesión:", error);
-			}
+		    try {
+		        const logoutBtn = document.querySelector('#userView .arcade-btn:last-child');
+		        logoutBtn.disabled = true;
+		        logoutBtn.textContent = '⏳ LOGGING OUT...';
+		        
+		        await auth.signOut();
+		        
+		    } catch (error) {
+		        console.error("Error al cerrar sesión:", error);
+		        alert("There was an error logging out. Please try again.");
+		        
+		        const logoutBtn = document.querySelector('#userView .arcade-btn:last-child');
+		        logoutBtn.disabled = false;
+		        logoutBtn.innerHTML = '<span aria-hidden="true">⏏</span> LOGOUT';
+		    }
 		}
 
         // 4. Nueva función: El "Observador"
@@ -1825,53 +1847,63 @@
 			}
 		}
 
+		// Evitar múltiples guardados simultáneos
+		let saveScoreTimeout = null;
+
 		async function saveScore(game, score) {
-			if (!currentUser || !currentUser.uid || !isStorageAvailable()) {
-				console.log('User not logged in or DB not available. Score not saved.');
-				return;
-			}
-			
-			const isCatchGame = game === 'catch';
-			const collectionName = isCatchGame ? 'user_best_catch' : 'user_best_memory';
-
-            // ⬇️ ESTE ES EL CAMBIO MÁS IMPORTANTE ⬇️
-            // El ID del documento ahora es el UID del usuario
-			const docId = currentUser.uid;
-			const docRef = db.collection(collectionName).doc(docId);
-            // ⬆️ FIN DEL CAMBIO IMPORTANTE ⬆️
-
-			try {
-				const doc = await docRef.get();
-				let shouldSave = false;
-
-				if (!doc.exists) {
-					shouldSave = true;
-				} else {
-					const existingScore = doc.data().score;
-					if (isCatchGame) {
-						if (score > existingScore) shouldSave = true;
-					} else {
-						if (score < existingScore) shouldSave = true;
-					}
-				}
-
-				if (shouldSave) {
-					console.log(`Saving new best score for ${game}: ${score}`);
-					await docRef.set({
-                        // También guardamos el nombre (displayName) para mostrarlo en el leaderboard
-						username: currentUser.displayName, 
-						score: score,
-						timestamp: new Date()
-					});
-
-					await loadUserStats();
-					await loadLeaderboards();
-				} else {
-					console.log(`Score ${score} is not better than existing. Not saving.`);
-				}
-			} catch (error) {
-				console.error('Error saving score:', error);
-			}
+		    if (!currentUser || !currentUser.uid || !isStorageAvailable()) {
+		        console.log('User not logged in or DB not available. Score not saved.');
+		        return;
+		    }
+		    
+		    // Cancelar guardado pendiente
+		    if (saveScoreTimeout) {
+		        clearTimeout(saveScoreTimeout);
+		    }
+		    
+		    // Esperar un momento antes de guardar (debounce)
+		    return new Promise((resolve) => {
+		        saveScoreTimeout = setTimeout(async () => {
+		            const isCatchGame = game === 'catch';
+		            const collectionName = isCatchGame ? 'user_best_catch' : 'user_best_memory';
+		            const docId = currentUser.uid;
+		            const docRef = db.collection(collectionName).doc(docId);
+		            
+		            try {
+		                const doc = await docRef.get();
+		                let shouldSave = false;
+		                
+		                if (!doc.exists) {
+		                    shouldSave = true;
+		                } else {
+		                    const existingScore = doc.data().score;
+		                    if (isCatchGame) {
+		                        shouldSave = score > existingScore;
+		                    } else {
+		                        shouldSave = score < existingScore;
+		                    }
+		                }
+		                
+		                if (shouldSave) {
+		                    console.log(`Saving new best score for ${game}: ${score}`);
+		                    await docRef.set({
+		                        username: currentUser.displayName,
+		                        score: score,
+		                        timestamp: firebase.firestore.FieldValue.serverTimestamp() // ✅ Usar timestamp del servidor
+		                    });
+		                    
+		                    await loadUserStats();
+		                    await loadLeaderboards();
+		                } else {
+		                    console.log(`Score ${score} is not better than existing. Not saving.`);
+		                }
+		                resolve();
+		            } catch (error) {
+		                console.error('Error saving score:', error);
+		                resolve();
+		            }
+		        }, 500); // Esperar 500ms antes de guardar
+		    });
 		}
 
 		async function loadLeaderboards() {
@@ -2060,10 +2092,10 @@
 		}
 
 		function createFallingItem() {
-			if (!catchGameActive) return;
-			
-			const item = document.createElement('div');
-			item.className = 'falling-item';
+		    if (!catchGameActive) return;
+		    
+		    const item = document.createElement('div');
+		    item.className = 'falling-item';
 			
 			const rand = Math.random();
 			let itemType;
@@ -2097,68 +2129,75 @@
 			document.getElementById('catchGameArea').appendChild(item);
 			
 			let hasCollided = false;
+    		let animationFrameId;
 			
-			const checkCollision = setInterval(() => {
-				if (!catchGameActive || !item.parentElement || hasCollided) {
-					clearInterval(checkCollision);
-					const index = itemCheckIntervals.indexOf(checkCollision);
-					if (index > -1) itemCheckIntervals.splice(index, 1);
-					return;
-				}
-				
-				const itemRect = item.getBoundingClientRect();
-				const catcherRect = document.getElementById('catcher').getBoundingClientRect();
-				
-				if (itemRect.bottom >= catcherRect.top &&
-					itemRect.top <= catcherRect.bottom &&
-					itemRect.right >= catcherRect.left &&
-					itemRect.left <= catcherRect.right) {
-					
-					hasCollided = true;
+			const checkCollision = () => {
+		        if (!catchGameActive || !item.parentElement || hasCollided) {
+		            cancelAnimationFrame(animationFrameId);
+		            return;
+		        }
+		        
+		        const itemRect = item.getBoundingClientRect();
+		        const catcherRect = document.getElementById('catcher').getBoundingClientRect();
+		        
+		        // Verificar si están colisionando
+		        const isColliding = (
+		            itemRect.bottom >= catcherRect.top &&
+		            itemRect.top <= catcherRect.bottom &&
+		            itemRect.right >= catcherRect.left &&
+		            itemRect.left <= catcherRect.right
+		        );
+		        
+		        if (isColliding) {
+		            hasCollided = true;
+		            handleItemCatch(item);
+		            cancelAnimationFrame(animationFrameId);
+		            return;
+		        }
+		        
+		        // Continuar verificando en el siguiente frame
+		        animationFrameId = requestAnimationFrame(checkCollision);
+		    };
+		    
+		    animationFrameId = requestAnimationFrame(checkCollision);
+		    
+		    // Limpiar después de que el item caiga
+		    setTimeout(() => {
+		        if (item.parentElement) item.remove();
+		        cancelAnimationFrame(animationFrameId);
+		    }, duration * 1000 + 1000);
+		}
 
-				if (item.dataset.type === 'star') {
-					catchScore += 10 * catchMultiplier;
-					document.getElementById('catchScore').textContent = catchScore;
-					item.style.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
-					item.style.transform = 'scale(2)';
-					item.style.opacity = '0';
-				} else if (item.dataset.type === 'powerup') {
-					applyPowerup(item.dataset.powerup);
-					item.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-					item.style.transform = 'scale(2) rotate(360deg)';
-					item.style.opacity = '0';
-				} else if (item.dataset.type === 'bomb') {
-					if (!hasShield) {
-						catchScore = Math.max(0, catchScore - 30);
-						document.getElementById('catchScore').textContent = catchScore;
-
-						const catcher = document.getElementById('catcher');
-						catcher.style.animation = 'shake 0.3s ease-in-out';
-						setTimeout(() => catcher.style.animation = '', 300);
-					} else {
-						hasShield = false;
-						document.getElementById('catcher').style.filter = 'drop-shadow(0 0 10px rgba(255, 190, 11, 0.8))';
-					}
-				}
-
-				setTimeout(() => {
-					if (item.parentElement) item.remove();
-				}, 300);
-
-				clearInterval(checkCollision);
-				const index = itemCheckIntervals.indexOf(checkCollision);
-				if (index > -1) itemCheckIntervals.splice(index, 1);
-			}
-		}, 30);
-			
-			itemCheckIntervals.push(checkCollision);
-			
-			setTimeout(() => {
-				if (item.parentElement) item.remove();
-				clearInterval(checkCollision);
-				const index = itemCheckIntervals.indexOf(checkCollision);
-				if (index > -1) itemCheckIntervals.splice(index, 1);
-			}, duration * 1000 + 1000); // Aumentado de 500 a 1000ms extra
+		// Función separada para manejar lo que pasa cuando atrapas algo
+		function handleItemCatch(item) {
+		    if (item.dataset.type === 'star') {
+		        catchScore += 10 * catchMultiplier;
+		        document.getElementById('catchScore').textContent = catchScore;
+		        item.style.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
+		        item.style.transform = 'scale(2)';
+		        item.style.opacity = '0';
+		    } else if (item.dataset.type === 'powerup') {
+		        applyPowerup(item.dataset.powerup);
+		        item.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
+		        item.style.transform = 'scale(2) rotate(360deg)';
+		        item.style.opacity = '0';
+		    } else if (item.dataset.type === 'bomb') {
+		        if (!hasShield) {
+		            catchScore = Math.max(0, catchScore - 30);
+		            document.getElementById('catchScore').textContent = catchScore;
+		            
+		            const catcher = document.getElementById('catcher');
+		            catcher.style.animation = 'shake 0.3s ease-in-out';
+		            setTimeout(() => catcher.style.animation = '', 300);
+		        } else {
+		            hasShield = false;
+		            document.getElementById('catcher').style.filter = 'drop-shadow(0 0 10px rgba(255, 190, 11, 0.8))';
+		        }
+		    }
+		    
+		    setTimeout(() => {
+		        if (item.parentElement) item.remove();
+		    }, 300);
 		}
 
 		function applyPowerup(powerup) {
