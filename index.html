@@ -617,32 +617,31 @@
     animation: fadeIn 300ms ease;
   }
 
-  .modal-content {
-    position: relative;
-    background: linear-gradient(
-      135deg,
-      oklch(15% 0.04 255 / 0.98),
-      oklch(20% 0.05 255 / 0.98)
-    );
-    border: 2px solid transparent;
-    border-radius: var(--radius-lg);
-    padding: var(--space-lg);
-    max-inline-size: min(850px, 96vw);
-    inline-size: 100%;
-    max-block-size: 92vh;
-    max-block-size: 92dvh;
-    
-    overflow-y: auto;
-    overscroll-behavior: contain;
-    
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-md);
-    
-    animation: slideUp 400ms cubic-bezier(0.4, 0, 0.2, 1);
-    contain: layout style paint;
-    isolation: isolate;
-  }
+	.modal-content {
+	  position: relative;
+	  background: linear-gradient(
+	    135deg,
+	    oklch(15% 0.04 255 / 0.98),
+	    oklch(20% 0.05 255 / 0.98)
+	  );
+	  border: 2px solid transparent;
+	  border-radius: var(--radius-lg);
+	  padding: var(--space-lg);
+	  max-inline-size: min(850px, 96vw);
+	  inline-size: 100%;
+	  max-block-size: 92vh;
+	  max-block-size: 92dvh;
+	  
+	  overflow-y: auto;
+	  overscroll-behavior: contain;
+	  
+	  display: flex;
+	  flex-direction: column;
+	  gap: var(--space-md);
+	  
+	  animation: slideUp 400ms cubic-bezier(0.4, 0, 0.2, 1);
+	  contain: layout style paint;
+	}
 
   .modal-content::before {
     content: '';
@@ -761,24 +760,23 @@
   }
 
   /* Catch Game Area */
-  .catch-game-area {
-    position: relative;
-    inline-size: 100%;
-    max-inline-size: min(650px, 100%);
-    margin-inline: auto;
-    block-size: clamp(280px, 45vh, 420px);
-    block-size: clamp(280px, 45dvh, 420px);
-    
-    background: linear-gradient(180deg, 
-      oklch(15% 0.05 255) 0%, 
-      oklch(18% 0.06 270) 100%);
-    border: 2px solid transparent;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    flex-shrink: 0;
-    contain: layout style paint;
-    isolation: isolate;
-  }
+	.catch-game-area {
+	  position: relative;
+	  inline-size: 100%;
+	  max-inline-size: min(650px, 100%);
+	  margin-inline: auto;
+	  block-size: clamp(250px, 40vh, 380px); /* REDUCIDO para dejar espacio al contenido inferior */
+	  block-size: clamp(250px, 40dvh, 380px);
+	  
+	  background: linear-gradient(180deg, 
+	    oklch(15% 0.05 255) 0%, 
+	    oklch(18% 0.06 270) 100%);
+	  border: 2px solid transparent;
+	  border-radius: var(--radius-lg);
+	  overflow: hidden;
+	  flex-shrink: 0;
+	  contain: layout style paint;
+	}
 
   .catch-game-area::before {
     content: '';
@@ -854,16 +852,18 @@
   }
 
   /* Memory Game */
-  .memory-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: clamp(0.4rem, 2cqi, 0.9rem);
-    max-inline-size: min(480px, 100%);
-    margin-inline: auto;
-    margin-block-end: var(--space-md);
-    flex-shrink: 0;
-    container-type: inline-size;
-  }
+	.memory-grid {
+	  display: grid;
+	  grid-template-columns: repeat(4, 1fr);
+	  gap: clamp(0.4rem, 2cqi, 0.9rem);
+	  max-inline-size: min(480px, 100%);
+	  margin-inline: auto;
+	  margin-block-end: var(--space-md);
+	  flex-shrink: 0;
+	  container-type: inline-size;
+	  justify-items: center; /* AÑADIR */
+	  align-items: center; /* AÑADIR */
+	}
 
   .memory-card {
     aspect-ratio: 1;
@@ -1175,6 +1175,11 @@
     scrollbar-width: thin;
     scrollbar-color: var(--clr-neon-cyan) oklch(10% 0.03 255 / 0.4);
   }
+
+  .modal-content > div:last-of-type {
+	  flex-shrink: 0; /* Evitar que se comprima */
+	  margin-block-start: auto; /* Empujar hacia abajo si hay espacio */
+	}
 }
 
 /* ============================================
