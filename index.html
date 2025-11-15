@@ -1715,16 +1715,22 @@
 			</div>
 
 			<div id="userView" style="display: none;">
-				<div class="user-info">
-					<div class="user-avatar" aria-hidden="true">🎮</div>
-					<div>
-						<div class="user-name" id="displayUsername"></div>
-						<div style="font-size: 0.8rem; opacity: 0.7;">ACTIVE PLAYER</div>
-					</div>
-				</div>
-				<button class="arcade-btn" onclick="logout()" aria-label="Logout from account">
-					<span aria-hidden="true">⏏</span> LOGOUT
-				</button>
+			    <div class="user-info">
+			        <div class="user-avatar" aria-hidden="true">🎮</div>
+			        <div>
+			            <div class="user-name" id="displayUsername"></div>
+			            <div style="font-size: 0.8rem; opacity: 0.7;">ACTIVE PLAYER</div>
+			        </div>
+			    </div>
+			    <div style="display: flex; gap: var(--space-sm); flex-wrap: wrap;">
+			        <!-- ✅ NUEVO: Botón de cambiar nickname -->
+			        <button class="arcade-btn" onclick="openChangeNickname()" aria-label="Change nickname" style="background: linear-gradient(135deg, var(--clr-neon-cyan), var(--clr-neon-purple));">
+			            <span aria-hidden="true">✏️</span> CHANGE NICK
+			        </button>
+			        <button class="arcade-btn" onclick="logout()" aria-label="Logout from account">
+			            <span aria-hidden="true">⏏</span> LOGOUT
+			        </button>
+			    </div>
 			</div>
 		</section>
 
@@ -2108,6 +2114,54 @@
 			<span aria-hidden="true">←</span> MAYBE LATER
 		</button>
 	</div>
+
+	<!-- Change Nickname Modal -->
+	<div class="modal" id="nicknameModal" role="dialog" aria-labelledby="nicknameModalTitle" aria-modal="true">
+	    <div class="modal-content" style="max-inline-size: min(500px, 92vw);">
+	        <div class="modal-header">
+	            <h2 class="modal-title" id="nicknameModalTitle"><span aria-hidden="true">✏️</span> CHANGE NICKNAME</h2>
+	            <button class="close-btn" onclick="closeNicknameModal()" aria-label="Close">×</button>
+	        </div>
+
+	        <div style="padding: var(--space-md);">
+	            <p style="margin-block-end: var(--space-md); opacity: 0.9; text-align: center; line-height: 1.6;">
+	                Choose a unique nickname for the leaderboards.<br>
+	                <span style="color: var(--clr-neon-yellow); font-size: 0.9rem;">⚠️ Max 25 characters. Most symbols allowed!</span>
+	            </p>
+
+	            <div style="margin-block-end: var(--space-md);">
+	                <label for="nicknameInput" style="display: block; margin-block-end: var(--space-xs); color: var(--clr-neon-cyan); font-weight: 600;">
+	                    New Nickname:
+	                </label>
+	                <input 
+	                    type="text" 
+	                    id="nicknameInput" 
+	                    class="arcade-input" 
+	                    placeholder="Enter your nickname..." 
+	                    maxlength="25"
+	                    style="width: 100%;"
+	                    aria-label="New nickname input"
+	                >
+	                <div id="nicknameError" style="color: var(--clr-neon-pink); margin-block-start: var(--space-xs); font-size: 0.85rem; min-height: 1.5rem;">
+	                    <!-- Error messages here -->
+	                </div>
+	            </div>
+
+	            <div style="display: flex; gap: var(--space-sm); justify-content: center; flex-wrap: wrap;">
+	                <button class="arcade-btn" onclick="saveNickname()" id="saveNicknameBtn">
+	                    <span aria-hidden="true">💾</span> SAVE NICKNAME
+	                </button>
+	                <button class="arcade-btn" onclick="closeNicknameModal()" style="background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.3);">
+	                    <span aria-hidden="true">✖️</span> CANCEL
+	                </button>
+	            </div>
+
+	            <div style="margin-block-start: var(--space-lg); padding: var(--space-sm); background: rgba(0,0,0,0.3); border-radius: var(--radius-md); font-size: 0.85rem; opacity: 0.8;">
+	                <strong style="color: var(--clr-neon-cyan);">ℹ️ Note:</strong> Your nickname will be updated across all leaderboards. Changes may take a few moments to reflect.
+	            </div>
+	        </div>
+	    </div>
+	</div>
 </body>
 
 	<script>
@@ -2195,43 +2249,223 @@
 		    }
 		}
 
+		// ===== NICKNAME SYSTEM =====
+let userNickname = null;
+
+// Cargar o crear nickname del usuario
+async function loadUserNickname(user) {
+    if (!user || !user.uid || !isStorageAvailable()) return user.displayName;
+    
+    try {
+        const userDoc = await db.collection('users').doc(user.uid).get();
+        
+        if (userDoc.exists && userDoc.data().nickname) {
+            userNickname = userDoc.data().nickname;
+            console.log('✅ Nickname cargado:', userNickname);
+        } else {
+            // Primera vez: usar nombre de Google
+            userNickname = user.displayName;
+            await db.collection('users').doc(user.uid).set({
+                nickname: userNickname,
+                googleName: user.displayName,
+                email: user.email,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            console.log('✅ Primer login: nickname creado con nombre de Google');
+        }
+        
+        return userNickname;
+    } catch (error) {
+        console.error('Error al cargar nickname:', error);
+        return user.displayName;
+    }
+}
+
+// Obtener el nickname actual del usuario
+function getUserDisplayName() {
+    if (!currentUser) return 'Guest';
+    return userNickname || currentUser.displayName;
+}
+
+// Abrir modal de cambio de nickname
+function openChangeNickname() {
+    if (!currentUser) return;
+    
+    document.getElementById('nicknameModal').classList.add('active');
+    document.getElementById('nicknameInput').value = userNickname || '';
+    document.getElementById('nicknameError').textContent = '';
+    document.getElementById('nicknameInput').focus();
+}
+
+// Cerrar modal
+function closeNicknameModal() {
+    document.getElementById('nicknameModal').classList.remove('active');
+    document.getElementById('nicknameInput').value = '';
+    document.getElementById('nicknameError').textContent = '';
+}
+
+// Validar nickname
+// Validar nickname (versión permisiva con símbolos especiales)
+function validateNickname(nickname) {
+    if (!nickname || nickname.trim().length === 0) {
+        return { valid: false, error: '❌ Nickname cannot be empty' };
+    }
+    
+    // Contar caracteres reales (algunos símbolos especiales cuentan como múltiples)
+    const realLength = [...nickname].length;
+    
+    if (realLength < 3) {
+        return { valid: false, error: '❌ Nickname must be at least 3 characters' };
+    }
+    
+    if (realLength > 25) { // Aumentado de 20 a 25 para dar más espacio
+        return { valid: false, error: '❌ Nickname must be 25 characters or less' };
+    }
+    
+    // Bloquear solo caracteres realmente problemáticos
+    const forbiddenChars = ['<', '>', '{', '}', '[', ']', '\\', '/', '|', '`'];
+    for (const char of forbiddenChars) {
+        if (nickname.includes(char)) {
+            return { valid: false, error: `❌ Character "${char}" is not allowed` };
+        }
+    }
+    
+    // Verificar que no sea solo espacios o símbolos vacíos
+    if (nickname.trim().replace(/[^\w]/g, '').length === 0 && !(/\p{Emoji}/u.test(nickname))) {
+        return { valid: false, error: '❌ Nickname must contain at least some letters or numbers' };
+    }
+    
+    return { valid: true };
+}
+
+// Guardar nuevo nickname
+async function saveNickname() {
+    if (!currentUser || !currentUser.uid || !isStorageAvailable()) return;
+    
+    const nicknameInput = document.getElementById('nicknameInput');
+    const errorDiv = document.getElementById('nicknameError');
+    const saveBtn = document.getElementById('saveNicknameBtn');
+    
+    const newNickname = nicknameInput.value.trim();
+    
+    // Validar
+    const validation = validateNickname(newNickname);
+    if (!validation.valid) {
+        errorDiv.textContent = validation.error;
+        return;
+    }
+    
+    // Deshabilitar botón mientras guarda
+    saveBtn.disabled = true;
+    saveBtn.textContent = '⏳ SAVING...';
+    errorDiv.textContent = '';
+    
+    try {
+        const userId = currentUser.uid;
+        
+        // Actualizar en la colección de usuarios
+        await db.collection('users').doc(userId).set({
+            nickname: newNickname,
+            googleName: currentUser.displayName,
+            email: currentUser.email,
+            updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+        }, { merge: true });
+        
+        // Actualizar todos los scores con el nuevo nickname
+        const collections = ['user_best_catch', 'user_best_memory', 'user_best_runner', 'user_best_invaders'];
+        
+        for (const collectionName of collections) {
+            const docRef = db.collection(collectionName).doc(userId);
+            const doc = await docRef.get();
+            
+            if (doc.exists) {
+                await docRef.update({
+                    username: newNickname
+                });
+            }
+        }
+        
+        // Actualizar variable local
+        userNickname = newNickname;
+        
+        // Actualizar UI
+        document.getElementById('displayUsername').textContent = newNickname;
+        
+        // Recargar leaderboards
+        await loadLeaderboards();
+        
+        console.log('✅ Nickname actualizado exitosamente:', newNickname);
+        
+        // Mostrar éxito
+        errorDiv.style.color = 'var(--clr-neon-cyan)';
+        errorDiv.textContent = '✅ Nickname updated successfully!';
+        
+        setTimeout(() => {
+            closeNicknameModal();
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = '<span aria-hidden="true">💾</span> SAVE NICKNAME';
+        }, 1500);
+        
+    } catch (error) {
+        console.error('❌ Error al guardar nickname:', error);
+        errorDiv.textContent = '❌ Error saving nickname. Please try again.';
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<span aria-hidden="true">💾</span> SAVE NICKNAME';
+    }
+}
+
+// Permitir guardar con Enter
+document.addEventListener('DOMContentLoaded', () => {
+    const nicknameInput = document.getElementById('nicknameInput');
+    if (nicknameInput) {
+        nicknameInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                saveNickname();
+            }
+        });
+    }
+});
+
         // 4. Nueva función: El "Observador"
         // Esta función se ejecuta CADA VEZ que el estado de login cambia
-		function initAuth() {
-			auth.onAuthStateChanged(user => {
-				if (user) {
-                    // *** EL USUARIO ESTÁ CONECTADO ***
-					console.log("Usuario conectado:", user.displayName, user.uid);
-                    currentUser = user; // Guardamos el objeto de usuario COMPLETO
-                    
-                    document.getElementById('loginView').style.display = 'none';
-                    document.getElementById('userView').style.display = 'flex';
-                    // Mostramos su nombre real de Google
-                    document.getElementById('displayUsername').textContent = user.displayName;
-                    
-                    loadUserStats();
-                    loadLeaderboards();
+function initAuth() {
+    auth.onAuthStateChanged(async (user) => {
+        if (user) {
+            console.log("Usuario conectado:", user.displayName, user.uid);
+            currentUser = user;
+            
+            // ✅ Cargar nickname personalizado
+            const displayName = await loadUserNickname(user);
+            
+            document.getElementById('loginView').style.display = 'none';
+            document.getElementById('userView').style.display = 'flex';
+            document.getElementById('displayUsername').textContent = displayName;
+            
+            loadUserStats();
+            loadLeaderboards();
 
-                } else {
-                    // *** EL USUARIO ESTÁ DESCONECTADO ***
-                	console.log("User logged out.");
-                	currentUser = null;
+        } else {
+            console.log("User logged out.");
+            currentUser = null;
+            userNickname = null; // ✅ Limpiar nickname
 
-                	document.getElementById('loginView').style.display = 'block';
-                	document.getElementById('userView').style.display = 'none';
+            document.getElementById('loginView').style.display = 'block';
+            document.getElementById('userView').style.display = 'none';
 
-                	closeGame('catch');
-                	closeGame('memory');
+            closeGame('catch');
+            closeGame('memory');
+            closeGame('runner');
+            closeGame('invaders');
 
-                    // Limpiar SÓLO las vistas previas PERSONALES
-                	document.getElementById('catchBestPreview').textContent = '-';
-                	document.getElementById('memoryBestPreview').textContent = '-';
+            document.getElementById('catchBestPreview').textContent = '-';
+            document.getElementById('memoryBestPreview').textContent = '-';
+            document.getElementById('runnerBestPreview').textContent = '-';
+            document.getElementById('invadersBestPreview').textContent = '-';
 
-                    // CARGAR los leaderboards globales
-                	loadLeaderboards();
-                }
-            });
-		}
+            loadLeaderboards();
+        }
+    });
+}
 
         // 5. Llama al observador cuando la página cargue
 		document.addEventListener('DOMContentLoaded', initAuth);
@@ -2331,19 +2565,18 @@ async function saveScore(game, score) {
                     }
                 }
                 
-                if (shouldSave) {
-                    console.log(`✅ Saving new best score for ${game}: ${score}`);
-                    await docRef.set({
-                        username: currentUser.displayName,
-                        score: score,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    });
-                    
-                    console.log(`✅ Score saved successfully for ${game}`);
-                    
-                    // ✅ Recargar stats y leaderboards
-                    await loadUserStats();
-                    await loadLeaderboards();
+					if (shouldSave) {
+					    console.log(`✅ Saving new best score for ${game}: ${score}`);
+					    await docRef.set({
+					        username: getUserDisplayName(), // ✅ Usar nickname personalizado
+					        score: score,
+					        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+					    });
+					    
+					    console.log(`✅ Score saved successfully for ${game}`);
+					    
+					    await loadUserStats();
+					    await loadLeaderboards();
                     
                 } else {
                     console.log(`ℹ️ Score ${score} is not better than existing ${doc.data().score}. Not saving.`);
