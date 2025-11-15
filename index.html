@@ -1753,7 +1753,6 @@
 		    } catch (error) {
 		        console.error("Error al iniciar sesión con Google:", error);
 		        
-		        // Mensajes de error más específicos
 		        let errorMessage = "There was an error signing in.";
 		        if (error.code === 'auth/popup-closed-by-user') {
 		            errorMessage = "Sign-in cancelled. Please try again.";
@@ -1762,11 +1761,6 @@
 		        }
 		        
 		        alert(errorMessage);
-		        
-		        // Restaurar el botón
-		        const loginBtn = document.querySelector('#loginView .arcade-btn');
-		        loginBtn.disabled = false;
-		        loginBtn.innerHTML = '<span aria-hidden="true">★</span> SIGN IN WITH GOOGLE <span aria-hidden="true">★</span>';
 		    }
 		}
 
@@ -1777,14 +1771,10 @@
 		        logoutBtn.textContent = '⏳ LOGGING OUT...';
 		        
 		        await auth.signOut();
-		        
+		    
 		    } catch (error) {
 		        console.error("Error al cerrar sesión:", error);
 		        alert("There was an error logging out. Please try again.");
-		        
-		        const logoutBtn = document.querySelector('#userView .arcade-btn:last-child');
-		        logoutBtn.disabled = false;
-		        logoutBtn.innerHTML = '<span aria-hidden="true">⏏</span> LOGOUT';
 		    }
 		}
 
