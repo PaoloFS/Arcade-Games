@@ -10,197 +10,199 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-        /* ============================================
-         * RESET & DESIGN TOKENS (Con Clamp)
-         * ============================================ */
-        *, *::before, *::after {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
+       /* ============================================
+ * RESET & DESIGN TOKENS (FLUID + MODERN)
+ * ============================================ */
+*, *::before, *::after {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
 
-        :root {
-            /* Tus Colores Neon Arcade (OKLCH) */
-            --neon-cyan: oklch(0.85 0.25 195);
-            --neon-pink: oklch(0.65 0.30 350);
-            --neon-yellow: oklch(0.85 0.20 85);
-            --neon-purple: oklch(0.60 0.28 290);
-            
-            /* Tus Fondos */
-            --bg-dark: oklch(0.12 0.02 265);
-            --bg-darker: oklch(0.08 0.01 265);
-            --bg-card: oklch(0.15 0.03 265 / 0.95);
-            
-            /* Tu Espaciado Fluido (Clamp) */
-            --space-md: clamp(1.5rem, 1.45rem + 0.28vw, 1.88rem);
-            --space-lg: clamp(2rem, 1.94rem + 0.37vw, 2.5rem);
-            
-            /* Tu Tipografía Fluida (Clamp) */
-            --fs-base: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
-            --fs-2xl: clamp(2rem, 1.94rem + 0.37vw, 2.5rem);
-            
-            /* Tus Radios */
-            --radius-lg: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
+:root {
+    /* Neon OKLCH Colors */
+    --neon-cyan: oklch(0.85 0.25 195);
+    --neon-pink: oklch(0.70 0.30 350);
+    --neon-yellow: oklch(0.90 0.20 85);
+    --neon-purple: oklch(0.65 0.22 290);
 
-            /* Tus Fuentes */
-            --font-pixel: 'Press Start 2P', monospace;
-            --font-sans: 'Space Grotesk', sans-serif;
-        }
+    /* Backgrounds */
+    --bg-dark: oklch(0.12 0.02 265);
+    --bg-darker: oklch(0.07 0.01 265);
+    --bg-card: oklch(0.17 0.03 265 / 0.90);
 
-        /* ============================================
-         * ESTILOS BASE & FONDO
-         * ============================================ */
-        html {
-            -webkit-font-smoothing: antialiased;
-            text-rendering: optimizeLegibility;
-        }
+    /* Fluid Spacing */
+    --space-xs: clamp(0.5rem, 0.45rem + 0.5vw, 1rem);
+    --space-sm: clamp(0.75rem, 0.65rem + 0.6vw, 1.25rem);
+    --space-md: clamp(1.25rem, 1.10rem + 0.9vw, 2rem);
+    --space-lg: clamp(2rem, 1.75rem + 1vw, 3rem);
 
-        body {
-            min-block-size: 100vh;
-            min-block-size: 100dvh;
-            background: 
-                radial-gradient(ellipse at top, oklch(0.2 0.05 265) 0%, var(--bg-dark) 40%, var(--bg-darker) 100%);
-            font-family: var(--font-sans);
-            color: oklch(0.95 0 0);
-            overflow: hidden;
-            
-            /* Centrado perfecto */
-            display: grid;
-            place-items: center;
-            padding: var(--space-md);
-            position: relative;
-        }
+    /* Fluid Typography */
+    --fs-base: clamp(0.95rem, 0.80rem + 0.6vw, 1.25rem);
+    --fs-lg: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+    --fs-2xl: clamp(1.8rem, 1.5rem + 2vw, 3rem);
 
-        /* Fondo de grid sutil */
-        body::before {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background-image: 
-                linear-gradient(90deg, var(--neon-cyan) 1px, transparent 1px),
-                linear-gradient(0deg, var(--neon-cyan) 1px, transparent 1px);
-            background-size: 60px 60px;
-            opacity: 0.03;
-            pointer-events: none;
-            z-index: 0;
-            animation: gridFloat 30s linear infinite;
-        }
+    /* Radius */
+    --radius-lg: clamp(1rem, 0.7rem + 1vw, 2rem);
 
-        /* Fondo de partículas sutil */
-        body::after {
-            content: '';
-            position: fixed;
-            inset: 0;
-            background: 
-                radial-gradient(circle at 20% 30%, var(--neon-cyan) 1px, transparent 1px),
-                radial-gradient(circle at 80% 70%, var(--neon-pink) 1px, transparent 1px),
-                radial-gradient(circle at 50% 50%, var(--neon-purple) 1px, transparent 1px);
-            background-size: 200px 200px, 250px 250px, 300px 300px;
-            opacity: 0.06;
-            animation: particleMove 40s ease-in-out infinite;
-            pointer-events: none;
-            z-index: 0;
-        }
+    /* Fonts */
+    --font-pixel: "Press Start 2P", monospace;
+    --font-sans: "Space Grotesk", sans-serif;
+}
 
-        /* ============================================
-         * TARJETA DE MENSAJE SIMPLE
-         * ============================================ */
-        .message-card {
-            position: relative;
-            z-index: 10;
-            text-align: center;
-            padding: var(--space-lg);
-            background: var(--bg-card);
-            border: 2px solid transparent;
-            border-radius: var(--radius-lg);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            box-shadow: 0 8px 32px oklch(0 0 0 / 0.35);
-            background-clip: padding-box;
-            
-            /* *** CAMBIO AQUÍ: Menos ancho máximo *** */
-            max-inline-size: 450px; /* Reducido de 600px */
-            inline-size: 95vw;
+/* ============================================
+ * BASE LAYOUT & BACKGROUND
+ * ============================================ */
+html {
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+}
 
-            /* Animación de entrada */
-            animation: fadeIn 1.5s ease-out;
-        }
+body {
+    min-block-size: 100dvh;
+    background: radial-gradient(
+        ellipse at top,
+        oklch(0.18 0.05 265),
+        var(--bg-dark) 60%,
+        var(--bg-darker)
+    );
+    color: oklch(0.96 0 0);
+    display: grid;
+    place-items: center;
+    padding: var(--space-md);
+    position: relative;
+    overflow: hidden;
+    font-family: var(--font-sans);
+}
 
-        /* Borde animado de la tarjeta */
-        .message-card::before {
-            content: '';
-            position: absolute;
-            inset: -2px;
-            border-radius: inherit;
-            padding: 2px;
-            background: linear-gradient(
-                90deg,
-                var(--neon-cyan),
-                var(--neon-pink),
-                var(--neon-yellow),
-                var(--neon-cyan)
-            );
-            background-size: 200% 100%;
-            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-            -webkit-mask-composite: xor;
-            mask-composite: exclude;
-            animation: borderFlow 8s linear infinite;
-            z-index: -1;
-        }
+/* Dynamic grid background */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image:
+        linear-gradient(90deg, var(--neon-cyan) 1px, transparent 1px),
+        linear-gradient(0deg, var(--neon-cyan) 1px, transparent 1px);
+    background-size: 55px 55px;
+    opacity: 0.03;
+    animation: gridMove 36s linear infinite;
+    z-index: 0;
+}
 
-        h1 {
-            font-family: var(--font-pixel);
-            font-size: var(--fs-2xl); /* Fuente grande y responsive */
-            line-height: 1.4;
-            color: var(--neon-yellow);
-            text-shadow: 0 0 15px var(--neon-yellow);
-            margin-block-end: var(--space-md);
-            /* Permite que el texto se divida en pantallas pequeñas */
-            text-wrap: balance;
-        }
+/* Holographic glow particles */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background:
+        radial-gradient(circle at 20% 30%, var(--neon-cyan) 2px, transparent 2px),
+        radial-gradient(circle at 80% 60%, var(--neon-pink) 2px, transparent 2px),
+        radial-gradient(circle at 50% 80%, var(--neon-yellow) 2px, transparent 2px);
+    background-size: 250px 250px, 300px 300px, 350px 350px;
+    opacity: 0.07;
+    animation: particlesFloat 50s ease-in-out infinite;
+    z-index: 0;
+}
 
-        p {
-            font-size: var(--fs-base); /* Fuente base responsive */
-            color: var(--neon-cyan);
-            text-shadow: 0 0 10px var(--neon-cyan);
-            opacity: 0.9;
-            line-height: 1.6;
-            max-inline-size: 40ch; /* Buen ancho de lectura */
-            margin-inline: auto;
-            text-wrap: balance;
-        }
+/* ============================================
+ * MAIN CARD
+ * ============================================ */
+.message-card {
+    position: relative;
+    z-index: 10;
+    padding: var(--space-lg);
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    border: 2px solid transparent;
+    background-clip: padding-box;
+    box-shadow: 0 0 30px oklch(0 0 0 / 0.55);
 
-        /* ============================================
-         * ANIMACIONES
-         * ============================================ */
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(15px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+    /* Fluid width for PC + iPhone */
+    max-inline-size: clamp(320px, 90vw, 520px);
 
-        @keyframes borderFlow {
-            to { background-position: 200% center; }
-        }
+    animation: fadeSlide 1.4s ease-out both;
+}
 
-        @keyframes gridFloat {
-            from { transform: translateY(0); }
-            to { transform: translateY(60px); }
-        }
+/* Animated border */
+.message-card::before {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    padding: 2px;
+    background: linear-gradient(
+        105deg,
+        var(--neon-cyan),
+        var(--neon-pink),
+        var(--neon-yellow),
+        var(--neon-cyan)
+    );
+    background-size: 300% 100%;
+    -webkit-mask: linear-gradient(#fff 0 0) content-box,
+                   linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    animation: borderFlow 6s linear infinite;
+    z-index: -1;
+}
 
-        @keyframes particleMove {
-            0%, 100% { background-position: 0% 0%, 100% 100%, 50% 50%; }
-            50% { background-position: 100% 100%, 0% 0%, 80% 20%; }
-        }
-        
-        /* ============================================
-         * ACCESIBILIDAD
-         * ============================================ */
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after {
-                animation: none !important;
-                transition: none !important;
-            }
-        }
+/* ============================================
+ * TEXT
+ * ============================================ */
+h1 {
+    font-family: var(--font-pixel);
+    font-size: var(--fs-2xl);
+    color: var(--neon-yellow);
+    text-shadow: 0 0 15px var(--neon-yellow);
+    margin-block-end: var(--space-sm);
+    line-height: 1.5;
+    text-wrap: balance;
+}
+
+p {
+    font-size: var(--fs-base);
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px var(--neon-cyan);
+    line-height: 1.7;
+    opacity: 0.92;
+    max-inline-size: 45ch;
+    margin-inline: auto;
+    text-wrap: balance;
+}
+
+/* ============================================
+ * ANIMATIONS
+ * ============================================ */
+@keyframes fadeSlide {
+    from { opacity: 0; transform: translateY(25px) scale(0.97); }
+    to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes borderFlow {
+    to { background-position: 300% center; }
+}
+
+@keyframes gridMove {
+    from { transform: translateY(0); }
+    to   { transform: translateY(80px); }
+}
+
+@keyframes particlesFloat {
+    0%, 100% { background-position: 0% 0%, 100% 100%, 50% 80%; }
+    50%      { background-position: 100% 90%, 0% 30%, 80% 10%; }
+}
+
+/* ============================================
+ * ACCESSIBILITY
+ * ============================================ */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation: none !important;
+    }
+}
+
     </style>
 </head>
 <body>
