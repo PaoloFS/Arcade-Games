@@ -2276,62 +2276,87 @@
 		// Evitar múltiples guardados simultáneos
 		let saveScoreTimeout = null;
 
-		async function saveScore(game, score) {
-		    if (!currentUser || !currentUser.uid || !isStorageAvailable()) {
-		        console.log('User not logged in or DB not available. Score not saved.');
-		        return;
-		    }
-		    
-		    // Cancelar guardado pendiente
-		    if (saveScoreTimeout) {
-		        clearTimeout(saveScoreTimeout);
-		    }
-		    
-		    // Esperar un momento antes de guardar (debounce)
-		    return new Promise((resolve) => {
-		        saveScoreTimeout = setTimeout(async () => {
-		            const isCatchGame = game === 'catch';
-		            const collectionName = isCatchGame ? 'user_best_catch' : 'user_best_memory';
-		            const docId = currentUser.uid;
-		            const docRef = db.collection(collectionName).doc(docId);
-		            
-		            try {
-		                const doc = await docRef.get();
-		                let shouldSave = false;
-		                
-		                if (!doc.exists) {
-		                    shouldSave = true;
-		                } else {
-		                    const existingScore = doc.data().score;
-		                    if (isCatchGame) {
-		                        shouldSave = score > existingScore;
-		                    } else {
-		                        shouldSave = score < existingScore;
-		                    }
-		                }
-		                
-		                if (shouldSave) {
-		                    console.log(`Saving new best score for ${game}: ${score}`);
-		                    await docRef.set({
-		                        username: currentUser.displayName,
-		                        score: score,
-		                        timestamp: firebase.firestore.FieldValue.serverTimestamp() // ✅ Usar timestamp del servidor
-		                    });
-		                    
-		                    await loadUserStats();
-		                    await loadLeaderboards();
-		                    await loadRunnerStats();
-		                } else {
-		                    console.log(`Score ${score} is not better than existing. Not saving.`);
-		                }
-		                resolve();
-		            } catch (error) {
-		                console.error('Error saving score:', error);
-		                resolve();
-		            }
-		        }, 500); // Esperar 500ms antes de guardar
-		    });
-		}
+		// Evitar múltiples guardados simultáneos
+let saveScoreTimeout = null;
+
+async function saveScore(game, score) {
+    if (!currentUser || !currentUser.uid || !isStorageAvailable()) {
+        console.log('User not logged in or DB not available. Score not saved.');
+        return;
+    }
+    
+    // Cancelar guardado pendiente
+    if (saveScoreTimeout) {
+        clearTimeout(saveScoreTimeout);
+    }
+    
+    // Esperar un momento antes de guardar (debounce)
+    return new Promise((resolve) => {
+        saveScoreTimeout = setTimeout(async () => {
+            const isCatchGame = game === 'catch';
+            const isMemoryGame = game === 'memory';
+            
+            // ✅ Determinar nombre de colección
+            let collectionName;
+            if (game === 'catch') collectionName = 'user_best_catch';
+            else if (game === 'memory') collectionName = 'user_best_memory';
+            else if (game === 'runner') collectionName = 'user_best_runner';
+            else if (game === 'invaders') collectionName = 'user_best_invaders';
+            else {
+                console.error('Unknown game:', game);
+                resolve();
+                return;
+            }
+            
+            const docId = currentUser.uid;
+            const docRef = db.collection(collectionName).doc(docId);
+            
+            try {
+                const doc = await docRef.get();
+                let shouldSave = false;
+                
+                if (!doc.exists) {
+                    console.log(`No previous score found for ${game}. Saving first score.`);
+                    shouldSave = true;
+                } else {
+                    const existingScore = doc.data().score;
+                    console.log(`Previous score for ${game}:`, existingScore, '| New score:', score);
+                    
+                    // Para Memory, menor es mejor
+                    if (isMemoryGame) {
+                        shouldSave = score < existingScore;
+                    } else {
+                        // Para otros juegos, mayor es mejor
+                        shouldSave = score > existingScore;
+                    }
+                }
+                
+                if (shouldSave) {
+                    console.log(`✅ Saving new best score for ${game}: ${score}`);
+                    await docRef.set({
+                        username: currentUser.displayName,
+                        score: score,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    
+                    console.log(`✅ Score saved successfully for ${game}`);
+                    
+                    // ✅ Recargar stats y leaderboards
+                    await loadUserStats();
+                    await loadLeaderboards();
+                    
+                } else {
+                    console.log(`ℹ️ Score ${score} is not better than existing ${doc.data().score}. Not saving.`);
+                }
+                resolve();
+            } catch (error) {
+                console.error('❌ Error saving score:', error);
+                console.error('Error details:', error.code, error.message);
+                resolve();
+            }
+        }, 500);
+    });
+}
 
 		async function loadLeaderboards() {
 			if (!isStorageAvailable()) {
