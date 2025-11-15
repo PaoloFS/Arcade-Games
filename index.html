@@ -3,608 +3,215 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Arcade - Critical System Update</title>
+    <title>Arcade - Temporarily Offline</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
     
     <style>
-       /* ============================================
- * RESET & DESIGN TOKENS (Con Clamp)
- * ============================================ */
-*, *::before, *::after {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
+        /* ============================================
+         * RESET & DESIGN TOKENS (Con Clamp)
+         * ============================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-:root {
-    /* Tus Colores Neon Arcade (OKLCH) */
-    --neon-cyan: oklch(0.85 0.25 195);
-    --neon-pink: oklch(0.65 0.30 350);
-    --neon-yellow: oklch(0.85 0.20 85);
-    --neon-purple: oklch(0.60 0.28 290);
-    --neon-green: oklch(0.80 0.25 145);
-    --neon-red: oklch(0.60 0.30 20); /* Para errores */
-    
-    /* Tus Fondos */
-    --bg-dark: oklch(0.12 0.02 265);
-    --bg-darker: oklch(0.08 0.01 265);
-    --bg-card: oklch(0.15 0.03 265 / 0.95);
-    
-    /* Tu Espaciado Fluido (Clamp) */
-    --space-3xs: clamp(0.25rem, 0.24rem + 0.05vw, 0.31rem);
-    --space-2xs: clamp(0.5rem, 0.48rem + 0.09vw, 0.63rem);
-    --space-xs: clamp(0.75rem, 0.73rem + 0.14vw, 0.94rem);
-    --space-sm: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
-    --space-md: clamp(1.5rem, 1.45rem + 0.28vw, 1.88rem);
-    --space-lg: clamp(2rem, 1.94rem + 0.37vw, 2.5rem);
-    --space-xl: clamp(3rem, 2.91rem + 0.56vw, 3.75rem);
-    
-    /* Tu Tipografía Fluida (Clamp) */
-    --fs-xs: clamp(0.75rem, 0.73rem + 0.14vw, 0.94rem);
-    --fs-sm: clamp(0.875rem, 0.85rem + 0.16vw, 1.09rem);
-    --fs-base: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
-    --fs-md: clamp(1.125rem, 1.09rem + 0.21vw, 1.41rem);
-    --fs-lg: clamp(1.25rem, 1.21rem + 0.23vw, 1.56rem);
-    --fs-xl: clamp(1.5rem, 1.45rem + 0.28vw, 1.88rem);
-    --fs-2xl: clamp(2rem, 1.94rem + 0.37vw, 2.5rem);
-    --fs-3xl: clamp(2.5rem, 2.42rem + 0.47vw, 3.13rem);
-    
-    /* Tus Radios */
-    --radius-sm: clamp(0.5rem, 0.48rem + 0.09vw, 0.63rem);
-    --radius-md: clamp(0.75rem, 0.73rem + 0.14vw, 0.94rem);
-    --radius-lg: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
+        :root {
+            /* Tus Colores Neon Arcade (OKLCH) */
+            --neon-cyan: oklch(0.85 0.25 195);
+            --neon-pink: oklch(0.65 0.30 350);
+            --neon-yellow: oklch(0.85 0.20 85);
+            --neon-purple: oklch(0.60 0.28 290);
+            
+            /* Tus Fondos */
+            --bg-dark: oklch(0.12 0.02 265);
+            --bg-darker: oklch(0.08 0.01 265);
+            --bg-card: oklch(0.15 0.03 265 / 0.95);
+            
+            /* Tu Espaciado Fluido (Clamp) */
+            --space-md: clamp(1.5rem, 1.45rem + 0.28vw, 1.88rem);
+            --space-lg: clamp(2rem, 1.94rem + 0.37vw, 2.5rem);
+            
+            /* Tu Tipografía Fluida (Clamp) */
+            --fs-base: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
+            --fs-2xl: clamp(2rem, 1.94rem + 0.37vw, 2.5rem);
+            
+            /* Tus Radios */
+            --radius-lg: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
 
-    /* Tus Fuentes */
-    --font-pixel: 'Press Start 2P', monospace;
-    --font-sans: 'Space Grotesk', sans-serif;
+            /* Tus Fuentes */
+            --font-pixel: 'Press Start 2P', monospace;
+            --font-sans: 'Space Grotesk', sans-serif;
+        }
 
-    /* Tus Transiciones */
-    --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
-}
+        /* ============================================
+         * ESTILOS BASE & FONDO
+         * ============================================ */
+        html {
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
 
-/* ============================================
- * ESTILOS BASE & FONDO
- * ============================================ */
-html {
-    -webkit-font-smoothing: antialiased;
-    text-rendering: optimizeLegibility;
-}
+        body {
+            min-block-size: 100vh;
+            min-block-size: 100dvh;
+            background: 
+                radial-gradient(ellipse at top, oklch(0.2 0.05 265) 0%, var(--bg-dark) 40%, var(--bg-darker) 100%);
+            font-family: var(--font-sans);
+            color: oklch(0.95 0 0);
+            overflow: hidden;
+            
+            /* Centrado perfecto */
+            display: grid;
+            place-items: center;
+            padding: var(--space-md);
+            position: relative;
+        }
 
-body {
-    min-block-size: 100vh;
-    min-block-size: 100dvh;
-    background: 
-        radial-gradient(ellipse at top, oklch(0.2 0.05 265) 0%, var(--bg-dark) 40%, var(--bg-darker) 100%);
-    font-family: var(--font-sans);
-    color: oklch(0.95 0 0);
-    overflow: hidden;
-    
-    display: grid;
-    place-items: center;
-    padding: var(--space-md);
-    position: relative;
-}
+        /* Fondo de grid sutil */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(90deg, var(--neon-cyan) 1px, transparent 1px),
+                linear-gradient(0deg, var(--neon-cyan) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+            animation: gridFloat 30s linear infinite;
+        }
 
-/* Fondo de grid sutil */
-body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: 
-        linear-gradient(90deg, var(--neon-cyan) 1px, transparent 1px),
-        linear-gradient(0deg, var(--neon-cyan) 1px, transparent 1px);
-    background-size: 60px 60px;
-    opacity: 0.03;
-    pointer-events: none;
-    z-index: 0;
-    animation: gridFloat 30s linear infinite;
-}
+        /* Fondo de partículas sutil */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, var(--neon-cyan) 1px, transparent 1px),
+                radial-gradient(circle at 80% 70%, var(--neon-pink) 1px, transparent 1px),
+                radial-gradient(circle at 50% 50%, var(--neon-purple) 1px, transparent 1px);
+            background-size: 200px 200px, 250px 250px, 300px 300px;
+            opacity: 0.06;
+            animation: particleMove 40s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
 
-/* Fondo de partículas sutil */
-body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background: 
-        radial-gradient(circle at 20% 30%, var(--neon-cyan) 1px, transparent 1px),
-        radial-gradient(circle at 80% 70%, var(--neon-pink) 1px, transparent 1px),
-        radial-gradient(circle at 50% 50%, var(--neon-purple) 1px, transparent 1px);
-    background-size: 200px 200px, 250px 250px, 300px 300px;
-    opacity: 0.06;
-    animation: particleMove 40s ease-in-out infinite;
-    pointer-events: none;
-    z-index: 0;
-}
+        /* ============================================
+         * TARJETA DE MENSAJE SIMPLE
+         * ============================================ */
+        .message-card {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: var(--space-lg);
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px oklch(0 0 0 / 0.35);
+            background-clip: padding-box;
+            
+            /* Limita el ancho en pantallas grandes, es 95% en móviles */
+            max-inline-size: 600px;
+            inline-size: 95vw;
 
-/* ============================================
- * PANTALLA DE CARGA
- * ============================================ */
-.loading-screen {
-    position: fixed;
-    inset: 0;
-    background: var(--bg-darker);
-    z-index: 9999;
-    display: grid;
-    place-items: center;
-    transition: opacity 1s ease-out 2s, visibility 1s ease-out 2s;
-}
+            /* Animación de entrada */
+            animation: fadeIn 1.5s ease-out;
+        }
 
-.loading-screen.hidden {
-    opacity: 0;
-    visibility: hidden;
-}
+        /* Borde animado de la tarjeta */
+        .message-card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(
+                90deg,
+                var(--neon-cyan),
+                var(--neon-pink),
+                var(--neon-yellow),
+                var(--neon-cyan)
+            );
+            background-size: 200% 100%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: borderFlow 8s linear infinite;
+            z-index: -1;
+        }
 
-.loader-text {
-    font-family: var(--font-pixel);
-    font-size: var(--fs-2xl); /* Usando tu variable clamp */
-    color: var(--neon-cyan);
-    text-shadow: 0 0 10px var(--neon-cyan);
-    animation: textGlitch 1.5s linear infinite alternate, fadeInOut 2s ease-in-out;
-}
+        h1 {
+            font-family: var(--font-pixel);
+            font-size: var(--fs-2xl); /* Fuente grande y responsive */
+            line-height: 1.4;
+            color: var(--neon-yellow);
+            text-shadow: 0 0 15px var(--neon-yellow);
+            margin-block-end: var(--space-md);
+            /* Permite que el texto se divida en pantallas pequeñas */
+            text-wrap: balance;
+        }
 
-/* ============================================
- * UI PRINCIPAL DE MANTENIMIENTO
- * ============================================ */
-.maintenance-container {
-    position: relative;
-    z-index: 10;
-    display: flex;
-    flex-direction: column;
-    gap: var(--space-lg); /* Usando tu variable clamp */
-    max-inline-size: 1000px;
-    inline-size: 95vw;
-    opacity: 0;
-    transition: opacity 1s ease-in 2.5s;
-}
+        p {
+            font-size: var(--fs-base); /* Fuente base responsive */
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            opacity: 0.9;
+            line-height: 1.6;
+            max-inline-size: 40ch; /* Buen ancho de lectura */
+            margin-inline: auto;
+            text-wrap: balance;
+        }
 
-.maintenance-container.active {
-    opacity: 1;
-}
+        /* ============================================
+         * ANIMACIONES
+         * ============================================ */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(15px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-.header-section {
-    text-align: center;
-    padding: var(--space-md); /* Usando tu variable clamp */
-    background: var(--bg-card);
-    border: 2px solid transparent;
-    border-radius: var(--radius-lg);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    box-shadow: 0 8px 32px oklch(0 0 0 / 0.35);
-    background-clip: padding-box;
-    position: relative;
-}
+        @keyframes borderFlow {
+            to { background-position: 200% center; }
+        }
 
-/* Borde animado */
-.header-section::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    padding: 2px;
-    background: linear-gradient(
-        90deg,
-        var(--neon-cyan),
-        var(--neon-pink),
-        var(--neon-yellow),
-        var(--neon-cyan)
-    );
-    background-size: 200% 100%;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    animation: borderFlow 8s linear infinite;
-    z-index: -1;
-}
+        @keyframes gridFloat {
+            from { transform: translateY(0); }
+            to { transform: translateY(60px); }
+        }
 
-h1 {
-    font-family: var(--font-pixel);
-    font-size: var(--fs-2xl); /* Usando tu variable clamp */
-    line-height: 1.4;
-    color: var(--neon-yellow);
-    text-shadow: 0 0 20px var(--neon-yellow);
-    margin-block-end: var(--space-sm); /* Usando tu variable clamp */
-}
-
-.status-message {
-    font-size: var(--fs-base); /* Usando tu variable clamp */
-    color: var(--neon-cyan);
-    text-shadow: 0 0 12px var(--neon-cyan);
-    opacity: 0.9;
-    line-height: 1.6;
-    max-inline-size: 60ch;
-    margin-inline: auto;
-}
-
-/* Barra de Progreso */
-.progress-indicator {
-    inline-size: 100%;
-    block-size: var(--space-md); /* Usando tu variable clamp */
-    background: oklch(0 0 0 / 0.6);
-    border: 2px solid var(--neon-purple);
-    border-radius: var(--radius-sm);
-    overflow: hidden;
-    position: relative;
-    box-shadow: inset 0 0 15px var(--neon-purple) / 30%;
-    margin-block-start: var(--space-lg); /* Usando tu variable clamp */
-    
-    background-image: repeating-linear-gradient(
-        45deg,
-        oklch(0 0 0 / 0.2),
-        oklch(0 0 0 / 0.2) 10px,
-        transparent 10px,
-        transparent 20px
-    );
-    background-size: 30px 30px;
-    animation: progressStripes 1s linear infinite;
-}
-
-.progress-fill {
-    inline-size: 0%; /* Controlado por JS */
-    block-size: 100%;
-    background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
-    transition: inline-size 0.5s ease-out;
-    box-shadow: 0 0 15px var(--neon-pink);
-}
-
-/* Grid de Módulos (Responsivo por naturaleza) */
-.modules-grid {
-    display: grid;
-    /* Usa auto-fit y minmax para responsiveness automático */
-    grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
-    gap: var(--space-md); /* Usando tu variable clamp */
-}
-
-.module-card {
-    background: var(--bg-card);
-    border: 2px solid transparent;
-    border-radius: var(--radius-md);
-    padding: var(--space-md); /* Usando tu variable clamp */
-    backdrop-filter: blur(15px);
-    -webkit-backdrop-filter: blur(15px);
-    box-shadow: 0 4px 16px oklch(0 0 0 / 0.25);
-    position: relative;
-    background-clip: padding-box;
-    text-align: center;
-    transition: all var(--transition-base);
-    min-block-size: 100px;
-}
+        @keyframes particleMove {
+            0%, 100% { background-position: 0% 0%, 100% 100%, 50% 50%; }
+            50% { background-position: 100% 100%, 0% 0%, 80% 20%; }
+        }
         
-.module-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 8px 24px oklch(0 0 0 / 0.4);
-}
-
-.module-card::before {
-    content: '';
-    position: absolute;
-    inset: -2px;
-    border-radius: inherit;
-    padding: 2px;
-    background: linear-gradient(
-        135deg,
-        var(--neon-cyan),
-        var(--neon-pink),
-        var(--neon-cyan)
-    );
-    background-size: 200% 200%;
-    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-    -webkit-mask-composite: xor;
-    mask-composite: exclude;
-    animation: borderRotate 10s linear infinite;
-    z-index: -1;
-    opacity: 0.5;
-    transition: opacity var(--transition-base);
-}
-        
-.module-card:hover::before {
-    opacity: 1;
-}
-
-.module-title {
-    font-family: var(--font-pixel);
-    font-size: var(--fs-sm); /* Usando tu variable clamp */
-    color: var(--neon-yellow);
-    text-shadow: 0 0 8px var(--neon-yellow);
-    margin-block-end: var(--space-2xs); /* Usando tu variable clamp */
-    line-height: 1.3;
-}
-
-.module-status {
-    font-family: var(--font-sans);
-    font-size: var(--fs-xs); /* Usando tu variable clamp */
-    font-weight: 600;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-}
-        
-.module-card[data-state="online"] .module-status { color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
-.module-card[data-state="offline"] .module-status { color: var(--neon-red); text-shadow: 0 0 5px var(--neon-red); }
-.module-card[data-state="updating"] .module-status { color: var(--neon-cyan); text-shadow: 0 0 5px var(--neon-cyan); animation: pulse 1.5s infinite; }
-.module-card[data-state="idle"] .module-status { color: oklch(0.7 0 0); } /* Grey */
-
-/* Log de Estado Detallado */
-.status-log-section {
-    background: oklch(0 0 0 / 0.7);
-    border: 1px solid var(--neon-cyan) / 20%;
-    border-radius: var(--radius-md);
-    max-block-size: 300px;
-    overflow: hidden;
-    padding: var(--space-sm); /* Usando tu variable clamp */
-    box-shadow: inset 0 0 20px oklch(0 0 0 / 0.5);
-    -webkit-mask-image: linear-gradient(transparent, black var(--space-lg), black 90%, transparent);
-    mask-image: linear-gradient(transparent, black var(--space-lg), black 90%, transparent);
-    position: relative;
-}
-        
-.status-log-section::before { /* Scanline animado en el log */
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(
-        transparent 0%, 
-        oklch(1 0 0 / 0.05) 50%, 
-        transparent 100%
-    );
-    background-size: 100% 30px;
-    animation: scanline 8s linear infinite;
-    pointer-events: none;
-    z-index: 1;
-}
-
-.status-log {
-    list-style: none;
-    animation: scrollLog 60s linear infinite; /* Más lento para más contenido */
-}
-
-.status-log li {
-    font-family: 'Space Grotesk', monospace;
-    font-size: var(--fs-sm); /* Usando tu variable clamp */
-    line-height: 1.6;
-    color: oklch(0.85 0 0);
-    display: flex;
-    gap: var(--space-xs); /* Usando tu variable clamp */
-    white-space: nowrap;
-}
-        
-.status-log li span {
-    opacity: 0.5;
-    flex-shrink: 0;
-    color: oklch(0.7 0 0);
-}
-        
-.status-log li::before {
-    flex-shrink: 0;
-    font-weight: 700;
-}
-
-.status-log li[data-log-status="ok"]::before { content: '[ OK ]'; color: var(--neon-green); }
-.status-log li[data-log-status="info"]::before { content: '[ INFO ]'; color: var(--neon-cyan); }
-.status-log li[data-log-status="warn"]::before { content: '[ WARN ]'; color: var(--neon-yellow); }
-.status-log li[data-log-status="error"]::before { content: '[ FAIL ]'; color: var(--neon-red); animation: textFlicker 0.5s infinite alternate; }
-.status-log li[data-log-status="debug"]::before { content: '[ DEBUG ]'; color: var(--neon-purple); opacity: 0.7; }
-
-/* ============================================
- * ANIMACIONES
- * ============================================ */
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes fadeInOut {
-    0%, 100% { opacity: 0; }
-    50% { opacity: 1; }
-}
-
-@keyframes textGlitch {
-    0% { transform: translate(0); text-shadow: 0 0 10px var(--neon-cyan); }
-    20% { transform: translate(-2px, 2px); text-shadow: 0 0 8px var(--neon-cyan), 1px 1px 0 var(--neon-pink); }
-    40% { transform: translate(2px, -2px); text-shadow: 0 0 12px var(--neon-cyan), -1px -1px 0 var(--neon-green); }
-    60% { transform: translate(-1px, 1px); text-shadow: 0 0 10px var(--neon-cyan); }
-    80% { transform: translate(1px, -1px); text-shadow: 0 0 11px var(--neon-cyan), 2px 0 0 var(--neon-yellow); }
-    100% { transform: translate(0); text-shadow: 0 0 10px var(--neon-cyan); }
-}
-
-@keyframes borderFlow {
-    to { background-position: 200% center; }
-}
-
-@keyframes borderRotate {
-    to { background-position: 200% 200%; }
-}
-
-@keyframes progressStripes {
-    to { background-position: 30px 0; }
-}
-
-@keyframes pulse {
-    0%, 100% { transform: scale(1); opacity: 1; }
-    50% { transform: scale(1.02); opacity: 0.8; }
-}
-
-@keyframes scanline {
-    0% { transform: translateY(-100%); }
-    100% { transform: translateY(100%); }
-}
-
-@keyframes scrollLog {
-    0% { transform: translateY(0); }
-    100% { transform: translateY(-50%); }
-}
-
-@keyframes gridFloat {
-    from { transform: translateY(0); }
-    to { transform: translateY(60px); }
-}
-
-@keyframes particleMove {
-    0%, 100% { background-position: 0% 0%, 100% 100%, 50% 50%; }
-    50% { background-position: 100% 100%, 0% 0%, 80% 20%; }
-}
-
-@keyframes textFlicker {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.7; }
-}
-
-/* ============================================
- * ACCESIBILIDAD
- * ============================================ */
-@media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        animation: none !important;
-        transition: none !important;
-    }
-}
+        /* ============================================
+         * ACCESIBILIDAD
+         * ============================================ */
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation: none !important;
+                transition: none !important;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <div id="loadingScreen" class="loading-screen">
-        <h2 class="loader-text">Loading System...</h2>
-    </div>
-
-    <div id="maintenanceUI" class="maintenance-container">
-        
-        <div class="header-section">
-            <h1>ARCADE SYSTEM OFFLINE: CRITICAL UPDATE</h1>
-            <p class="status-message">
-                I'm performing a major firmware upgrade to improve your gaming experience and
-                stabilize retro emulation. Please bear with me, this might take a moment.
-            </p>
-            <div class="progress-indicator">
-                <div id="progressBarFill" class="progress-fill"></div>
-            </div>
-        </div>
-
-        <div class="modules-grid">
-            <div class="module-card" data-state="updating">
-                <h3 class="module-title">MAIN CORE</h3>
-                <p class="module-status">UPDATING FIRMWARE...</p>
-            </div>
-            <div class="module-card" data-state="offline">
-                <h3 class="module-title">DATABASE: USERS</h3>
-                <p class="module-status">OFFLINE (MIGRATING)</p>
-            </div>
-            <div class="module-card" data-state="updating">
-                <h3 class="module-title">DATABASE: SCORES</h3>
-                <p class="module-status">SYNCING BACKUP...</p>
-            </div>
-            <div class="module-card" data-state="offline">
-                <h3 class="module-title">EMULATION ENGINE</h3>
-                <p class="module-status">INSTALLING DRIVERS</p>
-            </div>
-            <div class="module-card" data-state="online">
-                <h3 class="module-title">NETWORK INTERFACE</h3>
-                <p class="module-status">ONLINE (MONITORING)</p>
-            </div>
-            <div class="module-card" data-state="idle">
-                <h3 class="module-title">ASSET CACHE</h3>
-                <p class="module-status">IDLE</p>
-            </div>
-        </div>
-
-        <div class="status-log-section">
-            <ul class="status-log">
-                <li data-log-status="info"><span>[09:00:01]</span> Initiating full system shutdown...</li>
-                <li data-log-status="ok"><span>[09:00:03]</span> Core services offline.</li>
-                <li data-log-status="info"><span>[09:00:05]</span> Performing pre-update diagnostics...</li>
-                <li data-log-status="ok"><span>[09:00:07]</span> Diagnostic check passed. No critical errors detected.</li>
-                <li data-log-status="info"><span>[09:00:10]</span> Initializing firmware update sequence (v1.5.2)...</li>
-                <li data-log-status="info"><span>[09:00:12]</span> Flashing Main Core Microcode...</li>
-                <li data-log-status="warn"><span>[09:00:15]</span> Old 'NeonFlicker' module detected. Deprecated.</li>
-                <li data-log-status="ok"><span>[09:00:18]</span> Main Core updated. Rebooting core processor...</li>
-                <li data-log-status="info"><span>[09:00:22]</span> Starting database schema migration for 'PlayerScores'...</li>
-                <li data-log-status="ok"><span>[09:00:25]</span> 'PlayerScores' schema migrated successfully.</li>
-                <li data-log-status="info"><span>[09:00:28]</span> Backing up 'UserProfiles' database to secure storage...</li>
-                <li data-log-status="ok"><span>[09:00:33]</span> 'UserProfiles' backup complete.</li>
-                <li data-log-status="info"><span>[09:00:35]</span> Installing new Emulation Engine drivers (Houdini v2.1)...</li>
-                <li data-log-status="error"><span>[09:00:38]</span> Driver 'VirtuArcade.dll' conflict detected. Attempting rollback...</li>
-                <li data-log-status="info"><span>[09:00:41]</span> Rollback successful. Re-attempting driver installation...</li>
-                <li data-log-status="ok"><span>[09:00:45]</span> Emulation Engine drivers installed.</li>
-                <li data-log-status="info"><span>[09:00:48]</span> Verifying data integrity across all game ROMs...</li>
-                <li data-log-status="ok"><span>[09:00:55]</span> All game ROMs verified. Integrity 99.8%.</li>
-                <li data-log-status="warn"><span>[09:00:57]</span> Minor texture corruption in 'SpaceInvaders' ROM. Auto-repairing...</li>
-                <li data-log-status="ok"><span>[09:01:00]</span> 'SpaceInvaders' ROM repaired.</li>
-                <li data-log-status="info"><span>[09:0l:02]</span> Rebuilding global asset cache...</li>
-                <li data-log-status="ok"><span>[09:01:05]</span> Asset cache rebuilt.</li>
-                <li data-log-status="info"><span>[09:01:08]</span> Performing final system checks...</li>
-                <li data-log-status="ok"><span>[09:01:10]</span> All modules reporting green.</li>
-                <li data-log-status="info"><span>[09:01:12]</span> Preparing for system restart...</li>
-
-                <li data-log-status="info"><span>[09:00:01]</span> Initiating full system shutdown...</li>
-                <li data-log-status="ok"><span>[09:00:03]</span> Core services offline.</li>
-                <li data-log-status="info"><span>[09:00:05]</span> Performing pre-update diagnostics...</li>
-                <li data-log-status="ok"><span>[09:00:07]</span> Diagnostic check passed. No critical errors detected.</li>
-                <li data-log-status="info"><span>[09:00:10]</span> Initializing firmware update sequence (v1.5.2)...</li>
-                <li data-log-status="info"><span>[09:00:12]</span> Flashing Main Core Microcode...</li>
-                <li data-log-status="warn"><span>[09:00:15]</span> Old 'NeonFlicker' module detected. Deprecated.</li>
-                <li data-log-status="ok"><span>[09:00:18]</span> Main Core updated. Rebooting core processor...</li>
-                <li data-log-status="info"><span>[09:00:22]</span> Starting database schema migration for 'PlayerScores'...</li>
-                <li data-log-status="ok"><span>[09:00:25]</span> 'PlayerScores' schema migrated successfully.</li>
-                <li data-log-status="info"><span>[09:00:28]</span> Backing up 'UserProfiles' database to secure storage...</li>
-                <li data-log-status="ok"><span>[09:00:33]</span> 'UserProfiles' backup complete.</li>
-                <li data-log-status="info"><span>[09:00:35]</span> Installing new Emulation Engine drivers (Houdini v2.1)...</li>
-                <li data-log-status="error"><span>[09:00:38]</span> Driver 'VirtuArcade.dll' conflict detected. Attempting rollback...</li>
-                <li data-log-status="info"><span>[09:00:41]</span> Rollback successful. Re-attempting driver installation...</li>
-                <li data-log-status="ok"><span>[09:00:45]</span> Emulation Engine drivers installed.</li>
-                <li data-log-status="info"><span>[09:00:48]</span> Verifying data integrity across all game ROMs...</li>
-                <li data-log-status="ok"><span>[09:00:55]</span> All game ROMs verified. Integrity 99.8%.</li>
-                <li data-log-status="warn"><span>[09:00:57]</span> Minor texture corruption in 'SpaceInvaders' ROM. Auto-repairing...</li>
-                <li data-log-status="ok"><span>[09:01:00]</span> 'SpaceInvaders' ROM repaired.</li>
-                <li data-log-status="info"><span>[09:0l:02]</span> Rebuilding global asset cache...</li>
-                <li data-log-status="ok"><span>[09:01:05]</span> Asset cache rebuilt.</li>
-                <li data-log-status="info"><span>[09:01:08]</span> Performing final system checks...</li>
-                <li data-log-status="ok"><span>[09:01:10]</span> All modules reporting green.</li>
-                <li data-log-status="info"><span>[09:01:12]</span> Preparing for system restart...</li>
-            </ul>
-        </div>
-    </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const loadingScreen = document.getElementById('loadingScreen');
-            const maintenanceUI = document.getElementById('maintenanceUI');
-            const progressBarFill = document.getElementById('progressBarFill');
-            
-            // 1. Ocultar la pantalla de carga después de 2 segundos (coincide con la animación CSS)
-            setTimeout(() => {
-                loadingScreen.classList.add('hidden');
-            }, 2000); // 2 segundos
-
-            // 2. Mostrar la UI principal después de que la carga comience a ocultarse
-            setTimeout(() => {
-                maintenanceUI.classList.add('active');
-            }, 2500); // 2.5 segundos (justo después de que comience el fade out)
-
-            // 3. Simular el llenado de la barra de progreso
-            let progress = 0;
-            // Un intervalo más rápido para una sensación de "procesamiento" más activa
-            const progressInterval = setInterval(() => {
-                // Incremento aleatorio para más realismo
-                progress += Math.random() * 3; 
-                
-                if (progress <= 100) {
-                    progressBarFill.style.inlineSize = progress + '%';
-                } else {
-                    progressBarFill.style.inlineSize = '100%';
-                    clearInterval(progressInterval);
-                    
-                    // Cuando se completa, podríamos cambiar un módulo a 'ONLINE'
-                    setTimeout(() => {
-                        const coreModule = document.querySelector('.module-card[data-state="updating"]');
-                        if (coreModule) {
-                            coreModule.dataset.state = 'online';
-                            coreModule.querySelector('.module-status').textContent = 'ONLINE';
-                        }
-                    }, 1000); // 1 segundo después de completar la barra
-                }
-            }, 150); // Cada 150ms
-        });
-    </script>
+    <main class="message-card">
+        <h1>SYSTEM OFFLINE</h1>
+        <p>
+            Temporarily down for maintenance.
+            I'll be back online soon.
+        </p>
+    </main>
 
 </body>
 </html>
