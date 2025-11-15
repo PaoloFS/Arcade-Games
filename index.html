@@ -1183,6 +1183,103 @@
 	  flex-shrink: 0; /* Evitar que se comprima */
 	  margin-block-start: auto; /* Empujar hacia abajo si hay espacio */
 	}
+
+	/* Neon Runner Game */
+	.runner-game-area {
+	    position: relative;
+	    inline-size: 100%;
+	    max-inline-size: min(650px, 100%);
+	    margin-inline: auto;
+	    block-size: clamp(220px, 35vh, 400px);
+	    
+	    background: linear-gradient(180deg, 
+	        oklch(15% 0.05 255) 0%, 
+	        oklch(18% 0.06 270) 100%);
+	    border: 2px solid transparent;
+	    border-radius: var(--radius-lg);
+	    overflow: hidden;
+	    flex-shrink: 0;
+	    contain: layout style paint;
+	}
+
+	.runner-game-area::before {
+	    content: '';
+	    position: absolute;
+	    inset: 0px;
+	    border-radius: inherit;
+	    background: linear-gradient(
+	        45deg,
+	        var(--clr-neon-cyan),
+	        var(--clr-neon-pink),
+	        var(--clr-neon-yellow),
+	        var(--clr-neon-cyan)
+	    );
+	    background-size: 200% 200%;
+	    z-index: -1;
+	    will-change: background-position;
+	    animation: borderGlow 8s ease-in-out infinite;
+	    mask: 
+	        linear-gradient(#fff 0 0) content-box, 
+	        linear-gradient(#fff 0 0);
+	    mask-composite: exclude;
+	    -webkit-mask: 
+	        linear-gradient(#fff 0 0) content-box, 
+	        linear-gradient(#fff 0 0);
+	    -webkit-mask-composite: xor;
+	    padding: 2px;
+	}
+
+	.runner-ground {
+	    position: absolute;
+	    inset-block-end: 0;
+	    inline-size: 100%;
+	    block-size: 4px;
+	    background: linear-gradient(90deg, 
+	        var(--clr-neon-cyan), 
+	        var(--clr-neon-pink), 
+	        var(--clr-neon-yellow));
+	    background-size: 200% 100%;
+	    animation: groundScroll 1s linear infinite;
+	    box-shadow: 0 0 15px var(--clr-neon-cyan);
+	}
+
+	.runner-player {
+	    position: absolute;
+	    inset-block-end: 4px;
+	    inset-inline-start: clamp(40px, 10%, 80px);
+	    inline-size: clamp(45px, 10vw, 60px);
+	    block-size: clamp(45px, 10vw, 60px);
+	    font-size: clamp(2rem, 5vw, 2.5rem);
+	    
+	    display: grid;
+	    place-items: center;
+	    
+	    filter: drop-shadow(0 0 12px var(--clr-neon-yellow));
+	    z-index: 10;
+	    
+	    contain: layout style paint;
+	    will-change: transform;
+	    transition: transform 0.1s ease-out;
+	}
+
+	.runner-player.jumping {
+	    animation: playerJump 0.5s ease-out;
+	}
+
+	.runner-obstacle {
+	    position: absolute;
+	    inset-block-end: 4px;
+	    inline-size: clamp(35px, 8vw, 50px);
+	    block-size: clamp(35px, 8vw, 50px);
+	    font-size: clamp(1.5rem, 4vw, 2rem);
+	    
+	    display: grid;
+	    place-items: center;
+	    
+	    filter: drop-shadow(0 0 8px currentColor);
+	    will-change: transform;
+	    animation: obstacleMove linear;
+	}
 }
 
 /* ============================================
@@ -1307,6 +1404,22 @@
       transform: translate(-50%, -50%) scale(1) rotate(0deg); 
     }
   }
+
+  @keyframes groundScroll {
+	    from { background-position: 0% center; }
+	    to { background-position: 200% center; }
+	}
+
+	@keyframes playerJump {
+	    0% { transform: translateY(0); }
+	    50% { transform: translateY(-120px); }
+	    100% { transform: translateY(0); }
+	}
+
+	@keyframes obstacleMove {
+	    from { transform: translateX(0); }
+	    to { transform: translateX(-100vw); }
+	}
 }
 
 /* ============================================
@@ -1537,6 +1650,30 @@
 					</button>
 				</div>
 			</article>
+
+			<!-- Neon Runner Game Card -->
+			<article class="game-card" onclick="openGame('runner')" tabindex="0" role="button" aria-label="Play Neon Runner game">
+			    <div class="game-icon" aria-hidden="true">🏃</div>
+			    <h2 class="game-title">NEON RUNNER</h2>
+			    <p class="game-description">
+			        Jump over obstacles in this endless runner! Time your jumps perfectly and survive as long as possible.
+			    </p>
+			    <div class="game-stats-preview" aria-label="Neon Runner statistics">
+			        <div class="stat-preview">
+			            <div class="stat-preview-value" id="runnerBestPreview">-</div>
+			            <div class="stat-preview-label">Your Best</div>
+			        </div>
+			        <div class="stat-preview">
+			            <div class="stat-preview-value" id="runnerWorldPreview">-</div>
+			            <div class="stat-preview-label">World #1</div>
+			        </div>
+			    </div>
+			    <div style="text-align: center; margin-top: 1rem;">
+			        <button class="arcade-btn" onclick="event.stopPropagation(); openGame('runner')" aria-label="Start Neon Runner">
+			            <span aria-hidden="true">▶</span> PLAY NOW
+			        </button>
+			    </div>
+			</article>
 		</main>
 
 		<!-- Global Leaderboard Section -->
@@ -1651,6 +1788,46 @@
 		</div>
 	</div>
 
+	<!-- Neon Runner Game Modal -->
+	<div class="modal" id="runnerModal" role="dialog" aria-labelledby="runnerModalTitle" aria-modal="true">
+	    <div class="modal-content">
+	        <div class="modal-header">
+	            <h2 class="modal-title" id="runnerModalTitle"><span aria-hidden="true">🏃</span> NEON RUNNER</h2>
+	            <button class="close-btn" onclick="closeGame('runner')" aria-label="Close game">×</button>
+	        </div>
+
+	        <div class="game-stats" role="status" aria-live="polite">
+	            <div class="stat">
+	                <div class="stat-value" id="runnerScore" aria-label="Current score">0</div>
+	                <div class="stat-label">Distance</div>
+	            </div>
+	            <div class="stat">
+	                <div class="stat-value" id="runnerSpeed" aria-label="Current speed">1.0x</div>
+	                <div class="stat-label">Speed</div>
+	            </div>
+	        </div>
+
+	        <div class="runner-game-area" id="runnerGameArea" role="application" aria-label="Game area">
+	            <div class="runner-player" id="runnerPlayer" aria-label="Player character">🏃</div>
+	            <div class="runner-ground"></div>
+	        </div>
+
+	        <div style="text-align: center;">
+	            <button class="arcade-btn" onclick="startRunnerGame()" id="runnerStartBtn">
+	                <span aria-hidden="true">🚀</span> START RUNNING
+	            </button>
+	        </div>
+
+	        <div style="margin-top: 2rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 10px; font-size: 0.9rem; line-height: 1.6;">
+	            <strong style="color: var(--clr-neon-cyan);">🎮 CONTROLS:</strong><br>
+	            <div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.85rem; margin-top: 0.5rem;">
+	                <div><strong>SPACEBAR</strong> or <strong>CLICK</strong> – Jump</div>
+	                <div><strong>Hold</strong> – Higher Jump</div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
 	<!-- Game Over Alert -->
 	<div class="game-over-alert" id="gameOverAlert" role="alertdialog" aria-labelledby="gameOverTitle">
 		<div style="font-size: 4rem;" aria-hidden="true">🏆</div>
@@ -1672,6 +1849,18 @@
 		<button class="arcade-btn" onclick="closeMemoryVictory()" style="margin-top: 1rem;">
 			<span aria-hidden="true">🔄</span> PLAY AGAIN
 		</button>
+	</div>
+
+	<!-- Runner Game Over Alert -->
+	<div class="game-over-alert" id="runnerGameOverAlert" role="alertdialog" aria-labelledby="runnerGameOverTitle">
+	    <div style="font-size: 4rem;" aria-hidden="true">💥</div>
+	    <h2 id="runnerGameOverTitle">CRASH!</h2>
+	    <p style="opacity: 0.8; margin-bottom: 0.5rem;">YOU RAN</p>
+	    <div class="final-score-display" id="runnerFinalScore" aria-live="assertive">0</div>
+	    <p style="font-size: 1.2rem; margin-top: 0.5rem; opacity: 0.9;">METERS</p>
+	    <button class="arcade-btn" onclick="closeRunnerGameOver()" style="margin-top: 1rem;">
+	        <span aria-hidden="true">🔄</span> TRY AGAIN
+	    </button>
 	</div>
 
 	<!-- Login Required Alert -->
@@ -1895,6 +2084,7 @@
 		                    
 		                    await loadUserStats();
 		                    await loadLeaderboards();
+		                    await loadRunnerStats();
 		                } else {
 		                    console.log(`Score ${score} is not better than existing. Not saving.`);
 		                }
@@ -2013,6 +2203,8 @@
 			} else if (game === 'memory') {
 				document.getElementById('memoryModal').classList.add('active');
 				initMemoryGame();
+			} else if (game === 'runner') {
+			    document.getElementById('runnerModal').classList.add('active');
 			}
 		}
 
@@ -2022,6 +2214,9 @@
 				document.getElementById('catchModal').classList.remove('active');
 			} else if (game === 'memory') {
 				document.getElementById('memoryModal').classList.remove('active');
+			} else if (game === 'runner') {
+			    stopRunnerGame();
+			    document.getElementById('runnerModal').classList.remove('active');
 			}
 		}
 
@@ -2356,6 +2551,195 @@
 			}
 		`;
 		document.head.appendChild(style);
+
+		// ===== NEON RUNNER GAME =====
+		let runnerGameActive = false;
+		let runnerScore = 0;
+		let runnerSpeed = 1;
+		let runnerObstacles = [];
+		let runnerInterval;
+		let runnerScoreInterval;
+		let isJumping = false;
+
+		function startRunnerGame() {
+		    if (runnerGameActive || !currentUser) return;
+		    
+		    document.getElementById('runnerGameOverAlert').classList.remove('active');
+		    
+		    runnerGameActive = true;
+		    runnerScore = 0;
+		    runnerSpeed = 1;
+		    runnerObstacles = [];
+		    isJumping = false;
+		    
+		    document.getElementById('runnerScore').textContent = runnerScore;
+		    document.getElementById('runnerSpeed').textContent = runnerSpeed.toFixed(1) + 'x';
+		    document.getElementById('runnerStartBtn').disabled = true;
+		    
+		    // Limpiar obstáculos anteriores
+		    document.querySelectorAll('.runner-obstacle').forEach(obs => obs.remove());
+		    
+		    // Crear obstáculos
+		    runnerInterval = setInterval(() => {
+		        if (!runnerGameActive) return;
+		        createObstacle();
+		    }, 2000 / runnerSpeed);
+		    
+		    // Incrementar score
+		    runnerScoreInterval = setInterval(() => {
+		        if (!runnerGameActive) return;
+		        runnerScore += Math.floor(runnerSpeed * 10);
+		        document.getElementById('runnerScore').textContent = runnerScore;
+		        
+		        // Aumentar velocidad gradualmente
+		        if (runnerScore % 100 === 0) {
+		            runnerSpeed += 0.1;
+		            document.getElementById('runnerSpeed').textContent = runnerSpeed.toFixed(1) + 'x';
+		            
+		            // Actualizar velocidad de generación de obstáculos
+		            clearInterval(runnerInterval);
+		            runnerInterval = setInterval(() => {
+		                if (!runnerGameActive) return;
+		                createObstacle();
+		            }, 2000 / runnerSpeed);
+		        }
+		    }, 100);
+		}
+
+		function stopRunnerGame() {
+		    runnerGameActive = false;
+		    clearInterval(runnerInterval);
+		    clearInterval(runnerScoreInterval);
+		    
+		    document.querySelectorAll('.runner-obstacle').forEach(obs => obs.remove());
+		    document.getElementById('runnerStartBtn').disabled = false;
+		}
+
+		function createObstacle() {
+		    if (!runnerGameActive) return;
+		    
+		    const obstacle = document.createElement('div');
+		    obstacle.className = 'runner-obstacle';
+		    
+		    const obstacles = ['🌵', '🪨', '⚡', '🔥'];
+		    obstacle.textContent = obstacles[Math.floor(Math.random() * obstacles.length)];
+		    
+		    const gameArea = document.getElementById('runnerGameArea');
+		    obstacle.style.insetInlineStart = gameArea.offsetWidth + 'px';
+		    
+		    const duration = (3 / runnerSpeed);
+		    obstacle.style.animationDuration = duration + 's';
+		    
+		    gameArea.appendChild(obstacle);
+		    runnerObstacles.push(obstacle);
+		    
+		    // Verificar colisiones
+		    let collisionCheckInterval = setInterval(() => {
+		        if (!runnerGameActive || !obstacle.parentElement) {
+		            clearInterval(collisionCheckInterval);
+		            return;
+		        }
+		        
+		        const playerRect = document.getElementById('runnerPlayer').getBoundingClientRect();
+		        const obstacleRect = obstacle.getBoundingClientRect();
+		        
+		        const isColliding = (
+		            playerRect.right > obstacleRect.left &&
+		            playerRect.left < obstacleRect.right &&
+		            playerRect.bottom > obstacleRect.top &&
+		            playerRect.top < obstacleRect.bottom
+		        );
+		        
+		        if (isColliding && !isJumping) {
+		            clearInterval(collisionCheckInterval);
+		            stopRunnerGame();
+		            showRunnerGameOver();
+		        }
+		    }, 10);
+		    
+		    // Remover obstáculo después de que salga de pantalla
+		    setTimeout(() => {
+		        if (obstacle.parentElement) {
+		            obstacle.remove();
+		            runnerObstacles = runnerObstacles.filter(obs => obs !== obstacle);
+		        }
+		        clearInterval(collisionCheckInterval);
+		    }, duration * 1000 + 500);
+		}
+
+		function jump() {
+		    if (!runnerGameActive || isJumping) return;
+		    
+		    isJumping = true;
+		    const player = document.getElementById('runnerPlayer');
+		    player.classList.add('jumping');
+		    
+		    setTimeout(() => {
+		        player.classList.remove('jumping');
+		        isJumping = false;
+		    }, 500);
+		}
+
+		// Controles de salto
+		document.addEventListener('keydown', (e) => {
+		    if (e.code === 'Space' && runnerGameActive) {
+		        e.preventDefault();
+		        jump();
+		    }
+		});
+
+		document.getElementById('runnerGameArea').addEventListener('click', () => {
+		    if (runnerGameActive) jump();
+		});
+
+		document.getElementById('runnerGameArea').addEventListener('touchstart', (e) => {
+		    if (runnerGameActive) {
+		        e.preventDefault();
+		        jump();
+		    }
+		});
+
+		async function showRunnerGameOver() {
+		    document.getElementById('runnerFinalScore').textContent = runnerScore;
+		    document.getElementById('runnerGameOverAlert').classList.add('active');
+		    await saveScore('runner', runnerScore);
+		}
+
+		function closeRunnerGameOver() {
+		    document.getElementById('runnerGameOverAlert').classList.remove('active');
+		}
+
+		// Cargar stats de Runner
+		async function loadRunnerStats() {
+		    if (!currentUser || !currentUser.uid || !isStorageAvailable()) return;
+		    
+		    try {
+		        const docId = currentUser.uid;
+		        const runnerDoc = await db.collection('user_best_runner').doc(docId).get();
+		        if (runnerDoc.exists) {
+		            document.getElementById('runnerBestPreview').textContent = runnerDoc.data().score;
+		        }
+		    } catch (error) {
+		        console.error('Error loading runner stats:', error);
+		    }
+		}
+
+		async function loadRunnerLeaderboard() {
+		    if (!isStorageAvailable()) return;
+		    
+		    try {
+		        const snapshot = await db.collection('user_best_runner')
+		            .orderBy('score', 'desc')
+		            .limit(1)
+		            .get();
+		        
+		        if (!snapshot.empty) {
+		            document.getElementById('runnerWorldPreview').textContent = snapshot.docs[0].data().score;
+		        }
+		    } catch (error) {
+		        console.error('Error loading runner leaderboard:', error);
+		    }
+		}
 
 		// Load leaderboards on page load
 		window.addEventListener('load', async () => {
