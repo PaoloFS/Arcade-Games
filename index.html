@@ -450,6 +450,109 @@
             }
         }
 
+        /* ============================================
+ * SUPER RESPONSIVE OPTIMIZATION
+ * ============================================ */
+
+/* Celulares pequeños (≤ 600px) */
+@media (max-width: 600px) {
+
+    body {
+        overflow-y: auto;               /* Permite scroll */
+        padding: var(--space-sm);
+    }
+
+    .maintenance-container {
+        gap: var(--space-md);
+        inline-size: 100%;
+    }
+
+    .header-section {
+        padding: var(--space-sm);
+    }
+
+    h1 {
+        font-size: clamp(1.2rem, 5vw, 2rem);
+        line-height: 1.3;
+    }
+
+    .status-message {
+        font-size: 0.9rem;
+    }
+
+    .progress-indicator {
+        block-size: 1.2rem;
+    }
+
+    .modules-grid {
+        grid-template-columns: 1fr;     /* Una columna en móvil */
+        gap: var(--space-sm);
+    }
+
+    .module-card {
+        padding: var(--space-sm);
+        min-block-size: auto;
+    }
+
+    .module-title {
+        font-size: 0.75rem;
+    }
+
+    .module-status {
+        font-size: 0.7rem;
+    }
+
+    .status-log-section {
+        max-block-size: 200px;          /* Más pequeño para pantallas chicas */
+        padding: var(--space-xs);
+    }
+
+    .status-log li {
+        font-size: 0.75rem;
+    }
+}
+
+/* Tablets (600px – 900px) */
+@media (max-width: 900px) {
+
+    body {
+        padding: var(--space-md);
+        overflow-y: auto;
+    }
+
+    .modules-grid {
+        grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    }
+
+    .header-section {
+        padding: var(--space-md);
+    }
+}
+
+/* Ultra Small Screens (≤ 380px) */
+@media (max-width: 380px) {
+    h1 {
+        font-size: 1.1rem;
+    }
+
+    .loader-text {
+        font-size: 1rem;
+    }
+
+    .module-title {
+        font-size: 0.7rem;
+    }
+
+    .module-status {
+        font-size: 0.65rem;
+    }
+
+    .status-log li {
+        font-size: 0.7rem;
+    }
+}
+
+
     </style>
 </head>
 <body>
