@@ -824,7 +824,6 @@
     block-size: clamp(55px, 11vw, 75px);
     font-size: clamp(2.2rem, 5.5vw, 3rem);
     
-    transition: inset-inline-start 50ms linear;
     cursor: move;
     touch-action: none;
     user-select: none;
@@ -835,6 +834,7 @@
     display: grid;
     place-items: center;
     contain: layout style paint;
+    will-change: transform;
   }
 
   .falling-item {
@@ -2046,6 +2046,12 @@
 		let itemCheckIntervals = [];
 		let hasShield = false;
 		let catcherSpeed = 1;
+		let targetCatcherX = 0;
+		let catcherAnimFrame;
+		let catcherEl; // Para guardar el elemento
+		let gameAreaRect; // Para guardar las dimensiones
+
+		let itemCheckIntervals = [];
 
 		function startCatchGame() {
 			if (catchGameActive || !currentUser) return;
