@@ -1280,6 +1280,115 @@
 	    will-change: transform;
 	    animation: obstacleMove linear;
 	}
+
+	/* Space Invaders Game */
+.invaders-game-area {
+    position: relative;
+    inline-size: 100%;
+    max-inline-size: min(650px, 100%);
+    margin-inline: auto;
+    block-size: clamp(300px, 45vh, 500px);
+    
+    background: linear-gradient(180deg, 
+        oklch(5% 0.08 270) 0%, 
+        oklch(10% 0.05 255) 50%,
+        oklch(15% 0.05 255) 100%);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    flex-shrink: 0;
+    contain: layout style paint;
+}
+
+.invaders-game-area::before {
+    content: '';
+    position: absolute;
+    inset: 0px;
+    border-radius: inherit;
+    background: linear-gradient(
+        45deg,
+        var(--clr-neon-purple),
+        var(--clr-neon-pink),
+        var(--clr-neon-cyan),
+        var(--clr-neon-purple)
+    );
+    background-size: 200% 200%;
+    z-index: -1;
+    will-change: background-position;
+    animation: borderGlow 8s ease-in-out infinite;
+    mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    mask-composite: exclude;
+    -webkit-mask: 
+        linear-gradient(#fff 0 0) content-box, 
+        linear-gradient(#fff 0 0);
+    -webkit-mask-composite: xor;
+    padding: 2px;
+}
+
+.invaders-player {
+    position: absolute;
+    inset-block-end: 20px;
+    inline-size: clamp(40px, 8vw, 55px);
+    block-size: clamp(40px, 8vw, 55px);
+    font-size: clamp(1.8rem, 4vw, 2.5rem);
+    
+    display: grid;
+    place-items: center;
+    
+    filter: drop-shadow(0 0 15px var(--clr-neon-cyan));
+    z-index: 10;
+    
+    contain: layout style paint;
+    will-change: transform;
+    transition: left 0.1s ease-out;
+}
+
+.invader {
+    position: absolute;
+    inline-size: clamp(30px, 6vw, 45px);
+    block-size: clamp(30px, 6vw, 45px);
+    font-size: clamp(1.5rem, 3.5vw, 2rem);
+    
+    display: grid;
+    place-items: center;
+    
+    filter: drop-shadow(0 0 8px var(--clr-neon-pink));
+    will-change: transform;
+    animation: invaderFloat 2s ease-in-out infinite;
+}
+
+.bullet {
+    position: absolute;
+    inline-size: 4px;
+    block-size: clamp(12px, 3vw, 18px);
+    background: linear-gradient(180deg, 
+        var(--clr-neon-yellow), 
+        var(--clr-neon-cyan));
+    border-radius: var(--radius-full);
+    box-shadow: 
+        0 0 10px var(--clr-neon-yellow),
+        0 0 20px var(--clr-neon-cyan);
+    will-change: transform;
+}
+
+.enemy-bullet {
+    background: linear-gradient(180deg, 
+        var(--clr-neon-pink), 
+        var(--clr-neon-purple));
+    box-shadow: 
+        0 0 10px var(--clr-neon-pink),
+        0 0 20px var(--clr-neon-purple);
+}
+
+.explosion {
+    position: absolute;
+    font-size: clamp(2rem, 5vw, 3rem);
+    pointer-events: none;
+    animation: explode 0.5s ease-out forwards;
+    z-index: 100;
+}
 }
 
 /* ============================================
@@ -1419,6 +1528,22 @@
 	@keyframes obstacleMove {
 	    from { transform: translateX(0); }
 	    to { transform: translateX(-100vw); }
+	}
+
+	@keyframes invaderFloat {
+	    0%, 100% { transform: translateY(0) rotate(0deg); }
+	    50% { transform: translateY(-5px) rotate(5deg); }
+	}
+
+	@keyframes explode {
+	    0% { 
+	        transform: scale(0.5); 
+	        opacity: 1; 
+	    }
+	    100% { 
+	        transform: scale(2); 
+	        opacity: 0; 
+	    }
 	}
 }
 
@@ -1674,26 +1799,71 @@
 			        </button>
 			    </div>
 			</article>
+
+			<!-- Space Invaders Game Card -->
+			<article class="game-card" onclick="openGame('invaders')" tabindex="0" role="button" aria-label="Play Space Invaders Remix game">
+			    <div class="game-icon" aria-hidden="true">👾</div>
+			    <h2 class="game-title">SPACE INVADERS</h2>
+			    <p class="game-description">
+			        Defend Earth from alien invaders! Shoot them down before they reach your base. Classic arcade action!
+			    </p>
+			    <div class="game-stats-preview" aria-label="Space Invaders statistics">
+			        <div class="stat-preview">
+			            <div class="stat-preview-value" id="invadersBestPreview">-</div>
+			            <div class="stat-preview-label">Your Best</div>
+			        </div>
+			        <div class="stat-preview">
+			            <div class="stat-preview-value" id="invadersWorldPreview">-</div>
+			            <div class="stat-preview-label">World #1</div>
+			        </div>
+			    </div>
+			    <div style="text-align: center; margin-top: 1rem;">
+			        <button class="arcade-btn" onclick="event.stopPropagation(); openGame('invaders')" aria-label="Start Space Invaders">
+			            <span aria-hidden="true">▶</span> PLAY NOW
+			        </button>
+			    </div>
+			</article>
 		</main>
 
 		<!-- Global Leaderboard Section -->
 		<section class="leaderboard-section" aria-label="Global leaderboards">
-			<h2 class="leaderboard-title">◆ GLOBAL RANKINGS ◆</h2>
-			<div class="leaderboard-grid">
-				<div class="leaderboard-box">
-					<h3><span aria-hidden="true">⭐</span> STAR CATCHER</h3>
-					<ul class="leaderboard-list" id="catchLeaderboard" role="list" aria-label="Star Catcher top players">
-						<li class="no-scores">Loading rankings...</li>
-					</ul>
-				</div>
-				<div class="leaderboard-box">
-					<h3><span aria-hidden="true">🧠</span> MEMORY MASTER</h3>
-					<ul class="leaderboard-list" id="memoryLeaderboard" role="list" aria-label="Memory Master top players">
-						<li class="no-scores">Loading rankings...</li>
-					</ul>
-				</div>
-			</div>
-		</section>
+    <h2 class="leaderboard-title">◆ GLOBAL RANKINGS ◆</h2>
+
+    <!-- FILA 1 -->
+    <div class="leaderboard-grid">
+        <div class="leaderboard-box">
+            <h3><span aria-hidden="true">⭐</span> STAR CATCHER</h3>
+            <ul class="leaderboard-list" id="catchLeaderboard" role="list">
+                <li class="no-scores">Loading rankings...</li>
+            </ul>
+        </div>
+
+        <div class="leaderboard-box">
+            <h3><span aria-hidden="true">🧠</span> MEMORY MASTER</h3>
+            <ul class="leaderboard-list" id="memoryLeaderboard" role="list">
+                <li class="no-scores">Loading rankings...</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- FILA 2 -->
+    <div class="leaderboard-grid">
+        <div class="leaderboard-box">
+            <h3><span aria-hidden="true">🏃</span> NEON RUNNER</h3>
+            <ul class="leaderboard-list" id="runnerLeaderboard" role="list">
+                <li class="no-scores">Loading rankings...</li>
+            </ul>
+        </div>
+
+        <div class="leaderboard-box">
+            <h3><span aria-hidden="true">👾</span> SPACE INVADERS</h3>
+            <ul class="leaderboard-list" id="invadersLeaderboard" role="list">
+                <li class="no-scores">Loading rankings...</li>
+            </ul>
+        </div>
+    </div>
+</section>
+
 	</div>
 
 	<!-- Star Catcher Game Modal -->
@@ -1828,6 +1998,50 @@
 	    </div>
 	</div>
 
+	<!-- Space Invaders Game Modal -->
+	<div class="modal" id="invadersModal" role="dialog" aria-labelledby="invadersModalTitle" aria-modal="true">
+	    <div class="modal-content">
+	        <div class="modal-header">
+	            <h2 class="modal-title" id="invadersModalTitle"><span aria-hidden="true">👾</span> SPACE INVADERS</h2>
+	            <button class="close-btn" onclick="closeGame('invaders')" aria-label="Close game">×</button>
+	        </div>
+
+	        <div class="game-stats" role="status" aria-live="polite">
+	            <div class="stat">
+	                <div class="stat-value" id="invadersScore" aria-label="Current score">0</div>
+	                <div class="stat-label">Score</div>
+	            </div>
+	            <div class="stat">
+	                <div class="stat-value" id="invadersLives" aria-label="Lives remaining">❤️❤️❤️</div>
+	                <div class="stat-label">Lives</div>
+	            </div>
+	            <div class="stat">
+	                <div class="stat-value" id="invadersWave" aria-label="Current wave">1</div>
+	                <div class="stat-label">Wave</div>
+	            </div>
+	        </div>
+
+	        <div class="invaders-game-area" id="invadersGameArea" role="application" aria-label="Game area">
+	            <div class="invaders-player" id="invadersPlayer" aria-label="Player ship">🚀</div>
+	        </div>
+
+	        <div style="text-align: center;">
+	            <button class="arcade-btn" onclick="startInvadersGame()" id="invadersStartBtn">
+	                <span aria-hidden="true">🚀</span> START DEFENSE
+	            </button>
+	        </div>
+
+	        <div style="margin-top: 2rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 10px; font-size: 0.9rem; line-height: 1.6;">
+	            <strong style="color: var(--clr-neon-cyan);">🎮 CONTROLS:</strong><br>
+	            <div style="display: flex; gap: 1rem; flex-wrap: wrap; font-size: 0.85rem; margin-top: 0.5rem;">
+	                <div><strong>ARROWS</strong> or <strong>A/D</strong> – Move</div>
+	                <div><strong>SPACEBAR</strong> – Shoot</div>
+	                <div><strong>MOUSE</strong> – Click to move & shoot</div>
+	            </div>
+	        </div>
+	    </div>
+	</div>
+
 	<!-- Game Over Alert -->
 	<div class="game-over-alert" id="gameOverAlert" role="alertdialog" aria-labelledby="gameOverTitle">
 		<div style="font-size: 4rem;" aria-hidden="true">🏆</div>
@@ -1860,6 +2074,18 @@
 	    <p style="font-size: 1.2rem; margin-top: 0.5rem; opacity: 0.9;">METERS</p>
 	    <button class="arcade-btn" onclick="closeRunnerGameOver()" style="margin-top: 1rem;">
 	        <span aria-hidden="true">🔄</span> TRY AGAIN
+	    </button>
+	</div>
+
+	<!-- Invaders Game Over Alert -->
+	<div class="game-over-alert" id="invadersGameOverAlert" role="alertdialog" aria-labelledby="invadersGameOverTitle">
+	    <div style="font-size: 4rem;" aria-hidden="true">💀</div>
+	    <h2 id="invadersGameOverTitle">INVADED!</h2>
+	    <p style="opacity: 0.8; margin-bottom: 0.5rem;">FINAL SCORE</p>
+	    <div class="final-score-display" id="invadersFinalScore" aria-live="assertive">0</div>
+	    <p style="font-size: 1rem; margin-top: 0.5rem; opacity: 0.9;">Waves Survived: <span id="invadersFinalWave">0</span></p>
+	    <button class="arcade-btn" onclick="closeInvadersGameOver()" style="margin-top: 1rem;">
+	        <span aria-hidden="true">🔄</span> DEFEND AGAIN
 	    </button>
 	</div>
 
@@ -2014,27 +2240,37 @@
 		}
 
 		async function loadUserStats() {
-            // Ahora currentUser es un objeto, por eso chequeamos 'currentUser.uid'
-			if (!currentUser || !currentUser.uid || !isStorageAvailable()) return;
-			
-			try {
-                // Usamos el UID, no el nombre
-				const docId = currentUser.uid; 
-				
-				// Cargar mejor puntaje de Catch
-				const catchDoc = await db.collection('user_best_catch').doc(docId).get();
-				if (catchDoc.exists) {
-					document.getElementById('catchBestPreview').textContent = catchDoc.data().score;
-				}
+		    if (!currentUser || !currentUser.uid || !isStorageAvailable()) return;
+		    
+		    try {
+		        const docId = currentUser.uid;
+		        
+		        // Catch
+		        const catchDoc = await db.collection('user_best_catch').doc(docId).get();
+		        if (catchDoc.exists) {
+		            document.getElementById('catchBestPreview').textContent = catchDoc.data().score;
+		        }
 
-				// Cargar mejor puntaje de Memory
-				const memoryDoc = await db.collection('user_best_memory').doc(docId).get();
-				if (memoryDoc.exists) {
-					document.getElementById('memoryBestPreview').textContent = memoryDoc.data().score;
-				}
-			} catch (error) {
-				console.error('Error loading user stats:', error);
-			}
+		        // Memory
+		        const memoryDoc = await db.collection('user_best_memory').doc(docId).get();
+		        if (memoryDoc.exists) {
+		            document.getElementById('memoryBestPreview').textContent = memoryDoc.data().score;
+		        }
+		        
+		        // ✅ RUNNER
+		        const runnerDoc = await db.collection('user_best_runner').doc(docId).get();
+		        if (runnerDoc.exists) {
+		            document.getElementById('runnerBestPreview').textContent = runnerDoc.data().score;
+		        }
+		        
+		        // ✅ INVADERS
+		        const invadersDoc = await db.collection('user_best_invaders').doc(docId).get();
+		        if (invadersDoc.exists) {
+		            document.getElementById('invadersBestPreview').textContent = invadersDoc.data().score;
+		        }
+		    } catch (error) {
+		        console.error('Error loading user stats:', error);
+		    }
 		}
 
 		// Evitar múltiples guardados simultáneos
@@ -2105,6 +2341,8 @@
 			}
 			await loadCatchLeaderboard();
 			await loadMemoryLeaderboard();
+			await loadRunnerLeaderboard(); // ✅ NUEVO
+    		await loadInvadersLeaderboard();
 		}
 
 		async function loadCatchLeaderboard() {
@@ -2192,32 +2430,36 @@
 
 		// ===== MODAL MANAGEMENT =====
 		function openGame(game) {
-			if (!currentUser) {
-				// En lugar de alert(), mostrar el nuevo modal
-				document.getElementById('loginAlert').classList.add('active');
-				return;
-			}
+		    if (!currentUser) {
+		        document.getElementById('loginAlert').classList.add('active');
+		        return;
+		    }
 
-			if (game === 'catch') {
-				document.getElementById('catchModal').classList.add('active');
-			} else if (game === 'memory') {
-				document.getElementById('memoryModal').classList.add('active');
-				initMemoryGame();
-			} else if (game === 'runner') {
-			    document.getElementById('runnerModal').classList.add('active');
-			}
+		    if (game === 'catch') {
+		        document.getElementById('catchModal').classList.add('active');
+		    } else if (game === 'memory') {
+		        document.getElementById('memoryModal').classList.add('active');
+		        initMemoryGame();
+		    } else if (game === 'runner') { // ✅ NUEVO
+		        document.getElementById('runnerModal').classList.add('active');
+		    } else if (game === 'invaders') { // ✅ NUEVO
+		        document.getElementById('invadersModal').classList.add('active');
+		    }
 		}
 
 		function closeGame(game) {
-			if (game === 'catch') {
-				stopCatchGame();
-				document.getElementById('catchModal').classList.remove('active');
-			} else if (game === 'memory') {
-				document.getElementById('memoryModal').classList.remove('active');
-			} else if (game === 'runner') {
-			    stopRunnerGame();
-			    document.getElementById('runnerModal').classList.remove('active');
-			}
+		    if (game === 'catch') {
+		        stopCatchGame();
+		        document.getElementById('catchModal').classList.remove('active');
+		    } else if (game === 'memory') {
+		        document.getElementById('memoryModal').classList.remove('active');
+		    } else if (game === 'runner') { // ✅ NUEVO
+		        stopRunnerGame();
+		        document.getElementById('runnerModal').classList.remove('active');
+		    } else if (game === 'invaders') { // ✅ NUEVO
+		        stopInvadersGame();
+		        document.getElementById('invadersModal').classList.remove('active');
+		    }
 		}
 
 		// Función para cerrar la alerta de login
@@ -2724,22 +2966,458 @@
 		    }
 		}
 
-		async function loadRunnerLeaderboard() {
-		    if (!isStorageAvailable()) return;
-		    
-		    try {
-		        const snapshot = await db.collection('user_best_runner')
-		            .orderBy('score', 'desc')
-		            .limit(1)
-		            .get();
-		        
-		        if (!snapshot.empty) {
-		            document.getElementById('runnerWorldPreview').textContent = snapshot.docs[0].data().score;
-		        }
-		    } catch (error) {
-		        console.error('Error loading runner leaderboard:', error);
-		    }
-		}
+async function loadRunnerLeaderboard() {
+    if (!isStorageAvailable()) return;
+    
+    const leaderboardEl = document.getElementById('runnerLeaderboard');
+    if (!leaderboardEl) return; // Si no existe el elemento, salir
+    
+    leaderboardEl.innerHTML = '<li class="no-scores">Loading...</li>';
+
+    try {
+        const snapshot = await db.collection('user_best_runner')
+            .orderBy('score', 'desc')
+            .limit(10)
+            .get();
+
+        if (snapshot.empty) {
+            leaderboardEl.innerHTML = '<li class="no-scores">No scores yet. Be the first!</li>';
+            document.getElementById('runnerWorldPreview').textContent = '-';
+            return;
+        }
+
+        const sortedScores = snapshot.docs.map(doc => doc.data());
+        document.getElementById('runnerWorldPreview').textContent = sortedScores[0].score;
+
+        leaderboardEl.innerHTML = sortedScores.map((score, index) => {
+            const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+            return `
+                <li class="leaderboard-item ${rankClass}">
+                    <span class="leaderboard-rank">${medal}</span>
+                    <span class="leaderboard-name">${score.username}</span>
+                    <span class="leaderboard-score">${score.score}</span>
+                </li>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading runner leaderboard:', error);
+        leaderboardEl.innerHTML = '<li class="no-scores">Error loading scores</li>';
+    }
+}
+
+		// ===== SPACE INVADERS GAME =====
+let invadersGameActive = false;
+let invadersScore = 0;
+let invadersLives = 3;
+let invadersWave = 1;
+let invadersList = [];
+let bulletsList = [];
+let enemyBulletsList = [];
+let invadersPlayerX = 0;
+let invadersGameLoop;
+let invadersShootInterval;
+let lastShotTime = 0;
+const shootCooldown = 300;
+
+function startInvadersGame() {
+    if (invadersGameActive || !currentUser) return;
+    
+    document.getElementById('invadersGameOverAlert').classList.remove('active');
+    
+    invadersGameActive = true;
+    invadersScore = 0;
+    invadersLives = 3;
+    invadersWave = 1;
+    invadersList = [];
+    bulletsList = [];
+    enemyBulletsList = [];
+    
+    document.getElementById('invadersScore').textContent = invadersScore;
+    document.getElementById('invadersLives').textContent = '❤️'.repeat(invadersLives);
+    document.getElementById('invadersWave').textContent = invadersWave;
+    document.getElementById('invadersStartBtn').disabled = true;
+    
+    // Limpiar elementos anteriores
+    document.querySelectorAll('.invader, .bullet, .enemy-bullet, .explosion').forEach(el => el.remove());
+    
+    // Posicionar jugador
+    const gameArea = document.getElementById('invadersGameArea');
+    const player = document.getElementById('invadersPlayer');
+    invadersPlayerX = (gameArea.offsetWidth - player.offsetWidth) / 2;
+    player.style.left = invadersPlayerX + 'px';
+    
+    createInvaderWave();
+    
+    invadersGameLoop = setInterval(updateInvadersGame, 1000 / 60);
+    invadersShootInterval = setInterval(enemyShoot, 1500);
+}
+
+function stopInvadersGame() {
+    invadersGameActive = false;
+    clearInterval(invadersGameLoop);
+    clearInterval(invadersShootInterval);
+    
+    document.querySelectorAll('.invader, .bullet, .enemy-bullet, .explosion').forEach(el => el.remove());
+    document.getElementById('invadersStartBtn').disabled = false;
+}
+
+function createInvaderWave() {
+    const gameArea = document.getElementById('invadersGameArea');
+    const rows = 3 + Math.floor(invadersWave / 3);
+    const cols = 5 + Math.floor(invadersWave / 2);
+    const spacing = Math.min(60, gameArea.offsetWidth / (cols + 1));
+    
+    for (let row = 0; row < rows; row++) {
+        for (let col = 0; col < cols; col++) {
+            const invader = document.createElement('div');
+            invader.className = 'invader';
+            invader.textContent = ['👾', '👽', '🛸'][row % 3];
+            
+            const x = col * spacing + 30;
+            const y = row * 50 + 30;
+            
+            invader.style.left = x + 'px';
+            invader.style.top = y + 'px';
+            invader.dataset.x = x;
+            invader.dataset.y = y;
+            invader.dataset.direction = 1;
+            
+            gameArea.appendChild(invader);
+            invadersList.push(invader);
+        }
+    }
+}
+
+function updateInvadersGame() {
+    if (!invadersGameActive) return;
+    
+    // Mover invasores
+    let shouldMoveDown = false;
+    const gameArea = document.getElementById('invadersGameArea');
+    const maxWidth = gameArea.offsetWidth;
+    
+    invadersList.forEach(invader => {
+        let x = parseFloat(invader.dataset.x);
+        const y = parseFloat(invader.dataset.y);
+        const direction = parseFloat(invader.dataset.direction);
+        
+        x += direction * 0.5 * (1 + invadersWave * 0.1);
+        
+        if (x <= 0 || x >= maxWidth - 50) {
+            shouldMoveDown = true;
+        }
+        
+        invader.dataset.x = x;
+        invader.style.left = x + 'px';
+    });
+    
+    if (shouldMoveDown) {
+        invadersList.forEach(invader => {let y = parseFloat(invader.dataset.y);
+            y += 20;
+            invader.dataset.y = y;
+            invader.style.top = y + 'px';
+            invader.dataset.direction *= -1;
+            
+            // Game over si llegan abajo
+            if (y > gameArea.offsetHeight - 100) {
+                loseLife();
+            }
+        });
+    }
+    
+    // Mover balas del jugador
+    bulletsList.forEach((bullet, index) => {
+        if (!bullet.parentElement) {
+            bulletsList.splice(index, 1);
+            return;
+        }
+        
+        let y = parseFloat(bullet.style.top);
+        y -= 8;
+        bullet.style.top = y + 'px';
+        
+        // Remover si sale de pantalla
+        if (y < 0) {
+            bullet.remove();
+            bulletsList.splice(index, 1);
+            return;
+        }
+        
+        // Verificar colisión con invasores
+        const bulletRect = bullet.getBoundingClientRect();
+        invadersList.forEach((invader, invIndex) => {
+            if (!invader.parentElement) return;
+            
+            const invaderRect = invader.getBoundingClientRect();
+            if (checkCollision(bulletRect, invaderRect)) {
+                createExplosion(invaderRect.left, invaderRect.top);
+                invader.remove();
+                invadersList.splice(invIndex, 1);
+                bullet.remove();
+                bulletsList.splice(index, 1);
+                
+                invadersScore += 10 * invadersWave;
+                document.getElementById('invadersScore').textContent = invadersScore;
+                
+                // Nueva oleada si eliminamos todos
+                if (invadersList.length === 0) {
+                    invadersWave++;
+                    document.getElementById('invadersWave').textContent = invadersWave;
+                    setTimeout(() => createInvaderWave(), 1000);
+                }
+            }
+        });
+    });
+    
+    // Mover balas enemigas
+    enemyBulletsList.forEach((bullet, index) => {
+        if (!bullet.parentElement) {
+            enemyBulletsList.splice(index, 1);
+            return;
+        }
+        
+        let y = parseFloat(bullet.style.top);
+        y += 4;
+        bullet.style.top = y + 'px';
+        
+        // Remover si sale de pantalla
+        if (y > gameArea.offsetHeight) {
+            bullet.remove();
+            enemyBulletsList.splice(index, 1);
+            return;
+        }
+        
+        // Verificar colisión con jugador
+        const bulletRect = bullet.getBoundingClientRect();
+        const playerRect = document.getElementById('invadersPlayer').getBoundingClientRect();
+        
+        if (checkCollision(bulletRect, playerRect)) {
+            bullet.remove();
+            enemyBulletsList.splice(index, 1);
+            loseLife();
+        }
+    });
+}
+
+function checkCollision(rect1, rect2) {
+    return (
+        rect1.left < rect2.right &&
+        rect1.right > rect2.left &&
+        rect1.top < rect2.bottom &&
+        rect1.bottom > rect2.top
+    );
+}
+
+function shootBullet() {
+    if (!invadersGameActive) return;
+    
+    const now = Date.now();
+    if (now - lastShotTime < shootCooldown) return;
+    lastShotTime = now;
+    
+    const player = document.getElementById('invadersPlayer');
+    const bullet = document.createElement('div');
+    bullet.className = 'bullet';
+    
+    const playerRect = player.getBoundingClientRect();
+    const gameAreaRect = document.getElementById('invadersGameArea').getBoundingClientRect();
+    
+    bullet.style.left = (playerRect.left - gameAreaRect.left + playerRect.width / 2 - 2) + 'px';
+    bullet.style.top = (playerRect.top - gameAreaRect.top) + 'px';
+    
+    document.getElementById('invadersGameArea').appendChild(bullet);
+    bulletsList.push(bullet);
+}
+
+function enemyShoot() {
+    if (!invadersGameActive || invadersList.length === 0) return;
+    
+    // Seleccionar un invasor aleatorio
+    const shooter = invadersList[Math.floor(Math.random() * invadersList.length)];
+    if (!shooter || !shooter.parentElement) return;
+    
+    const bullet = document.createElement('div');
+    bullet.className = 'bullet enemy-bullet';
+    
+    const shooterRect = shooter.getBoundingClientRect();
+    const gameAreaRect = document.getElementById('invadersGameArea').getBoundingClientRect();
+    
+    bullet.style.left = (shooterRect.left - gameAreaRect.left + shooterRect.width / 2 - 2) + 'px';
+    bullet.style.top = (shooterRect.bottom - gameAreaRect.top) + 'px';
+    
+    document.getElementById('invadersGameArea').appendChild(bullet);
+    enemyBulletsList.push(bullet);
+}
+
+function createExplosion(x, y) {
+    const explosion = document.createElement('div');
+    explosion.className = 'explosion';
+    explosion.textContent = '💥';
+    explosion.style.left = x + 'px';
+    explosion.style.top = y + 'px';
+    
+    document.getElementById('invadersGameArea').appendChild(explosion);
+    
+    setTimeout(() => explosion.remove(), 500);
+}
+
+function loseLife() {
+    invadersLives--;
+    document.getElementById('invadersLives').textContent = '❤️'.repeat(Math.max(0, invadersLives));
+    
+    if (invadersLives <= 0) {
+        stopInvadersGame();
+        showInvadersGameOver();
+    } else {
+        // Flash del jugador
+        const player = document.getElementById('invadersPlayer');
+        player.style.animation = 'shake 0.3s ease-in-out';
+        setTimeout(() => player.style.animation = '', 300);
+    }
+}
+
+async function showInvadersGameOver() {
+    document.getElementById('invadersFinalScore').textContent = invadersScore;
+    document.getElementById('invadersFinalWave').textContent = invadersWave;
+    document.getElementById('invadersGameOverAlert').classList.add('active');
+    await saveScore('invaders', invadersScore);
+}
+
+function closeInvadersGameOver() {
+    document.getElementById('invadersGameOverAlert').classList.remove('active');
+}
+
+// Controles de movimiento
+let keysPressed = {};
+
+document.addEventListener('keydown', (e) => {
+    if (!invadersGameActive) return;
+    keysPressed[e.key] = true;
+    
+    if (e.code === 'Space') {
+        e.preventDefault();
+        shootBullet();
+    }
+});
+
+document.addEventListener('keyup', (e) => {
+    keysPressed[e.key] = false;
+});
+
+// Actualizar posición del jugador basado en teclas
+setInterval(() => {
+    if (!invadersGameActive) return;
+    
+    const gameArea = document.getElementById('invadersGameArea');
+    const player = document.getElementById('invadersPlayer');
+    const speed = 5;
+    
+    if (keysPressed['ArrowLeft'] || keysPressed['a'] || keysPressed['A']) {
+        invadersPlayerX = Math.max(0, invadersPlayerX - speed);
+    }
+    if (keysPressed['ArrowRight'] || keysPressed['d'] || keysPressed['D']) {
+        invadersPlayerX = Math.min(gameArea.offsetWidth - player.offsetWidth, invadersPlayerX + speed);
+    }
+    
+    player.style.left = invadersPlayerX + 'px';
+}, 16);
+
+// Control con mouse/touch
+document.getElementById('invadersGameArea').addEventListener('mousemove', (e) => {
+    if (!invadersGameActive) return;
+    
+    const gameArea = document.getElementById('invadersGameArea');
+    const player = document.getElementById('invadersPlayer');
+    const rect = gameArea.getBoundingClientRect();
+    
+    invadersPlayerX = e.clientX - rect.left - player.offsetWidth / 2;
+    invadersPlayerX = Math.max(0, Math.min(invadersPlayerX, gameArea.offsetWidth - player.offsetWidth));
+    player.style.left = invadersPlayerX + 'px';
+});
+
+document.getElementById('invadersGameArea').addEventListener('click', (e) => {
+    if (invadersGameActive) {
+        e.preventDefault();
+        shootBullet();
+    }
+});
+
+document.getElementById('invadersGameArea').addEventListener('touchmove', (e) => {
+    if (!invadersGameActive) return;
+    e.preventDefault();
+    
+    const gameArea = document.getElementById('invadersGameArea');
+    const player = document.getElementById('invadersPlayer');
+    const rect = gameArea.getBoundingClientRect();
+    const touch = e.touches[0];
+    
+    invadersPlayerX = touch.clientX - rect.left - player.offsetWidth / 2;
+    invadersPlayerX = Math.max(0, Math.min(invadersPlayerX, gameArea.offsetWidth - player.offsetWidth));
+    player.style.left = invadersPlayerX + 'px';
+});
+
+document.getElementById('invadersGameArea').addEventListener('touchstart', (e) => {
+    if (invadersGameActive) {
+        e.preventDefault();
+        shootBullet();
+    }
+});
+
+// Cargar stats de Invaders
+async function loadInvadersStats() {
+    if (!currentUser || !currentUser.uid || !isStorageAvailable()) return;
+    
+    try {
+        const docId = currentUser.uid;
+        const invadersDoc = await db.collection('user_best_invaders').doc(docId).get();
+        if (invadersDoc.exists) {
+            document.getElementById('invadersBestPreview').textContent = invadersDoc.data().score;
+        }
+    } catch (error) {
+        console.error('Error loading invaders stats:', error);
+    }
+}
+
+async function loadInvadersLeaderboard() {
+    if (!isStorageAvailable()) return;
+
+    const leaderboardEl = document.getElementById('invadersLeaderboard');
+    if (!leaderboardEl) return;
+    
+    leaderboardEl.innerHTML = '<li class="no-scores">Loading...</li>';
+
+    try {
+        const snapshot = await db.collection('user_best_invaders')
+            .orderBy('score', 'desc')
+            .limit(10)
+            .get();
+
+        if (snapshot.empty) {
+            leaderboardEl.innerHTML = '<li class="no-scores">No scores yet. Be the first!</li>';
+            document.getElementById('invadersWorldPreview').textContent = '-';
+            return;
+        }
+
+        const sortedScores = snapshot.docs.map(doc => doc.data());
+        document.getElementById('invadersWorldPreview').textContent = sortedScores[0].score;
+
+        leaderboardEl.innerHTML = sortedScores.map((score, index) => {
+            const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
+            const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
+            return `
+                <li class="leaderboard-item ${rankClass}">
+                    <span class="leaderboard-rank">${medal}</span>
+                    <span class="leaderboard-name">${score.username}</span>
+                    <span class="leaderboard-score">${score.score}</span>
+                </li>
+            `;
+        }).join('');
+    } catch (error) {
+        console.error('Error loading invaders leaderboard:', error);
+        leaderboardEl.innerHTML = '<li class="no-scores">Error loading scores</li>';
+    }
+}
 
 		// Load leaderboards on page load
 		window.addEventListener('load', async () => {
