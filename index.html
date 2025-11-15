@@ -1,2139 +1,601 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="en">
 <head>
-	<meta charset="UTF-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Arcade Zone - Multiplayer Games</title>
-	<style>
-		/* FUENTES */
-	@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Orbitron:wght@400;700;900&display=swap');
-/*
- * ARCADE GAMES - CSS MODERN REFACTOR (2025)
- * -----------------------------------------
- * - Uso de CSS Layers (@layer) para estructura.
- * - Uso de Nesting Nativo (anidación) para legibilidad.
- * - Uso de @property (Houdini) para animaciones de gradiente fluidas.
- * - Uso de animation-timeline: view() para animaciones de entrada.
- * - Variables fluidas (clamp) para tipografía y espaciado.
- * - Paleta de colores y variables CSS optimizadas.
- * - Animaciones optimizadas para performance (transform/opacity).
- * - Reducción de animaciones "ruidosas" para un look más limpio.
- */
-
-/* ---------------------------------- */
-/* 1. CAPA DE DEFINICIONES Y GLOBALES  */
-/* ---------------------------------- */
-@layer definitions {
-
-	/* * REGISTRO DE @PROPERTY (HOUDINI)
-	 * Esto le dice al navegador CÓMO animar propiedades personalizadas.
-	 * Es clave para la animación fluida del borde de gradiente.
-	 */
-	@property --border-angle {
-		syntax: '<angle>';
-		inherits: false;
-		initial-value: 0deg;
-	}
-
-	@property --gradient-pos {
-		syntax: '<percentage>';
-		inherits: false;
-		initial-value: 0%;
-	}
-
-
-	:root {
-		/* Paleta de Colores */
-		--neon-cyan: #00fff9;
-		--neon-pink: #ff006e;
-		--neon-yellow: #ffbe0b;
-		--neon-purple: #8338ec;
-		--neon-green: #39ff14;
-		--dark-bg: #0a0e27;
-		--darker-bg: #050812;
-		--card-bg: color-mix(in srgb, var(--dark-bg) 95%, #fff 5%);
-		--text-light: #f1f5f9;
-		--text-muted: #94a3b8;
-
-		/* Tipografía Fluida (Fluid Type) */
-		--fs-xs: clamp(0.7rem, 1.8vw, 0.85rem);
-		--fs-sm: clamp(0.8rem, 2vw, 0.95rem);
-		--fs-base: clamp(0.9rem, 2.5vw, 1.1rem);
-		--fs-md: clamp(1rem, 3vw, 1.3rem);
-		--fs-lg: clamp(1.2rem, 3.5vw, 1.5rem);
-		--fs-xl: clamp(1.4rem, 4.5vw, 2rem);
-		--fs-2xl: clamp(1.8rem, 5.5vw, 3rem);
-		--fs-3xl: clamp(2.2rem, 6.5vw, 4rem);
-
-		/* Espaciado Fluido (Fluid Spacing) */
-		--spacing-xs: clamp(0.25rem, 1vw, 0.5rem);
-		--spacing-sm: clamp(0.5rem, 1.5vw, 1rem);
-		--spacing-md: clamp(1rem, 2.5vw, 1.5rem);
-		--spacing-lg: clamp(1.5rem, 3.5vw, 2rem);
-		--spacing-xl: clamp(2rem, 4.5vw, 3rem);
-
-		/* Varios */
-		--border-radius-sm: clamp(6px, 1vw, 10px);
-		--border-radius-md: clamp(12px, 2vw, 20px);
-		--border-radius-lg: clamp(15px, 2.5vw, 25px);
-		--border-width: clamp(3px, 0.4vw, 4px);
-		--transition-fast: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-		--transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-	}
-
-	/* Reseteo y Estilos Base */
-	* {
-		box-sizing: border-box;
-		margin: 0;
-		padding: 0;
-	}
-
-	body {
-		min-height: 100vh;
-		background: radial-gradient(ellipse at top, #1a1f3a 0%, var(--dark-bg) 50%, #000 100%);
-		font-family: 'Orbitron', sans-serif;
-		color: var(--text-light);
-		overflow-x: hidden;
-		position: relative;
-	}
-
-	/* Scrollbar Personalizado (Sutil) */
-	::-webkit-scrollbar {
-		width: 10px;
-	}
-	::-webkit-scrollbar-track {
-		background: var(--darker-bg);
-	}
-	::-webkit-scrollbar-thumb {
-		background: linear-gradient(var(--neon-cyan), var(--neon-purple));
-		border-radius: 10px;
-		border: 2px solid var(--darker-bg);
-	}
-	::-webkit-scrollbar-thumb:hover {
-		background: linear-gradient(var(--neon-pink), var(--neon-yellow));
-	}
-}
-
-/* ---------------------------------- */
-/* 2. CAPA DE DISEÑO (LAYOUT)         */
-/* ---------------------------------- */
-@layer layout {
-	.container {
-		position: relative;
-		z-index: 2;
-		max-inline-size: min(1400px, 96vw);
-		margin-inline: auto;
-		padding: var(--spacing-md) var(--spacing-sm);
-	}
-
-	.games-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
-		gap: var(--spacing-lg);
-		margin-bottom: var(--spacing-xl);
-	}
-
-	.leaderboard-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
-		gap: var(--spacing-lg);
-	}
-
-	/* Media Queries Generales de Layout */
-	@media (min-width: 1600px) {
-		.container {
-			max-inline-size: 1500px;
-		}
-		.games-grid {
-			grid-template-columns: repeat(2, 1fr);
-		}
-	}
-
-	@media (max-width: 380px) {
-		.game-stats {
-			flex-direction: column;
-			gap: var(--spacing-sm);
-		}
-		.stat {
-			min-inline-size: 100%;
-		}
-	}
-}
-
-/* ---------------------------------- */
-/* 3. CAPA DE COMPONENTES             */
-/* ---------------------------------- */
-@layer components {
-
-	/* * FONDO ANIMADO
-	 * Optimizado para reducir la carga. 
-	 * Combinamos efectos y mantenemos los más icónicos (grid y estrellas).
-	 */
-	.animated-bg {
-		position: fixed;
-		inset: 0;
-		z-index: 0;
-		overflow: hidden;
-		pointer-events: none;
-
-		/* Grid 3D */
-		&::before {
-			content: '';
-			position: absolute;
-			inset: 0;
-			background-image:
-				linear-gradient(var(--neon-cyan, 0.2) 1px, transparent 1px),
-				linear-gradient(90deg, var(--neon-cyan, 0.2) 1px, transparent 1px);
-			background-size: 50px 50px;
-			animation: gridMove 15s linear infinite;
-			opacity: 0.3;
-			transform-origin: center center;
-			will-change: transform;
-		}
-
-		/* Estrellas */
-		&::after {
-			content: '';
-			position: absolute;
-			inset: 0;
-			background-image: radial-gradient(1px 1px at 20% 30%, #fff, #fff),
-				radial-gradient(1px 1px at 80% 10%, #fff, #fff),
-				radial-gradient(1px 1px at 50% 70%, #fff, #fff),
-				radial-gradient(2px 2px at 90% 60%, #fff, #fff),
-				radial-gradient(2px 2px at 10% 80%, #fff, #fff);
-			animation: twinkle 8s ease-in-out infinite;
-			opacity: 0.5;
-			will-change: opacity;
-		}
-	}
-
-	/* * CABECERA
-	 * Mantenemos la energía pero con animaciones más fluidas.
-	 */
-	.header {
-		text-align: center;
-		margin-bottom: var(--spacing-xl);
-		padding: var(--spacing-md) 0;
-
-		h1 {
-			font-family: 'Press Start 2P', cursive;
-			font-size: var(--fs-2xl);
-			background: linear-gradient(45deg,
-					var(--neon-cyan) 0%,
-					var(--neon-pink) 25%,
-					var(--neon-yellow) 50%,
-					var(--neon-purple) 75%,
-					var(--neon-cyan) 100%);
-			background-size: 400% auto;
-			-webkit-background-clip: text;
-			background-clip: text;
-			-webkit-text-fill-color: transparent;
-			line-height: 1.5;
-			margin-bottom: var(--spacing-sm);
-			filter: drop-shadow(0 0 20px color-mix(in srgb, var(--neon-cyan) 70%, transparent));
-			animation: gradientShift 6s ease infinite;
-			text-wrap: balance;
-			will-change: background-position;
-		}
-
-		p {
-			font-size: var(--fs-base);
-			color: var(--neon-cyan);
-			letter-spacing: 0.1em;
-			text-shadow: 0 0 15px var(--neon-cyan);
-			animation: textGlow 4s ease-in-out infinite;
-			will-change: text-shadow, opacity;
-		}
-	}
-
-	/* * TARJETA BASE CON BORDE ANIMADO (UTILIDAD)
-	 * Usamos @property para una animación de gradiente 100% fluida en la GPU.
-	 * Esta clase se aplica a .user-panel, .game-card, .modal-content, etc.
-	 */
-	.animated-border-card {
-		--border-angle: 0deg; /* Definido en @layer definitions */
-		background: var(--card-bg);
-		border-radius: var(--border-radius-md);
-		padding: var(--spacing-lg);
-		position: relative;
-		overflow: hidden;
-		backdrop-filter: blur(10px);
-		isolation: isolate; /* Nuevo contexto de apilamiento */
-
-		&::before {
-			content: '';
-			position: absolute;
-			inset: -_px; /* Cubre el borde */
-			border-radius: inherit;
-			padding: var(--border-width);
-			background: conic-gradient(from var(--border-angle),
-					var(--neon-cyan),
-					var(--neon-pink),
-					var(--neon-yellow),
-					var(--neon-purple),
-					var(--neon-cyan));
-			animation: borderSpin 4s linear infinite;
-			-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-			-webkit-mask-composite: xor;
-			mask-composite: exclude;
-			z-index: -1;
-			will-change: --border-angle;
-		}
-	}
-
-	/* Panel de Usuario */
-	.user-panel {
-		@extend .animated-border-card; /* Concepto - Aplicamos los estilos */
-		/* Aplicando los estilos de .animated-border-card manualmente */
-		--border-angle: 0deg;
-		background: var(--card-bg);
-		border-radius: var(--border-radius-md);
-		padding: var(--spacing-md); /* Padding personalizado */
-		position: relative;
-		overflow: hidden;
-		backdrop-filter: blur(10px);
-		isolation: isolate;
-		&::before {
-			content: '';
-			position: absolute;
-			inset: -_px;
-			border-radius: inherit;
-			padding: var(--border-width);
-			background: conic-gradient(from var(--border-angle),
-					var(--neon-cyan),
-					var(--neon-pink),
-					var(--neon-yellow),
-					var(--neon-purple),
-					var(--neon-cyan));
-			animation: borderSpin 4s linear infinite;
-			-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-			-webkit-mask-composite: xor;
-			mask-composite: exclude;
-			z-index: -1;
-			will-change: --border-angle;
-		}
-		/* Fin de estilos extendidos */
-
-		margin-bottom: var(--spacing-xl);
-		display: flex;
-		justify-content: center;
-		align-items: center;
-		flex-wrap: wrap;
-		gap: var(--spacing-md);
-
-		/* Brillo sutil que se mueve */
-		&::after {
-			content: '';
-			position: absolute;
-			top: 0;
-			left: -100%;
-			width: 100%;
-			height: 100%;
-			background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--neon-cyan) 10%, transparent), transparent);
-			animation: panelShine 6s linear infinite;
-			will-change: left;
-		}
-
-		.user-info {
-			display: flex;
-			align-items: center;
-			gap: var(--spacing-sm);
-		}
-
-		.user-avatar {
-			width: clamp(50px, 10vw, 65px);
-			height: clamp(50px, 10vw, 65px);
-			background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-			border-radius: 50%;
-			display: grid;
-			place-items: center;
-			font-size: clamp(1.6rem, 4.5vw, 2.2rem);
-			border: var(--border-width) solid var(--neon-cyan);
-			flex-shrink: 0;
-			box-shadow:
-				0 0 15px color-mix(in srgb, var(--neon-pink) 60%, transparent),
-				inset 0 0 10px #fff3;
-			animation: avatarGlow 3s ease-in-out infinite;
-			will-change: box-shadow;
-		}
-
-		.user-name {
-			font-size: var(--fs-md);
-			font-weight: 700;
-			color: var(--neon-yellow);
-			text-shadow: 0 0 12px var(--neon-yellow);
-			word-break: break-word;
-			max-inline-size: min(200px, 30vw);
-		}
-	}
-
-	/* Inputs y Botones */
-	.input-group {
-		display: flex;
-		gap: var(--spacing-sm);
-		align-items: center;
-		flex-wrap: wrap;
-		justify-content: center;
-	}
-
-	.arcade-input {
-		padding: clamp(0.6rem, 1.8vw, 0.9rem) clamp(0.8rem, 2.5vw, 1.2rem);
-		background: #0006;
-		border: 2px solid var(--neon-cyan);
-		border-radius: var(--border-radius-sm);
-		color: var(--text-light);
-		font-family: 'Orbitron', sans-serif;
-		font-size: var(--fs-sm);
-		min-inline-size: min(180px, 100%);
-		transition: var(--transition-fast);
-		box-shadow: inset 0 0 10px color-mix(in srgb, var(--neon-cyan) 20%, transparent);
-
-		&:focus {
-			outline: none;
-			border-color: var(--neon-pink);
-			box-shadow:
-				0 0 15px color-mix(in srgb, var(--neon-pink) 50%, transparent),
-				inset 0 0 15px color-mix(in srgb, var(--neon-pink) 30%, transparent);
-			background: #000a;
-		}
-	}
-
-	.arcade-btn {
-		padding: clamp(0.6rem, 1.8vw, 0.9rem) clamp(1rem, 2.8vw, 1.8rem);
-		background: linear-gradient(135deg, var(--neon-pink), var(--neon-purple));
-		border: 2px solid var(--neon-cyan);
-		color: var(--text-light);
-		font-family: 'Orbitron', sans-serif;
-		font-weight: 700;
-		font-size: var(--fs-sm);
-		border-radius: var(--border-radius-sm);
-		cursor: pointer;
-		transition: var(--transition-fast);
-		text-transform: uppercase;
-		letter-spacing: 0.05em;
-		position: relative;
-		overflow: hidden;
-		white-space: nowrap;
-		box-shadow: 0 0 15px color-mix(in srgb, var(--neon-pink) 40%, transparent);
-		will-change: transform, box-shadow;
-
-		/* Pseudo-elemento para el brillo sutil */
-		&::after {
-			content: '';
-			position: absolute;
-			inset: -3px;
-			border-radius: inherit;
-			background: inherit;
-			filter: blur(8px);
-			opacity: 0.5;
-			z-index: -1;
-			animation: buttonGlow 3s ease-in-out infinite;
-			will-change: opacity;
-		}
-
-		/* Efecto de ripple en hover */
-		&::before {
-			content: '';
-			position: absolute;
-			top: 50%;
-			left: 50%;
-			width: 0;
-			height: 0;
-			background: #fff5;
-			border-radius: 50%;
-			transform: translate(-50%, -50%);
-			transition: width 0.6s, height 0.6s;
-			opacity: 0;
-		}
-
-		&:hover {
-			transform: translateY(-3px) scale(1.05);
-			box-shadow: 0 6px 25px color-mix(in srgb, var(--neon-pink) 70%, transparent), 0 0 30px color-mix(in srgb, var(--neon-cyan) 30%, transparent);
-			
-			&::before {
-				width: 300px;
-				height: 300px;
-				opacity: 1;
-			}
-		}
-
-		&:active {
-			transform: translateY(0) scale(0.98);
-		}
-
-		&:disabled {
-			opacity: 0.5;
-			cursor: not-allowed;
-			animation: none;
-			&::after { animation: none; }
-		}
-	}
-
-	/* Tarjetas de Juego */
-	.game-card {
-		@extend .animated-border-card;
-		/* Aplicando los estilos de .animated-border-card manualmente */
-		--border-angle: 0deg;
-		background: var(--card-bg);
-		border-radius: var(--border-radius-lg); /* Más redondeado */
-		padding: var(--spacing-lg);
-		position: relative;
-		overflow: hidden;
-		backdrop-filter: blur(10px);
-		isolation: isolate;
-		&::before {
-			content: '';
-			position: absolute;
-			inset: -_px;
-			border-radius: inherit;
-			padding: var(--border-width);
-			background: conic-gradient(from var(--border-angle),
-					var(--neon-cyan),
-					var(--neon-pink),
-					var(--neon-purple),
-					var(--neon-cyan));
-			animation: borderSpin 6s linear infinite; /* Más lento por defecto */
-			-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-			-webkit-mask-composite: xor;
-			mask-composite: exclude;
-			z-index: -1;
-			opacity: 0.6; /* Más sutil por defecto */
-			transition: opacity var(--transition-fast);
-			will-change: --border-angle, opacity;
-		}
-		/* Fin de estilos extendidos */
-
-		cursor: pointer;
-		transition: transform var(--transition-fast), box-shadow var(--transition-fast);
-		box-shadow: 0 8px 25px #0008;
-		
-		/* Animación de entrada */
-		opacity: 0;
-		transform: translateY(20px);
-		animation: fadeInUp 0.5s ease-out forwards;
-		/* * Animación de entrada moderna: se activa al entrar al viewport.
-		 * Descomentar la línea de abajo y comentar la de arriba para usarla.
-		 */
-		/* animation: fadeInUp 0.6s ease-out forwards;
-		   animation-timeline: view();
-		   animation-range: entry 10% cover 30%; */
-
-		&:nth-child(1) { animation-delay: 0s; }
-		&:nth-child(2) { animation-delay: 0.1s; }
-		/* ... se pueden añadir más delays si hay más tarjetas */
-
-		&:hover {
-			transform: translateY(-10px) scale(1.03);
-			box-shadow:
-				0 15px 40px color-mix(in srgb, var(--neon-cyan) 30%, transparent),
-				0 0 50px color-mix(in srgb, var(--neon-pink) 20%, transparent);
-
-			&::before {
-				opacity: 1;
-				animation-duration: 2s; /* Más rápido en hover */
-			}
-		}
-
-		.game-icon {
-			font-size: clamp(3.5rem, 9vw, 5rem);
-			text-align: center;
-			margin-bottom: var(--spacing-sm);
-			filter: drop-shadow(0 0 15px currentColor);
-		}
-		&:nth-child(1) .game-icon { color: var(--neon-yellow); }
-		&:nth-child(2) .game-icon { color: var(--neon-pink); }
-
-		.game-title {
-			font-family: 'Press Start 2P', cursive;
-			font-size: var(--fs-md);
-			text-align: center;
-			margin-bottom: var(--spacing-sm);
-			color: var(--neon-cyan);
-			line-height: 1.6;
-			text-shadow: 0 0 10px var(--neon-cyan);
-			text-wrap: balance;
-		}
-
-		.game-description {
-			text-align: center;
-			opacity: 0.9;
-			margin-bottom: var(--spacing-md);
-			font-size: var(--fs-sm);
-			line-height: 1.6;
-			color: var(--text-muted);
-		}
-
-		.game-stats-preview {
-			display: flex;
-			justify-content: space-around;
-			padding: var(--spacing-sm);
-			background: #0005;
-			border-radius: var(--border-radius-sm);
-			margin-bottom: var(--spacing-sm);
-			gap: var(--spacing-sm);
-			border: 2px solid color-mix(in srgb, var(--neon-cyan) 30%, transparent);
-			box-shadow: inset 0 0 15px color-mix(in srgb, var(--neon-cyan) 10%, transparent);
-		}
-
-		.stat-preview {
-			text-align: center;
-			flex: 1;
-
-			&-value {
-				font-size: var(--fs-lg);
-				font-weight: 700;
-				color: var(--neon-yellow);
-				text-shadow: 0 0 10px var(--neon-yellow);
-			}
-
-			&-label {
-				font-size: var(--fs-xs);
-				color: var(--text-muted);
-				text-transform: uppercase;
-				margin-top: 0.25rem;
-			}
-		}
-	}
-
-	/* Modal */
-	.modal {
-		display: none;
-		position: fixed;
-		inset: 0;
-		background: #000c;
-		z-index: 1000;
-		backdrop-filter: blur(8px);
-		padding: var(--spacing-md);
-
-		&.active {
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			animation: fadeIn 0.3s ease;
-		}
-
-		.modal-content {
-			@extend .animated-border-card;
-			/* Aplicando los estilos de .animated-border-card manualmente */
-			--border-angle: 0deg;
-			background: var(--card-bg);
-			border-radius: var(--border-radius-lg);
-			padding: var(--spacing-lg);
-			position: relative;
-			overflow: hidden;
-			backdrop-filter: blur(10px);
-			isolation: isolate;
-			&::before {
-				content: '';
-				position: absolute;
-				inset: -_px;
-				border-radius: inherit;
-				padding: var(--border-width);
-				background: conic-gradient(from var(--border-angle),
-						var(--neon-cyan),
-						var(--neon-pink),
-						var(--neon-yellow),
-						var(--neon-purple),
-						var(--neon-cyan));
-				animation: borderSpin 4s linear infinite;
-				-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-				-webkit-mask-composite: xor;
-				mask-composite: exclude;
-				z-index: -1;
-				will-change: --border-angle;
-			}
-			/* Fin de estilos extendidos */
-			
-			background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
-			max-inline-size: min(850px, 96vw);
-			inline-size: 100%;
-			max-block-size: 92vh;
-			overflow-y: auto;
-			overflow-x: hidden;
-			animation: slideUp 0.4s var(--transition-fast);
-			display: flex;
-			flex-direction: column;
-		}
-
-		.modal-header {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			margin-bottom: var(--spacing-lg);
-			padding-bottom: var(--spacing-sm);
-			border-bottom: 2px solid var(--neon-cyan);
-			gap: var(--spacing-sm);
-			box-shadow: 0 4px 15px color-mix(in srgb, var(--neon-cyan) 20%, transparent);
-			position: relative;
-
-			/* Resplandor del borde (más performante que animar el borde) */
-			&::after {
-				content: '';
-				position: absolute;
-				bottom: -2px;
-				left: 0;
-				width: 100%;
-				height: 2px;
-				background: var(--neon-pink);
-				box-shadow: 0 0 15px var(--neon-pink);
-				animation: headerGlow 5s ease-in-out infinite;
-				will-change: opacity;
-			}
-		}
-
-		.modal-title {
-			font-family: 'Press Start 2P', cursive;
-			font-size: var(--fs-lg);
-			color: var(--neon-yellow);
-			line-height: 1.5;
-			text-shadow: 0 0 15px var(--neon-yellow);
-			text-wrap: balance;
-			flex: 1;
-		}
-
-		.close-btn {
-			background: transparent;
-			border: 2px solid var(--neon-pink);
-			color: var(--neon-pink);
-			width: clamp(42px, 9vw, 50px);
-			height: clamp(42px, 9vw, 50px);
-			border-radius: 50%;
-			cursor: pointer;
-			font-size: var(--fs-lg);
-			transition: var(--transition-fast);
-			flex-shrink: 0;
-			display: grid;
-			place-items: center;
-			box-shadow: 0 0 10px color-mix(in srgb, var(--neon-pink) 40%, transparent);
-
-			&:hover {
-				background: var(--neon-pink);
-				color: var(--text-light);
-				transform: rotate(90deg) scale(1.1);
-				box-shadow: 0 0 20px var(--neon-pink);
-			}
-		}
-	}
-
-	/* Estadísticas del Juego (en Modal) */
-	.game-stats {
-		display: flex;
-		justify-content: space-around;
-		flex-wrap: wrap;
-		margin-bottom: var(--spacing-lg);
-		padding: var(--spacing-md);
-		background: #0005;
-		border-radius: var(--border-radius-sm);
-		gap: var(--spacing-md);
-		border: 2px solid color-mix(in srgb, var(--neon-cyan) 40%, transparent);
-		box-shadow: inset 0 0 15px color-mix(in srgb, var(--neon-cyan) 15%, transparent);
-
-		.stat {
-			text-align: center;
-			flex: 1;
-			min-inline-size: clamp(80px, 25%, 120px);
-		}
-
-		.stat-value {
-			font-size: var(--fs-xl);
-			font-weight: 700;
-			color: var(--neon-yellow);
-			font-family: 'Press Start 2P', cursive;
-			text-shadow: 0 0 12px var(--neon-yellow);
-		}
-
-		.stat-label {
-			font-size: var(--fs-xs);
-			color: var(--text-muted);
-			text-transform: uppercase;
-			margin-top: 0.3rem;
-		}
-	}
-
-	/* Área del Juego "Catch" */
-	.catch-game-area {
-		@extend .animated-border-card;
-		/* Aplicando los estilos de .animated-border-card manualmente */
-		--border-angle: 0deg;
-		background: var(--card-bg);
-		border-radius: var(--border-radius-md);
-		padding: 0; /* Sin padding interno */
-		position: relative;
-		overflow: hidden;
-		backdrop-filter: blur(10px);
-		isolation: isolate;
-		&::before {
-			content: '';
-			position: absolute;
-			inset: -_px;
-			border-radius: inherit;
-			padding: var(--border-width);
-			background: conic-gradient(from var(--border-angle),
-					var(--neon-cyan),
-					var(--neon-pink),
-					var(--neon-yellow),
-					var(--neon-purple),
-					var(--neon-cyan));
-			animation: borderSpin 3s ease-in-out infinite; /* Más rápido, es un juego activo */
-			-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-			-webkit-mask-composite: xor;
-			mask-composite: exclude;
-			z-index: -1;
-			will-change: --border-angle;
-		}
-		/* Fin de estilos extendidos */
-		
-		background: linear-gradient(180deg, #0a0e27 0%, #1a1035 100%);
-		width: 100%;
-		max-inline-size: min(650px, 100%);
-		margin-inline: auto;
-		margin-bottom: var(--spacing-md);
-		height: clamp(280px, 45vh, 420px);
-		flex-shrink: 0;
-
-		/* Resplandor interno */
-		&::after {
-			content: '';
-			position: absolute;
-			inset: 0;
-			background: radial-gradient(circle at center, transparent 0%, color-mix(in srgb, var(--neon-cyan) 10%, transparent) 100%);
-			animation: gameGlow 4s ease-in-out infinite;
-			pointer-events: none;
-			will-change: opacity;
-		}
-
-		.catcher {
-			position: absolute;
-			bottom: clamp(15px, 3vw, 25px);
-			width: clamp(55px, 11vw, 75px);
-			height: clamp(55px, 11vw, 75px);
-			font-size: clamp(2.2rem, 5.5vw, 3rem);
-			transition: left 0.05s linear;
-			cursor: move;
-			filter: drop-shadow(0 0 15px var(--neon-yellow));
-			z-index: 100;
-			user-select: none;
-			display: grid;
-			place-items: center;
-			animation: catcherFloat 2s ease-in-out infinite;
-			will-change: transform;
-		}
-
-		.falling-item {
-			position: absolute;
-			font-size: clamp(1.8rem, 4.5vw, 2.5rem);
-			pointer-events: none;
-			filter: drop-shadow(0 0 12px currentColor);
-			user-select: none;
-			animation: itemSpin 2s linear infinite;
-			will-change: transform;
-
-			&.powerup {
-				animation: powerupPulse 0.5s ease-in-out infinite, itemSpin 2s linear infinite;
-			}
-		}
-	}
-
-	/* Juego de Memoria */
-	.memory-grid {
-		display: grid;
-		grid-template-columns: repeat(4, 1fr);
-		gap: clamp(0.4rem, 1.5vw, 0.9rem);
-		margin-bottom: var(--spacing-md);
-		max-inline-size: min(480px, 100%);
-		margin-inline: auto;
-		flex-shrink: 0;
-
-		.memory-card {
-			aspect-ratio: 1;
-			min-inline-size: 0;
-			min-block-size: clamp(55px, 15vw, 90px);
-			background: linear-gradient(135deg, color-mix(in srgb, var(--neon-cyan) 20%, transparent), color-mix(in srgb, var(--neon-purple) 20%, transparent));
-			border: var(--border-width) solid var(--neon-cyan);
-			border-radius: var(--border-radius-sm);
-			cursor: pointer;
-			display: grid;
-			place-items: center;
-			font-size: clamp(1.8rem, 5.5vw, 3rem);
-			transition: var(--transition-slow);
-			position: relative;
-			transform: scale(1);
-			user-select: none;
-			box-shadow:
-				0 0 15px color-mix(in srgb, var(--neon-cyan) 30%, transparent),
-				inset 0 0 15px color-mix(in srgb, var(--neon-cyan) 10%, transparent);
-			transform-style: preserve-3d;
-			will-change: transform, background, border-color, box-shadow;
-
-			/* Contenido de la tarjeta (oculto por defecto) */
-			&::after {
-				content: attr(data-icon);
-				position: absolute;
-				inset: 0;
-				display: grid;
-				place-items: center;
-				transform: rotateY(180deg);
-				-webkit-backface-visibility: hidden;
-				backface-visibility: hidden;
-			}
-
-			&:hover:not(.flipped):not(.matched) {
-				transform: scale(1.08);
-				border-color: var(--neon-pink);
-				box-shadow:
-					0 0 25px color-mix(in srgb, var(--neon-pink) 50%, transparent),
-					inset 0 0 20px color-mix(in srgb, var(--neon-pink) 20%, transparent);
-			}
-
-			&.flipped {
-				background: linear-gradient(135deg, color-mix(in srgb, var(--neon-pink) 40%, transparent), color-mix(in srgb, var(--neon-purple) 40%, transparent));
-				border-color: var(--neon-pink);
-				transform: rotateY(180deg);
-				box-shadow:
-					0 0 20px color-mix(in srgb, var(--neon-pink) 60%, transparent),
-					inset 0 0 20px color-mix(in srgb, var(--neon-pink) 20%, transparent);
-			}
-
-			&.matched {
-				background: linear-gradient(135deg, color-mix(in srgb, var(--neon-cyan) 30%, transparent), color-mix(in srgb, var(--neon-yellow) 30%, transparent));
-				border-color: var(--neon-yellow);
-				cursor: default;
-				animation: matchExplosion 0.6s ease;
-				transform: rotateY(180deg); /* Mantiene la cara visible */
-				box-shadow:
-					0 0 30px var(--neon-yellow),
-					inset 0 0 20px color-mix(in srgb, var(--neon-yellow) 30%, transparent);
-			}
-		}
-	}
-
-	/* Leaderboard */
-	.leaderboard-section {
-		@extend .animated-border-card;
-		/* Aplicando los estilos de .animated-border-card manualmente */
-		--border-angle: 0deg;
-		background: var(--card-bg);
-		border-radius: var(--border-radius-lg);
-		padding: var(--spacing-lg);
-		position: relative;
-		overflow: hidden;
-		backdrop-filter: blur(10px);
-		isolation: isolate;
-		&::before {
-			content: '';
-			position: absolute;
-			inset: -_px;
-			border-radius: inherit;
-			padding: var(--border-width);
-			background: conic-gradient(from var(--border-angle),
-					var(--neon-purple),
-					var(--neon-pink),
-					var(--neon-cyan),
-					var(--neon-purple));
-			animation: borderSpin 6s ease-in-out infinite;
-			-webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-			-webkit-mask-composite: xor;
-			mask-composite: exclude;
-			z-index: -1;
-			will-change: --border-angle;
-		}
-		/* Fin de estilos extendidos */
-
-		.leaderboard-title {
-			font-family: 'Press Start 2P', cursive;
-			font-size: var(--fs-lg);
-			text-align: center;
-			margin-bottom: var(--spacing-lg);
-			color: var(--neon-yellow);
-			line-height: 1.5;
-			text-shadow: 0 0 20px var(--neon-yellow);
-			text-wrap: balance;
-		}
-
-		.leaderboard-box {
-			background: #0005;
-			border: 2px solid color-mix(in srgb, var(--neon-cyan) 40%, transparent);
-			border-radius: var(--border-radius-md);
-			padding: var(--spacing-md);
-			box-shadow:
-				0 0 20px color-mix(in srgb, var(--neon-cyan) 20%, transparent),
-				inset 0 0 20px color-mix(in srgb, var(--neon-cyan) 10%, transparent);
-
-			h3 {
-				text-align: center;
-				color: var(--neon-pink);
-				margin-bottom: var(--spacing-md);
-				font-size: var(--fs-md);
-				text-shadow: 0 0 15px var(--neon-pink);
-				text-wrap: balance;
-			}
-		}
-
-		.leaderboard-list {
-			list-style: none;
-		}
-
-		.leaderboard-item {
-			display: flex;
-			justify-content: space-between;
-			align-items: center;
-			padding: var(--spacing-sm);
-			margin-bottom: var(--spacing-xs);
-			background: color-mix(in srgb, var(--neon-cyan) 8%, transparent);
-			border: 2px solid color-mix(in srgb, var(--neon-cyan) 30%, transparent);
-			border-radius: var(--border-radius-sm);
-			transition: var(--transition-fast);
-			gap: var(--spacing-xs);
-			position: relative;
-			overflow: hidden;
-
-			/* Animación de entrada */
-			opacity: 0;
-			transform: translateX(-20px);
-			animation: slideInLeft 0.5s ease-out forwards;
-			/* * Animación de entrada moderna: se activa al entrar al viewport.
-			 * Descomentar la línea de abajo y comentar la de arriba para usarla.
-			 */
-			/* animation: slideInLeft 0.5s ease-out forwards;
-			   animation-timeline: view();
-			   animation-range: entry 10% cover 30%; */
-			
-			&:nth-child(1) { animation-delay: 0s; }
-			&:nth-child(2) { animation-delay: 0.05s; }
-			&:nth-child(3) { animation-delay: 0.1s; }
-			&:nth-child(4) { animation-delay: 0.15s; }
-			&:nth-child(5) { animation-delay: 0.2s; }
-			
-			/* * Resplandor de Top 3 (PERFORMANTE)
-			 * Usamos un pseudo-elemento con opacity animada,
-			 * en lugar de animar el box-shadow.
-			 */
-			&.top-1, &.top-2, &.top-3 {
-				&::after {
-					content: '';
-					position: absolute;
-					inset: -50%;
-					z-index: -1;
-					background: radial-gradient(circle, currentColor 20%, transparent 70%);
-					animation: rankShine 2s ease-in-out infinite;
-					will-change: opacity;
-				}
-			}
-
-			&.top-1 {
-				background: linear-gradient(135deg, color-mix(in srgb, gold 30%, transparent), color-mix(in srgb, var(--neon-yellow) 20%, transparent));
-				border-color: gold;
-				color: gold;
-			}
-			&.top-2 {
-				background: linear-gradient(135deg, color-mix(in srgb, silver 30%, transparent), color-mix(in srgb, var(--text-muted) 20%, transparent));
-				border-color: silver;
-				color: silver;
-			}
-			&.top-3 {
-				background: linear-gradient(135deg, color-mix(in srgb, #cd7f32 30%, transparent), color-mix(in srgb, #b87333 20%, transparent));
-				border-color: #cd7f32;
-				color: #cd7f32;
-			}
-
-			&:hover {
-				background: color-mix(in srgb, var(--neon-cyan) 20%, transparent);
-				transform: translateX(8px) scale(1.02);
-				border-color: var(--neon-cyan);
-				box-shadow: 0 0 20px color-mix(in srgb, var(--neon-cyan) 40%, transparent);
-			}
-		}
-
-		.leaderboard-rank {
-			font-size: var(--fs-md);
-			font-weight: 700;
-			min-inline-size: clamp(35px, 7vw, 50px);
-			text-align: center;
-			text-shadow: 0 0 8px currentColor;
-		}
-
-		.leaderboard-name {
-			flex: 1;
-			margin-inline: var(--spacing-xs);
-			font-weight: 600;
-			font-size: var(--fs-sm);
-			word-break: break-word;
-			overflow-wrap: break-word;
-			color: var(--text-light); /* Reset color para que no herede el de top-3 */
-		}
-
-		.leaderboard-score {
-			font-size: var(--fs-md);
-			font-weight: 700;
-			color: var(--neon-yellow);
-			text-shadow: 0 0 12px var(--neon-yellow);
-		}
-
-		.no-scores {
-			text-align: center;
-			opacity: 0.6;
-			padding: var(--spacing-lg);
-			font-style: italic;
-			font-size: var(--fs-sm);
-		}
-	}
-
-	/* Alerta de Game Over */
-	.game-over-alert {
-		position: fixed;
-		top: 50%;
-		left: 50%;
-		transform: translate(-50%, -50%) scale(0);
-		background: linear-gradient(135deg, var(--neon-purple), var(--neon-pink));
-		padding: var(--spacing-xl);
-		border-radius: var(--border-radius-lg);
-		border: var(--border-width) solid var(--neon-cyan);
-		box-shadow:
-			0 0 80px var(--neon-cyan),
-			0 0 50px var(--neon-pink),
-			inset 0 0 30px #fff3;
-		text-align: center;
-		z-index: 1001;
-		transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
-		max-inline-size: min(480px, 92vw);
-		will-change: transform;
-
-		&.active {
-			transform: translate(-50%, -50%) scale(1);
-			animation: alertExplosion 0.6s ease-out;
-		}
-
-		h2 {
-			font-family: 'Press Start 2P', cursive;
-			font-size: var(--fs-xl);
-			margin-bottom: var(--spacing-sm);
-			color: var(--neon-yellow);
-			line-height: 1.5;
-			text-shadow:
-				0 0 20px var(--neon-yellow),
-				0 0 40px #fff;
-			animation: titleExplosion 1.5s ease-in-out infinite;
-			text-wrap: balance;
-			will-change: transform, text-shadow;
-		}
-
-		.final-score-display {
-			font-size: var(--fs-3xl);
-			font-weight: 900;
-			color: var(--text-light);
-			margin: var(--spacing-sm) 0;
-			text-shadow:
-				0 0 20px #fff,
-				0 0 40px var(--neon-cyan),
-				0 0 70px var(--neon-pink);
-			animation: scoreExplosion 1s ease-in-out infinite;
-			will-change: transform, text-shadow;
-		}
-	}
-}
-
-/* ---------------------------------- */
-/* 4. CAPA DE KEYFRAMES (ANIMACIONES) */
-/* ---------------------------------- */
-@layer animations {
-
-	/* Fondo */
-	@keyframes gridMove {
-		from { transform: perspective(600px) rotateX(60deg) translateY(0); }
-		to { transform: perspective(600px) rotateX(60deg) translateY(100px); }
-	}
-	@keyframes twinkle {
-		0%, 100% { opacity: 0.3; }
-		50% { opacity: 0.8; }
-	}
-
-	/* Header */
-	@keyframes gradientShift {
-		0%, 100% { background-position: 0% center; }
-		50% { background-position: 100% center; }
-	}
-	@keyframes textGlow {
-		0%, 100% { text-shadow: 0 0 15px var(--neon-cyan); opacity: 0.8; }
-		50% { text-shadow: 0 0 25px var(--neon-cyan); opacity: 1; }
-	}
-
-	/* Borde Animado (con @property) */
-	@keyframes borderSpin {
-		from { --border-angle: 0deg; }
-		to { --border-angle: 360deg; }
-	}
-	
-	/* Panel Usuario */
-	@keyframes panelShine {
-		from { left: -100%; }
-		to { left: 200%; }
-	}
-	@keyframes avatarGlow {
-		0%, 100% {
-			box-shadow: 0 0 15px color-mix(in srgb, var(--neon-pink) 60%, transparent),
-						inset 0 0 10px #fff3;
-		}
-		50% {
-			box-shadow: 0 0 25px color-mix(in srgb, var(--neon-cyan) 70%, transparent),
-						inset 0 0 15px #fff5;
-		}
-	}
-
-	/* Botón */
-	@keyframes buttonGlow {
-		0%, 100% { opacity: 0.4; }
-		50% { opacity: 0.8; }
-	}
-
-	/* Modal */
-	@keyframes fadeIn {
-		from { opacity: 0; }
-		to { opacity: 1; }
-	}
-	@keyframes slideUp {
-		from { transform: translateY(20px); opacity: 0; }
-		to { transform: translateY(0); opacity: 1; }
-	}
-	@keyframes headerGlow {
-		0%, 100% { opacity: 0.7; }
-		50% { opacity: 1; }
-	}
-
-	/* Juego "Catch" */
-	@keyframes gameGlow {
-		0%, 100% { opacity: 0.3; }
-		50% { opacity: 0.6; }
-	}
-	@keyframes catcherFloat {
-		0%, 100% { transform: translateY(0); }
-		50% { transform: translateY(-4px); }
-	}
-	@keyframes itemSpin {
-		from { transform: rotate(0deg); }
-		to { transform: rotate(360deg); }
-	}
-	@keyframes powerupPulse {
-		0%, 100% { transform: scale(1); }
-		50% { transform: scale(1.2); }
-	}
-
-	/* Juego Memoria */
-	@keyframes matchExplosion {
-		0% { transform: rotateY(180deg) scale(1); }
-		25% { transform: rotateY(180deg) scale(1.2) rotate(5deg); }
-		50% { transform: rotateY(180deg) scale(1.1) rotate(-5deg); }
-		100% { transform: rotateY(180deg) scale(1); }
-	}
-
-	/* Leaderboard */
-	@keyframes slideInLeft {
-		from { opacity: 0; transform: translateX(-20px); }
-		to { opacity: 1; transform: translateX(0); }
-	}
-	@keyframes fadeInUp {
-		from { opacity: 0; transform: translateY(20px); }
-		to { opacity: 1; transform: translateY(0); }
-	}
-	@keyframes rankShine {
-		0%, 100% { opacity: 0.3; }
-		50% { opacity: 0.7; }
-	}
-	
-	/* Game Over */
-	@keyframes alertExplosion {
-		from { transform: translate(-50%, -50%) scale(0); }
-		to { transform: translate(-50%, -50%) scale(1); }
-	}
-	@keyframes titleExplosion {
-		0%, 100% {
-			transform: scale(1);
-			text-shadow: 0 0 20px var(--neon-yellow), 0 0 40px #fff;
-		}
-		50% {
-			transform: scale(1.05);
-			text-shadow: 0 0 30px var(--neon-yellow), 0 0 60px #fff;
-		}
-	}
-	@keyframes scoreExplosion {
-		0%, 100% {
-			transform: scale(1) rotate(-1deg);
-			text-shadow: 0 0 20px #fff, 0 0 40px var(--neon-cyan), 0 0 70px var(--neon-pink);
-		}
-		50% {
-			transform: scale(1.1) rotate(1deg);
-			text-shadow: 0 0 30px #fff, 0 0 60px var(--neon-cyan), 0 0 100px var(--neon-pink);
-		}
-	}
-}
-
-/* ---------------------------------- */
-/* 5. CAPA DE ACCESIBILIDAD Y RESPONSIVE */
-/* ---------------------------------- */
-@layer utilities {
-
-	/* Reducción de movimiento */
-	@media (prefers-reduced-motion: reduce) {
-		*,
-		*::before,
-		*::after {
-			animation-duration: 0.01ms !important;
-			animation-iteration-count: 1 !important;
-			transition-duration: 0.01ms !important;
-		}
-	}
-	
-	/* Optimización para táctiles (desactiva hover, prioriza active) */
-	@media (hover: none) and (pointer: coarse) {
-		.game-card:hover,
-		.arcade-btn:hover,
-		.memory-card:hover,
-		.leaderboard-item:hover,
-		.close-btn:hover {
-			transform: none;
-			box-shadow: none; /* Asumir que el estado base es suficiente */
-		}
-	
-		/* Mantenemos/añadimos feedback al "tocar" */
-		.game-card:active { transform: scale(0.98); }
-		.arcade-btn:active { transform: scale(0.96); }
-		.memory-card:active:not(.flipped):not(.matched) { transform: scale(0.95); }
-		.leaderboard-item:active { transform: scale(0.98); }
-		.close-btn:active { transform: scale(0.95) rotate(90deg); }
-	}
-}
-</style>
-<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-firestore-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/9.15.0/firebase-auth-compat.js"></script>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Arcade - Critical System Update</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Space+Grotesk:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* ============================================
+         * RESET & YOUR DESIGN TOKENS (OKLCH)
+         * ============================================ */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            /* Your Neon Arcade Colors */
+            --neon-cyan: oklch(0.85 0.25 195);
+            --neon-pink: oklch(0.65 0.30 350);
+            --neon-yellow: oklch(0.85 0.20 85);
+            --neon-purple: oklch(0.60 0.28 290);
+            --neon-green: oklch(0.80 0.25 145);
+            --neon-red: oklch(0.60 0.30 20); /* Nuevo color para errores */
+            
+            /* Your Backgrounds */
+            --bg-dark: oklch(0.12 0.02 265);
+            --bg-darker: oklch(0.08 0.01 265);
+            --bg-card: oklch(0.15 0.03 265 / 0.95);
+            --bg-glass: oklch(0.18 0.03 265 / 0.7);
+            
+            /* Your Spacing & Radii */
+            --space-3xs: clamp(0.25rem, 0.24rem + 0.05vw, 0.31rem);
+            --space-2xs: clamp(0.5rem, 0.48rem + 0.09vw, 0.63rem);
+            --space-xs: clamp(0.75rem, 0.73rem + 0.14vw, 0.94rem);
+            --space-sm: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
+            --space-md: clamp(1.5rem, 1.45rem + 0.28vw, 1.88rem);
+            --space-lg: clamp(2rem, 1.94rem + 0.37vw, 2.5rem);
+            --space-xl: clamp(3rem, 2.91rem + 0.56vw, 3.75rem);
+            --radius-sm: clamp(0.5rem, 0.48rem + 0.09vw, 0.63rem);
+            --radius-md: clamp(0.75rem, 0.73rem + 0.14vw, 0.94rem);
+            --radius-lg: clamp(1rem, 0.97rem + 0.19vw, 1.25rem);
+            --radius-full: 9999px;
+
+            /* Your Fonts */
+            --font-pixel: 'Press Start 2P', monospace;
+            --font-sans: 'Space Grotesk', sans-serif;
+
+            /* Transitions */
+            --transition-base: 250ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ============================================
+         * BASE STYLES & BACKGROUND
+         * ============================================ */
+        html {
+            -webkit-font-smoothing: antialiased;
+            text-rendering: optimizeLegibility;
+        }
+
+        body {
+            min-block-size: 100vh;
+            min-block-size: 100dvh;
+            background: 
+                radial-gradient(ellipse at top, oklch(0.2 0.05 265) 0%, var(--bg-dark) 40%, var(--bg-darker) 100%);
+            font-family: var(--font-sans);
+            color: oklch(0.95 0 0);
+            overflow: hidden;
+            
+            display: grid;
+            place-items: center;
+            padding: var(--space-md);
+            position: relative;
+        }
+
+        /* Your subtle grid background */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background-image: 
+                linear-gradient(90deg, var(--neon-cyan) 1px, transparent 1px),
+                linear-gradient(0deg, var(--neon-cyan) 1px, transparent 1px);
+            background-size: 60px 60px;
+            opacity: 0.03;
+            pointer-events: none;
+            z-index: 0;
+            animation: gridFloat 30s linear infinite; /* Reuse your animation */
+        }
+        
+        /* Your particle background */
+        body::after {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: 
+                radial-gradient(circle at 20% 30%, var(--neon-cyan) 1px, transparent 1px),
+                radial-gradient(circle at 80% 70%, var(--neon-pink) 1px, transparent 1px),
+                radial-gradient(circle at 50% 50%, var(--neon-purple) 1px, transparent 1px);
+            background-size: 200px 200px, 250px 250px, 300px 300px;
+            opacity: 0.06;
+            animation: particleMove 40s ease-in-out infinite;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        /* ============================================
+         * LOADING SCREEN (New Feature)
+         * ============================================ */
+        .loading-screen {
+            position: fixed;
+            inset: 0;
+            background: var(--bg-darker);
+            z-index: 9999;
+            display: grid;
+            place-items: center;
+            /* CSS controls the fade out */
+            transition: opacity 1s ease-out 2s, visibility 1s ease-out 2s;
+        }
+
+        .loading-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-text {
+            font-family: var(--font-pixel);
+            font-size: clamp(1.2rem, 4vw, 2.5rem);
+            color: var(--neon-cyan);
+            text-shadow: 0 0 10px var(--neon-cyan);
+            /* Combines a glitch and a fade in/out */
+            animation: textGlitch 1.5s linear infinite alternate, fadeInOut 2s ease-in-out;
+        }
+        
+        /* ============================================
+         * MAIN MAINTENANCE UI
+         * ============================================ */
+        .maintenance-container {
+            position: relative;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-lg);
+            max-inline-size: 1000px;
+            inline-size: 95vw;
+            opacity: 0; /* Hidden until loading screen fades */
+            /* Fades in after the loading screen (2s) starts to fade (2.5s) */
+            transition: opacity 1s ease-in 2.5s;
+        }
+        
+        .maintenance-container.active {
+            opacity: 1;
+        }
+
+        .header-section {
+            text-align: center;
+            padding: var(--space-md);
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            border-radius: var(--radius-lg);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            box-shadow: 0 8px 32px oklch(0 0 0 / 0.35);
+            background-clip: padding-box;
+            position: relative;
+        }
+        
+        .header-section::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(
+                90deg,
+                var(--neon-cyan),
+                var(--neon-pink),
+                var(--neon-yellow),
+                var(--neon-cyan)
+            );
+            background-size: 200% 100%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: borderFlow 8s linear infinite;
+            z-index: -1;
+        }
+
+        h1 {
+            font-family: var(--font-pixel);
+            font-size: clamp(1.8rem, 4vw, 2.8rem);
+            line-height: 1.4;
+            color: var(--neon-yellow);
+            text-shadow: 0 0 20px var(--neon-yellow);
+            margin-block-end: var(--space-sm);
+        }
+
+        .status-message {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--neon-cyan);
+            text-shadow: 0 0 12px var(--neon-cyan);
+            opacity: 0.9;
+            line-height: 1.6;
+            max-inline-size: 60ch;
+            margin-inline: auto;
+        }
+
+        /* Progress Bar (more complex, 'Houdini' style) */
+        .progress-indicator {
+            inline-size: 100%;
+            block-size: var(--space-md);
+            background: oklch(0 0 0 / 0.6);
+            border: 2px solid var(--neon-purple);
+            border-radius: var(--radius-sm);
+            overflow: hidden;
+            position: relative;
+            box-shadow: inset 0 0 15px var(--neon-purple) / 30%;
+            margin-block-start: var(--space-lg);
+            
+            /* Background stripes for a processing look */
+            background-image: repeating-linear-gradient(
+                45deg,
+                oklch(0 0 0 / 0.2),
+                oklch(0 0 0 / 0.2) 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            background-size: 30px 30px;
+            animation: progressStripes 1s linear infinite;
+        }
+
+        .progress-fill {
+            inline-size: 0%; /* Controlled by JS */
+            block-size: 100%;
+            background: linear-gradient(90deg, var(--neon-pink), var(--neon-purple));
+            transition: inline-size 0.5s ease-out; /* Smooth fill */
+            box-shadow: 0 0 15px var(--neon-pink);
+        }
+
+        /* Status Modules Grid */
+        .modules-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--space-md);
+        }
+
+        .module-card {
+            background: var(--bg-card);
+            border: 2px solid transparent;
+            border-radius: var(--radius-md);
+            padding: var(--space-md);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 4px 16px oklch(0 0 0 / 0.25);
+            position: relative;
+            background-clip: padding-box;
+            text-align: center;
+            transition: all var(--transition-base);
+            min-block-size: 100px; /* Min height for modules */
+        }
+        
+        .module-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 24px oklch(0 0 0 / 0.4);
+        }
+
+        .module-card::before {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: inherit;
+            padding: 2px;
+            background: linear-gradient(
+                135deg,
+                var(--neon-cyan),
+                var(--neon-pink),
+                var(--neon-cyan)
+            );
+            background-size: 200% 200%;
+            -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+            -webkit-mask-composite: xor;
+            mask-composite: exclude;
+            animation: borderRotate 10s linear infinite;
+            z-index: -1;
+            opacity: 0.5;
+            transition: opacity var(--transition-base);
+        }
+        
+        .module-card:hover::before {
+            opacity: 1;
+        }
+
+        .module-title {
+            font-family: var(--font-pixel);
+            font-size: 0.9rem;
+            color: var(--neon-yellow);
+            text-shadow: 0 0 8px var(--neon-yellow);
+            margin-block-end: var(--space-2xs);
+            line-height: 1.3;
+        }
+
+        .module-status {
+            font-family: var(--font-sans);
+            font-size: 0.8rem;
+            font-weight: 600;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+        }
+        
+        .module-card[data-state="online"] .module-status { color: var(--neon-green); text-shadow: 0 0 5px var(--neon-green); }
+        .module-card[data-state="offline"] .module-status { color: var(--neon-red); text-shadow: 0 0 5px var(--neon-red); }
+        .module-card[data-state="updating"] .module-status { color: var(--neon-cyan); text-shadow: 0 0 5px var(--neon-cyan); animation: pulse 1.5s infinite; }
+        .module-card[data-state="idle"] .module-status { color: oklch(0.7 0 0); } /* Grey */
+
+        /* Detailed Status Log */
+        .status-log-section {
+            background: oklch(0 0 0 / 0.7);
+            border: 1px solid var(--neon-cyan) / 20%;
+            border-radius: var(--radius-md);
+            max-block-size: 300px; /* Taller log */
+            overflow: hidden;
+            padding: var(--space-sm);
+            box-shadow: inset 0 0 20px oklch(0 0 0 / 0.5);
+            -webkit-mask-image: linear-gradient(transparent, black var(--space-lg), black 90%, transparent);
+            mask-image: linear-gradient(transparent, black var(--space-lg), black 90%, transparent);
+            position: relative;
+        }
+        
+        .status-log-section::before { /* Animated scanline on log */
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(
+                transparent 0%, 
+                oklch(1 0 0 / 0.05) 50%, 
+                transparent 100%
+            );
+            background-size: 100% 30px;
+            animation: scanline 8s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .status-log {
+            list-style: none;
+            animation: scrollLog 60s linear infinite; /* Slower for more content */
+        }
+
+        .status-log li {
+            font-family: 'Space Grotesk', monospace; /* More terminal-like font */
+            font-size: 0.85rem;
+            line-height: 1.6;
+            color: oklch(0.85 0 0);
+            display: flex;
+            gap: var(--space-xs);
+            white-space: nowrap; /* Prevent wrapping for terminal feel */
+        }
+        
+        .status-log li span {
+            opacity: 0.5;
+            flex-shrink: 0;
+            color: oklch(0.7 0 0);
+        }
+        
+        .status-log li::before {
+            flex-shrink: 0;
+            font-weight: 700;
+        }
+
+        .status-log li[data-log-status="ok"]::before { content: '[ OK ]'; color: var(--neon-green); }
+        .status-log li[data-log-status="info"]::before { content: '[ INFO ]'; color: var(--neon-cyan); }
+        .status-log li[data-log-status="warn"]::before { content: '[ WARN ]'; color: var(--neon-yellow); }
+        .status-log li[data-log-status="error"]::before { content: '[ FAIL ]'; color: var(--neon-red); animation: textFlicker 0.5s infinite alternate; }
+        .status-log li[data-log-status="debug"]::before { content: '[ DEBUG ]'; color: var(--neon-purple); opacity: 0.7; }
+
+        /* ============================================
+         * ANIMATIONS (REUSED & NEW)
+         * ============================================ */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes fadeInOut {
+            0%, 100% { opacity: 0; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes textGlitch {
+            0% { transform: translate(0); text-shadow: 0 0 10px var(--neon-cyan); }
+            20% { transform: translate(-2px, 2px); text-shadow: 0 0 8px var(--neon-cyan), 1px 1px 0 var(--neon-pink); }
+            40% { transform: translate(2px, -2px); text-shadow: 0 0 12px var(--neon-cyan), -1px -1px 0 var(--neon-green); }
+            60% { transform: translate(-1px, 1px); text-shadow: 0 0 10px var(--neon-cyan); }
+            80% { transform: translate(1px, -1px); text-shadow: 0 0 11px var(--neon-cyan), 2px 0 0 var(--neon-yellow); }
+            100% { transform: translate(0); text-shadow: 0 0 10px var(--neon-cyan); }
+        }
+
+        @keyframes borderFlow {
+            to { background-position: 200% center; }
+        }
+
+        @keyframes borderRotate {
+            to { background-position: 200% 200%; }
+        }
+        
+        @keyframes progressStripes {
+            to { background-position: 30px 0; }
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.02); opacity: 0.8; }
+        }
+        
+        @keyframes scanline {
+            0% { transform: translateY(-100%); }
+            100% { transform: translateY(100%); }
+        }
+
+        @keyframes scrollLog {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-50%); } /* Scrolls exactly half the list */
+        }
+        
+        @keyframes gridFloat {
+            from { transform: translateY(0); }
+            to { transform: translateY(60px); }
+        }
+
+        @keyframes particleMove {
+            0%, 100% { background-position: 0% 0%, 100% 100%, 50% 50%; }
+            50% { background-position: 100% 100%, 0% 0%, 80% 20%; }
+        }
+        
+        @keyframes textFlicker {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.7; }
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            .modules-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+    </style>
 </head>
 <body>
-	<div class="animated-bg">
-		<div class="grid-lines"></div>
-		<div class="stars" id="starsContainer"></div>
-	</div>
 
-	<div class="container">
-		<div class="header">
-			<h1 data-text="ARCADE ZONE">ARCADE ZONE</h1>
-			<p>◆ MULTIPLAYER GAMES ◆</p>
-		</div>
+    <div id="loadingScreen" class="loading-screen">
+        <h2 class="loader-text">Loading System...</h2>
+    </div>
 
-		<!-- User Panel -->
-		<div class="user-panel">
-			<div id="loginView">
-				<button class="arcade-btn" onclick="loginWithGoogle()">
-					★ SIGN IN WITH GOOGLE TO PLAY ★
-				</button>
-			</div>
+    <div id="maintenanceUI" class="maintenance-container">
+        
+        <div class="header-section">
+            <h1>ARCADE SYSTEM OFFLINE: CRITICAL UPDATE</h1>
+            <p class="status-message">
+                I'm performing a major firmware upgrade to improve your gaming experience and
+                stabilize retro emulation. Please bear with me, this might take a moment.
+            </p>
+            <div class="progress-indicator">
+                <div id="progressBarFill" class="progress-fill"></div>
+            </div>
+        </div>
 
-			<div id="userView" style="display: none;">
-				<div class="user-info">
-					<div class="user-avatar">🎮</div>
-					<div>
-						<div class="user-name" id="displayUsername"></div>
-						<div style="font-size: 0.8rem; opacity: 0.7;">PLAYER</div>
-					</div>
-				</div>
-				<button class="arcade-btn" onclick="logout()">LOGOUT</button>
-			</div>
-		</div>
+        <div class="modules-grid">
+            <div class="module-card" data-state="updating">
+                <h3 class="module-title">MAIN CORE</h3>
+                <p class="module-status">UPDATING FIRMWARE...</p>
+            </div>
+            <div class="module-card" data-state="offline">
+                <h3 class="module-title">DATABASE: USERS</h3>
+                <p class="module-status">OFFLINE (MIGRATING)</p>
+            </div>
+            <div class="module-card" data-state="updating">
+                <h3 class="module-title">DATABASE: SCORES</h3>
+                <p class="module-status">SYNCING BACKUP...</p>
+            </div>
+            <div class="module-card" data-state="offline">
+                <h3 class="module-title">EMULATION ENGINE</h3>
+                <p class="module-status">INSTALLING DRIVERS</p>
+            </div>
+            <div class="module-card" data-state="online">
+                <h3 class="module-title">NETWORK INTERFACE</h3>
+                <p class="module-status">ONLINE (MONITORING)</p>
+            </div>
+            <div class="module-card" data-state="idle">
+                <h3 class="module-title">ASSET CACHE</h3>
+                <p class="module-status">IDLE</p>
+            </div>
+        </div>
 
-		<!-- Games Grid -->
-		<div class="games-grid">
-			<!-- Star Catcher Card -->
-			<div class="game-card" onclick="openGame('catch')">
-				<div class="game-icon">⭐</div>
-				<h3 class="game-title">STAR CATCHER</h3>
-				<p class="game-description">Catch stars and power-ups while avoiding bombs!</p>
-				<div class="game-stats-preview">
-					<div class="stat-preview">
-						<div class="stat-preview-value" id="catchBestPreview">-</div>
-						<div class="stat-preview-label">Your Best</div>
-					</div>
-					<div class="stat-preview">
-						<div class="stat-preview-value" id="catchWorldPreview">-</div>
-						<div class="stat-preview-label">World Record</div>
-					</div>
-				</div>
-				<div style="text-align: center; margin-top: 1rem;">
-					<button class="arcade-btn" onclick="event.stopPropagation(); openGame('catch')">PLAY NOW</button>
-				</div>
-			</div>
+        <div class="status-log-section">
+            <ul class="status-log">
+                <li data-log-status="info"><span>[09:00:01]</span> Initiating full system shutdown...</li>
+                <li data-log-status="ok"><span>[09:00:03]</span> Core services offline.</li>
+                <li data-log-status="info"><span>[09:00:05]</span> Performing pre-update diagnostics...</li>
+                <li data-log-status="ok"><span>[09:00:07]</span> Diagnostic check passed. No critical errors detected.</li>
+                <li data-log-status="info"><span>[09:00:10]</span> Initializing firmware update sequence (v1.5.2)...</li>
+                <li data-log-status="info"><span>[09:00:12]</span> Flashing Main Core Microcode...</li>
+                <li data-log-status="warn"><span>[09:00:15]</span> Old 'NeonFlicker' module detected. Deprecated.</li>
+                <li data-log-status="ok"><span>[09:00:18]</span> Main Core updated. Rebooting core processor...</li>
+                <li data-log-status="info"><span>[09:00:22]</span> Starting database schema migration for 'PlayerScores'...</li>
+                <li data-log-status="ok"><span>[09:00:25]</span> 'PlayerScores' schema migrated successfully.</li>
+                <li data-log-status="info"><span>[09:00:28]</span> Backing up 'UserProfiles' database to secure storage...</li>
+                <li data-log-status="ok"><span>[09:00:33]</span> 'UserProfiles' backup complete.</li>
+                <li data-log-status="info"><span>[09:00:35]</span> Installing new Emulation Engine drivers (Houdini v2.1)...</li>
+                <li data-log-status="error"><span>[09:00:38]</span> Driver 'VirtuArcade.dll' conflict detected. Attempting rollback...</li>
+                <li data-log-status="info"><span>[09:00:41]</span> Rollback successful. Re-attempting driver installation...</li>
+                <li data-log-status="ok"><span>[09:00:45]</span> Emulation Engine drivers installed.</li>
+                <li data-log-status="info"><span>[09:00:48]</span> Verifying data integrity across all game ROMs...</li>
+                <li data-log-status="ok"><span>[09:00:55]</span> All game ROMs verified. Integrity 99.8%.</li>
+                <li data-log-status="warn"><span>[09:00:57]</span> Minor texture corruption in 'SpaceInvaders' ROM. Auto-repairing...</li>
+                <li data-log-status="ok"><span>[09:01:00]</span> 'SpaceInvaders' ROM repaired.</li>
+                <li data-log-status="info"><span>[09:0l:02]</span> Rebuilding global asset cache...</li>
+                <li data-log-status="ok"><span>[09:01:05]</span> Asset cache rebuilt.</li>
+                <li data-log-status="info"><span>[09:01:08]</span> Performing final system checks...</li>
+                <li data-log-status="ok"><span>[09:01:10]</span> All modules reporting green.</li>
+                <li data-log-status="info"><span>[09:01:12]</span> Preparing for system restart...</li>
 
-			<!-- Memory Game Card -->
-			<div class="game-card" onclick="openGame('memory')">
-				<div class="game-icon">🧠</div>
-				<h3 class="game-title">MEMORY MASTER</h3>
-				<p class="game-description">Match all pairs in the fewest moves!</p>
-				<div class="game-stats-preview">
-					<div class="stat-preview">
-						<div class="stat-preview-value" id="memoryBestPreview">-</div>
-						<div class="stat-preview-label">Your Best</div>
-					</div>
-					<div class="stat-preview">
-						<div class="stat-preview-value" id="memoryWorldPreview">-</div>
-						<div class="stat-preview-label">World Record</div>
-					</div>
-				</div>
-				<div style="text-align: center; margin-top: 1rem;">
-					<button class="arcade-btn" onclick="event.stopPropagation(); openGame('memory')">PLAY NOW</button>
-				</div>
-			</div>
-		</div>
+                <li data-log-status="info"><span>[09:00:01]</span> Initiating full system shutdown...</li>
+                <li data-log-status="ok"><span>[09:00:03]</span> Core services offline.</li>
+                <li data-log-status="info"><span>[09:00:05]</span> Performing pre-update diagnostics...</li>
+                <li data-log-status="ok"><span>[09:00:07]</span> Diagnostic check passed. No critical errors detected.</li>
+                <li data-log-status="info"><span>[09:00:10]</span> Initializing firmware update sequence (v1.5.2)...</li>
+                <li data-log-status="info"><span>[09:00:12]</span> Flashing Main Core Microcode...</li>
+                <li data-log-status="warn"><span>[09:00:15]</span> Old 'NeonFlicker' module detected. Deprecated.</li>
+                <li data-log-status="ok"><span>[09:00:18]</span> Main Core updated. Rebooting core processor...</li>
+                <li data-log-status="info"><span>[09:00:22]</span> Starting database schema migration for 'PlayerScores'...</li>
+                <li data-log-status="ok"><span>[09:00:25]</span> 'PlayerScores' schema migrated successfully.</li>
+                <li data-log-status="info"><span>[09:00:28]</span> Backing up 'UserProfiles' database to secure storage...</li>
+                <li data-log-status="ok"><span>[09:00:33]</span> 'UserProfiles' backup complete.</li>
+                <li data-log-status="info"><span>[09:00:35]</span> Installing new Emulation Engine drivers (Houdini v2.1)...</li>
+                <li data-log-status="error"><span>[09:00:38]</span> Driver 'VirtuArcade.dll' conflict detected. Attempting rollback...</li>
+                <li data-log-status="info"><span>[09:00:41]</span> Rollback successful. Re-attempting driver installation...</li>
+                <li data-log-status="ok"><span>[09:00:45]</span> Emulation Engine drivers installed.</li>
+                <li data-log-status="info"><span>[09:00:48]</span> Verifying data integrity across all game ROMs...</li>
+                <li data-log-status="ok"><span>[09:00:55]</span> All game ROMs verified. Integrity 99.8%.</li>
+                <li data-log-status="warn"><span>[09:00:57]</span> Minor texture corruption in 'SpaceInvaders' ROM. Auto-repairing...</li>
+                <li data-log-status="ok"><span>[09:01:00]</span> 'SpaceInvaders' ROM repaired.</li>
+                <li data-log-status="info"><span>[09:0l:02]</span> Rebuilding global asset cache...</li>
+                <li data-log-status="ok"><span>[09:01:05]</span> Asset cache rebuilt.</li>
+                <li data-log-status="info"><span>[09:01:08]</span> Performing final system checks...</li>
+                <li data-log-status="ok"><span>[09:01:10]</span> All modules reporting green.</li>
+                <li data-log-status="info"><span>[09:01:12]</span> Preparing for system restart...</li>
+            </ul>
+        </div>
+    </div>
 
-		<!-- Leaderboard Section -->
-		<div class="leaderboard-section">
-			<h2 class="leaderboard-title">◆ GLOBAL LEADERBOARD ◆</h2>
-			<div class="leaderboard-grid">
-				<div class="leaderboard-box">
-					<h3>⭐ STAR CATCHER</h3>
-					<ul class="leaderboard-list" id="catchLeaderboard">
-						<li class="no-scores">Loading...</li>
-					</ul>
-				</div>
-				<div class="leaderboard-box">
-					<h3>🧠 MEMORY MASTER</h3>
-					<ul class="leaderboard-list" id="memoryLeaderboard">
-						<li class="no-scores">Loading...</li>
-					</ul>
-				</div>
-			</div>
-		</div>
-	</div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const loadingScreen = document.getElementById('loadingScreen');
+            const maintenanceUI = document.getElementById('maintenanceUI');
+            const progressBarFill = document.getElementById('progressBarFill');
+            
+            // 1. Ocultar la pantalla de carga después de 2 segundos (coincide con la animación CSS)
+            setTimeout(() => {
+                loadingScreen.classList.add('hidden');
+            }, 2000); // 2 segundos
 
-	<!-- Catch Game Modal -->
-	<div class="modal" id="catchModal">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h2 class="modal-title">⭐ STAR CATCHER</h2>
-				<button class="close-btn" onclick="closeGame('catch')">×</button>
-			</div>
+            // 2. Mostrar la UI principal después de que la carga comience a ocultarse
+            setTimeout(() => {
+                maintenanceUI.classList.add('active');
+            }, 2500); // 2.5 segundos (justo después de que comience el fade out)
 
-			<div class="game-stats">
-				<div class="stat">
-					<div class="stat-value" id="catchScore">0</div>
-					<div class="stat-label">Score</div>
-				</div>
-				<div class="stat">
-					<div class="stat-value" id="catchTime">30</div>
-					<div class="stat-label">Time</div>
-				</div>
-				<div class="stat">
-					<div class="stat-value" id="catchMultiplier">x1</div>
-					<div class="stat-label">Multiplier</div>
-				</div>
-			</div>
-
-			<div class="catch-game-area" id="catchGameArea">
-				<div class="catcher" id="catcher">🎯</div>
-			</div>
-
-			<div style="text-align: center;">
-				<button class="arcade-btn" onclick="startCatchGame()" id="catchStartBtn">START GAME</button>
-			</div>
-
-			<div style="margin-top: 2rem; padding: 1rem; background: rgba(0,0,0,0.3); border-radius: 10px; font-size: 0.9rem;">
-				<strong>POWER-UPS:</strong><br>
-				⚡ Speed Boost | 🌟 Double Points | ⏰ Time Extension | 🛡️ Shield
-			</div>
-		</div>
-	</div>
-
-	<!-- Memory Game Modal -->
-	<div class="modal" id="memoryModal">
-		<div class="modal-content">
-			<div class="modal-header">
-				<h2 class="modal-title">🧠 MEMORY MASTER</h2>
-				<button class="close-btn" onclick="closeGame('memory')">×</button>
-			</div>
-
-			<div class="game-stats">
-				<div class="stat">
-					<div class="stat-value" id="memoryMoves">0</div>
-					<div class="stat-label">Moves</div>
-				</div>
-				<div class="stat">
-					<div class="stat-value" id="memoryPairs">0/8</div>
-					<div class="stat-label">Pairs</div>
-				</div>
-			</div>
-
-			<div class="memory-grid" id="memoryGrid"></div>
-
-			<div style="text-align: center;">
-				<button class="arcade-btn" onclick="initMemoryGame()">NEW GAME</button>
-			</div>
-		</div>
-	</div>
-
-	<!-- Game Over Alert -->
-	<div class="game-over-alert" id="gameOverAlert">
-		<div style="font-size: 4rem;">🏆</div>
-		<h2>GAME OVER!</h2>
-		<p style="opacity: 0.8; margin-bottom: 0.5rem;">FINAL SCORE</p>
-		<div class="final-score-display" id="finalScore">0</div>
-		<button class="arcade-btn" onclick="closeGameOverAlert()" style="margin-top: 1rem;">CONTINUE</button>
-	</div>
-
-	<!-- Memory Victory Alert -->
-	<div class="game-over-alert" id="memoryVictoryAlert">
-		<div style="font-size: 4rem;">🎉</div>
-		<h2>PERFECT!</h2>
-		<p style="opacity: 0.8; margin-bottom: 0.5rem;">COMPLETED IN</p>
-		<div class="final-score-display" id="finalMoves">0</div>
-		<p style="font-size: 1.2rem; margin-top: 0.5rem;">MOVES</p>
-		<button class="arcade-btn" onclick="closeMemoryVictory()" style="margin-top: 1rem;">PLAY AGAIN</button>
-	</div>
-
-	<!-- Login Required Alert -->
-	<div class="game-over-alert" id="loginAlert">
-		<div style="font-size: 4rem;">🔒</div>
-		<h2 style="font-size: 1.5rem;">LOGIN REQUIRED</h2>
-		<p style="opacity: 0.8; margin: 1.5rem 0; font-size: 1rem;">Sign in with Google to save your scores and compete on the leaderboard!</p>
-		<button class="arcade-btn" onclick="closeLoginAlert(); loginWithGoogle();" style="margin-top: 1rem;">
-			⭐ SIGN IN NOW ⭐
-		</button>
-		<button class="arcade-btn" onclick="closeLoginAlert()" style="margin-top: 0.5rem; background: rgba(255,255,255,0.1);">
-			CANCEL
-		</button>
-	</div>
-
-	<script>
-		// Initialize stars
-		const starsContainer = document.getElementById('starsContainer');
-		for (let i = 0; i < 100; i++) {
-			const star = document.createElement('div');
-			star.className = 'star';
-			star.style.left = Math.random() * 100 + '%';
-			star.style.top = Math.random() * 100 + '%';
-			star.style.animationDelay = Math.random() * 3 + 's';
-			starsContainer.appendChild(star);
-		}
-
-		// ===== AÑADE ESTO: INICIALIZACIÓN DE FIREBASE =====
-
-	    // Pega aquí tu objeto de configuración que copiaste
-		const firebaseConfig = {
-			apiKey: "AIzaSyDipUw7d4av0JwfudVDdECNjZXdjy3OGyw",
-			authDomain: "juego-arcade-scores.firebaseapp.com",
-			projectId: "juego-arcade-scores",
-			storageBucket: "juego-arcade-scores.firebasestorage.app",
-			messagingSenderId: "33838418828",
-			appId: "1:33838418828:web:5aa1579a7f645992c2a4a9",
-			measurementId: "G-47JPGCPBM0"
-		};
-
-	    // Inicializa Firebase y Firestore
-		firebase.initializeApp(firebaseConfig);
-		const db = firebase.firestore();
-
-	    // ===== FIN DE LA INICIALIZACIÓN DE FIREBASE =====
-
-// ===== USER MANAGEMENT & FIRESTORE LOGIC =====
-// 1. Define la variable 'auth'
-		const auth = firebase.auth();
-		let currentUser = null; // Esto ahora será un objeto de Firebase, no un string
-
-		// 2. Nueva función: Iniciar sesión con Google
-		async function loginWithGoogle() {
-			try {
-                // Crea un "proveedor" de Google
-				const provider = new firebase.auth.GoogleAuthProvider();
-                // Abre una ventana emergente para iniciar sesión
-				await auth.signInWithPopup(provider);
-                // El 'observer' (initAuth) se encargará del resto
-
-			} catch (error) {
-				console.error("Error al iniciar sesión con Google:", error);
-				alert("Hubo un error al iniciar sesión.");
-			}
-		}
-
-		// 3. Nueva función: Salir
-		async function logout() {
-			try {
-                // Le dice a Firebase que cierre la sesión
-				await auth.signOut();
-                // El 'observer' (initAuth) se encargará del resto
-			} catch (error) {
-				console.error("Error al cerrar sesión:", error);
-			}
-		}
-
-        // 4. Nueva función: El "Observador"
-        // Esta función se ejecuta CADA VEZ que el estado de login cambia
-		function initAuth() {
-			auth.onAuthStateChanged(user => {
-				if (user) {
-                    // *** EL USUARIO ESTÁ CONECTADO ***
-					console.log("Usuario conectado:", user.displayName, user.uid);
-                    currentUser = user; // Guardamos el objeto de usuario COMPLETO
-                    
-                    document.getElementById('loginView').style.display = 'none';
-                    document.getElementById('userView').style.display = 'flex';
-                    // Mostramos su nombre real de Google
-                    document.getElementById('displayUsername').textContent = user.displayName;
-                    
-                    loadUserStats();
-                    loadLeaderboards();
-
+            // 3. Simular el llenado de la barra de progreso
+            let progress = 0;
+            // Un intervalo más rápido para una sensación de "procesamiento" más activa
+            const progressInterval = setInterval(() => {
+                // Incremento aleatorio para más realismo
+                progress += Math.random() * 3; 
+                
+                if (progress <= 100) {
+                    progressBarFill.style.inlineSize = progress + '%';
                 } else {
-                    // *** EL USUARIO ESTÁ DESCONECTADO ***
-                	console.log("User logged out.");
-                	currentUser = null;
-
-                	document.getElementById('loginView').style.display = 'block';
-                	document.getElementById('userView').style.display = 'none';
-
-                	closeGame('catch');
-                	closeGame('memory');
-
-                    // Limpiar SÓLO las vistas previas PERSONALES
-                	document.getElementById('catchBestPreview').textContent = '-';
-                	document.getElementById('memoryBestPreview').textContent = '-';
-
-                    // CARGAR los leaderboards globales
-                	loadLeaderboards();
+                    progressBarFill.style.inlineSize = '100%';
+                    clearInterval(progressInterval);
+                    
+                    // Cuando se completa, podríamos cambiar un módulo a 'ONLINE'
+                    setTimeout(() => {
+                        const coreModule = document.querySelector('.module-card[data-state="updating"]');
+                        if (coreModule) {
+                            coreModule.dataset.state = 'online';
+                            coreModule.querySelector('.module-status').textContent = 'ONLINE';
+                        }
+                    }, 1000); // 1 segundo después de completar la barra
                 }
-            });
-		}
+            }, 150); // Cada 150ms
+        });
+    </script>
 
-        // 5. Llama al observador cuando la página cargue
-		document.addEventListener('DOMContentLoaded', initAuth);
-
-		function isStorageAvailable() {
-			// Esta función ahora comprueba si 'db' (nuestra base de datos) existe.
-			return typeof db !== 'undefined' && db !== null;
-		}
-
-		async function loadUserStats() {
-            // Ahora currentUser es un objeto, por eso chequeamos 'currentUser.uid'
-			if (!currentUser || !currentUser.uid || !isStorageAvailable()) return;
-			
-			try {
-                // Usamos el UID, no el nombre
-				const docId = currentUser.uid; 
-				
-				// Cargar mejor puntaje de Catch
-				const catchDoc = await db.collection('user_best_catch').doc(docId).get();
-				if (catchDoc.exists) {
-					document.getElementById('catchBestPreview').textContent = catchDoc.data().score;
-				}
-
-				// Cargar mejor puntaje de Memory
-				const memoryDoc = await db.collection('user_best_memory').doc(docId).get();
-				if (memoryDoc.exists) {
-					document.getElementById('memoryBestPreview').textContent = memoryDoc.data().score;
-				}
-			} catch (error) {
-				console.error('Error loading user stats:', error);
-			}
-		}
-
-		async function saveScore(game, score) {
-			if (!currentUser || !currentUser.uid || !isStorageAvailable()) {
-				console.log('User not logged in or DB not available. Score not saved.');
-				return;
-			}
-			
-			const isCatchGame = game === 'catch';
-			const collectionName = isCatchGame ? 'user_best_catch' : 'user_best_memory';
-
-            // ⬇️ ESTE ES EL CAMBIO MÁS IMPORTANTE ⬇️
-            // El ID del documento ahora es el UID del usuario
-			const docId = currentUser.uid;
-			const docRef = db.collection(collectionName).doc(docId);
-            // ⬆️ FIN DEL CAMBIO IMPORTANTE ⬆️
-
-			try {
-				const doc = await docRef.get();
-				let shouldSave = false;
-
-				if (!doc.exists) {
-					shouldSave = true;
-				} else {
-					const existingScore = doc.data().score;
-					if (isCatchGame) {
-						if (score > existingScore) shouldSave = true;
-					} else {
-						if (score < existingScore) shouldSave = true;
-					}
-				}
-
-				if (shouldSave) {
-					console.log(`Saving new best score for ${game}: ${score}`);
-					await docRef.set({
-                        // También guardamos el nombre (displayName) para mostrarlo en el leaderboard
-						username: currentUser.displayName, 
-						score: score,
-						timestamp: new Date()
-					});
-
-					await loadUserStats();
-					await loadLeaderboards();
-				} else {
-					console.log(`Score ${score} is not better than existing. Not saving.`);
-				}
-			} catch (error) {
-				console.error('Error saving score:', error);
-			}
-		}
-
-		async function loadLeaderboards() {
-			if (!isStorageAvailable()) {
-				document.getElementById('catchLeaderboard').innerHTML = '<li class="no-scores">Database not available</li>';
-				document.getElementById('memoryLeaderboard').innerHTML = '<li class="no-scores">Database not available</li>';
-				return;
-			}
-			await loadCatchLeaderboard();
-			await loadMemoryLeaderboard();
-		}
-
-		async function loadCatchLeaderboard() {
-			if (!isStorageAvailable()) return;
-			
-			const leaderboardEl = document.getElementById('catchLeaderboard');
-			leaderboardEl.innerHTML = '<li class="no-scores">Loading...</li>';
-
-			try {
-                // Pedir a Firestore los 10 mejores, ordenados por 'score' descendente
-				const snapshot = await db.collection('user_best_catch')
-				.orderBy('score', 'desc')
-				.limit(10)
-				.get();
-
-				if (snapshot.empty) {
-					leaderboardEl.innerHTML = '<li class="no-scores">No scores yet. Be the first!</li>';
-					document.getElementById('catchWorldPreview').textContent = '-';
-					return;
-				}
-
-				const sortedScores = snapshot.docs.map(doc => doc.data());
-
-                // Actualizar el "World Record"
-				document.getElementById('catchWorldPreview').textContent = sortedScores[0].score;
-
-				leaderboardEl.innerHTML = sortedScores.map((score, index) => {
-					const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
-					const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
-					return `
-						<li class="leaderboard-item ${rankClass}">
-							<span class="leaderboard-rank">${medal}</span>
-							<span class="leaderboard-name">${score.username}</span>
-							<span class="leaderboard-score">${score.score}</span>
-						</li>
-					`;
-				}).join('');
-			} catch (error) {
-				console.error('Error loading catch leaderboard:', error);
-				leaderboardEl.innerHTML = '<li class="no-scores">Error loading scores</li>';
-			}
-		}
-
-		async function loadMemoryLeaderboard() {
-			if (!isStorageAvailable()) return;
-
-			const leaderboardEl = document.getElementById('memoryLeaderboard');
-			leaderboardEl.innerHTML = '<li class="no-scores">Loading...</li>';
-
-			try {
-                // Pedir a Firestore los 10 mejores, ordenados por 'score' ascendente (menos movimientos es mejor)
-				const snapshot = await db.collection('user_best_memory')
-				.orderBy('score', 'asc')
-				.limit(10)
-				.get();
-
-				if (snapshot.empty) {
-					leaderboardEl.innerHTML = '<li class="no-scores">No scores yet. Be the first!</li>';
-					document.getElementById('memoryWorldPreview').textContent = '-';
-					return;
-				}
-
-				const sortedScores = snapshot.docs.map(doc => doc.data());
-
-                // Actualizar el "World Record"
-				document.getElementById('memoryWorldPreview').textContent = sortedScores[0].score;
-
-				leaderboardEl.innerHTML = sortedScores.map((score, index) => {
-					const rankClass = index === 0 ? 'top-1' : index === 1 ? 'top-2' : index === 2 ? 'top-3' : '';
-					const medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `${index + 1}.`;
-					return `
-						<li class="leaderboard-item ${rankClass}">
-							<span class="leaderboard-rank">${medal}</span>
-							<span class="leaderboard-name">${score.username}</span>
-							<span class="leaderboard-score">${score.score}</span>
-						</li>
-					`;
-				}).join('');
-			} catch (error)
-			{
-				console.error('Error loading memory leaderboard:', error);
-				leaderboardEl.innerHTML = '<li class="no-scores">Error loading scores</li>';
-			}
-		}
-
-		// ===== MODAL MANAGEMENT =====
-		function openGame(game) {
-			if (!currentUser) {
-				// En lugar de alert(), mostrar el nuevo modal
-				document.getElementById('loginAlert').classList.add('active');
-				return;
-			}
-
-			if (game === 'catch') {
-				document.getElementById('catchModal').classList.add('active');
-			} else if (game === 'memory') {
-				document.getElementById('memoryModal').classList.add('active');
-				initMemoryGame();
-			}
-		}
-
-		function closeGame(game) {
-			if (game === 'catch') {
-				stopCatchGame();
-				document.getElementById('catchModal').classList.remove('active');
-			} else if (game === 'memory') {
-				document.getElementById('memoryModal').classList.remove('active');
-			}
-		}
-
-		// Función para cerrar la alerta de login
-		function closeLoginAlert() {
-			document.getElementById('loginAlert').classList.remove('active');
-		}
-
-		// Función para cerrar la victoria de Memory
-		function closeMemoryVictory() {
-			document.getElementById('memoryVictoryAlert').classList.remove('active');
-			initMemoryGame(); // Reinicia automáticamente
-		}
-
-		// ===== CATCH GAME =====
-		let catchGameActive = false;
-		let catchScore = 0;
-		let catchTime = 30;
-		let catchMultiplier = 1;
-		let catchInterval;
-		let catchTimer;
-		let itemCheckIntervals = [];
-		let hasShield = false;
-		let catcherSpeed = 1;
-
-		function startCatchGame() {
-			if (catchGameActive || !currentUser) return;
-			
-			document.getElementById('gameOverAlert').classList.remove('active');
-			
-			catchGameActive = true;
-			catchScore = 0;
-			catchTime = 30;
-			catchMultiplier = 1;
-			hasShield = false;
-			catcherSpeed = 1;
-			
-			document.getElementById('catchScore').textContent = catchScore;
-			document.getElementById('catchTime').textContent = catchTime;
-			document.getElementById('catchMultiplier').textContent = 'x' + catchMultiplier;
-			document.getElementById('catcher').style.filter = 'drop-shadow(0 0 10px rgba(255, 190, 11, 0.8))';
-			
-			document.querySelectorAll('.falling-item').forEach(item => item.remove());
-			
-			document.getElementById('catchStartBtn').disabled = true;
-			
-			catchInterval = setInterval(createFallingItem, 700);
-			catchTimer = setInterval(() => {
-				catchTime--;
-				document.getElementById('catchTime').textContent = catchTime;
-				if (catchTime <= 0) {
-					stopCatchGame();
-					showGameOverAlert();
-				}
-			}, 1000);
-		}
-
-		function stopCatchGame() {
-			catchGameActive = false;
-			clearInterval(catchInterval);
-			clearInterval(catchTimer);
-			
-			itemCheckIntervals.forEach(interval => clearInterval(interval));
-			itemCheckIntervals = [];
-			
-			document.querySelectorAll('.falling-item').forEach(item => item.remove());
-			
-			document.getElementById('catchStartBtn').disabled = false;
-		}
-
-		function createFallingItem() {
-			if (!catchGameActive) return;
-			
-			const item = document.createElement('div');
-			item.className = 'falling-item';
-			
-			const rand = Math.random();
-			let itemType;
-			
-			if (rand < 0.15) {
-				itemType = 'bomb';
-				item.textContent = '💣';
-			} else if (rand < 0.25) {
-				// Power-ups
-				const powerups = ['⚡', '🌟', '⏰', '🛡️'];
-				const powerup = powerups[Math.floor(Math.random() * powerups.length)];
-				item.textContent = powerup;
-				itemType = 'powerup';
-				item.dataset.powerup = powerup;
-				item.classList.add('powerup');
-			} else {
-				itemType = 'star';
-				item.textContent = '⭐';
-			}
-			
-			item.dataset.type = itemType;
-			
-			const gameWidth = document.getElementById('catchGameArea').offsetWidth;
-			item.style.left = Math.random() * (gameWidth - 60) + 'px';
-			item.style.top = '-80px'; // Más arriba para dar más espacio
-
-			const baseDuration = Math.random() * 1.5 + 4; // Duración más larga y menos aleatoria
-			const duration = baseDuration / catcherSpeed;
-			item.style.animation = `fall ${duration}s linear`;
-			
-			document.getElementById('catchGameArea').appendChild(item);
-			
-			let hasCollided = false;
-			
-			const checkCollision = setInterval(() => {
-				if (!catchGameActive || !item.parentElement || hasCollided) {
-					clearInterval(checkCollision);
-					const index = itemCheckIntervals.indexOf(checkCollision);
-					if (index > -1) itemCheckIntervals.splice(index, 1);
-					return;
-				}
-				
-				const itemRect = item.getBoundingClientRect();
-				const catcherRect = document.getElementById('catcher').getBoundingClientRect();
-				
-				if (itemRect.bottom >= catcherRect.top &&
-					itemRect.top <= catcherRect.bottom &&
-					itemRect.right >= catcherRect.left &&
-					itemRect.left <= catcherRect.right) {
-					
-					hasCollided = true;
-
-				if (item.dataset.type === 'star') {
-					catchScore += 10 * catchMultiplier;
-					document.getElementById('catchScore').textContent = catchScore;
-					item.style.transition = 'transform 0.2s ease-out, opacity 0.2s ease-out';
-					item.style.transform = 'scale(2)';
-					item.style.opacity = '0';
-				} else if (item.dataset.type === 'powerup') {
-					applyPowerup(item.dataset.powerup);
-					item.style.transition = 'transform 0.3s ease-out, opacity 0.3s ease-out';
-					item.style.transform = 'scale(2) rotate(360deg)';
-					item.style.opacity = '0';
-				} else if (item.dataset.type === 'bomb') {
-					if (!hasShield) {
-						catchScore = Math.max(0, catchScore - 30);
-						document.getElementById('catchScore').textContent = catchScore;
-
-						const catcher = document.getElementById('catcher');
-						catcher.style.animation = 'shake 0.3s ease-in-out';
-						setTimeout(() => catcher.style.animation = '', 300);
-					} else {
-						hasShield = false;
-						document.getElementById('catcher').style.filter = 'drop-shadow(0 0 10px rgba(255, 190, 11, 0.8))';
-					}
-				}
-
-				setTimeout(() => {
-					if (item.parentElement) item.remove();
-				}, 300);
-
-				clearInterval(checkCollision);
-				const index = itemCheckIntervals.indexOf(checkCollision);
-				if (index > -1) itemCheckIntervals.splice(index, 1);
-			}
-		}, 30);
-			
-			itemCheckIntervals.push(checkCollision);
-			
-			setTimeout(() => {
-				if (item.parentElement) item.remove();
-				clearInterval(checkCollision);
-				const index = itemCheckIntervals.indexOf(checkCollision);
-				if (index > -1) itemCheckIntervals.splice(index, 1);
-			}, duration * 1000 + 1000); // Aumentado de 500 a 1000ms extra
-		}
-
-		function applyPowerup(powerup) {
-			switch(powerup) {
-			case '⚡':
-				catcherSpeed = 1.5;
-				setTimeout(() => catcherSpeed = 1, 5000);
-				break;
-			case '🌟':
-				catchMultiplier = 2;
-				document.getElementById('catchMultiplier').textContent = 'x' + catchMultiplier;
-				setTimeout(() => {
-					catchMultiplier = 1;
-					document.getElementById('catchMultiplier').textContent = 'x' + catchMultiplier;
-				}, 5000);
-				break;
-			case '⏰':
-				catchTime += 10;
-				document.getElementById('catchTime').textContent = catchTime;
-				break;
-			case '🛡️':
-				hasShield = true;
-				document.getElementById('catcher').style.filter = 'drop-shadow(0 0 20px rgba(0, 255, 249, 1))';
-				break;
-			}
-		}
-
-		async function showGameOverAlert() {
-			document.getElementById('finalScore').textContent = catchScore;
-			document.getElementById('gameOverAlert').classList.add('active');
-			await saveScore('catch', catchScore);
-		}
-
-		function closeGameOverAlert() {
-			document.getElementById('gameOverAlert').classList.remove('active');
-		}
-
-		let catcherX = 0;
-		document.getElementById('catchGameArea').addEventListener('mousemove', (e) => {
-			if (!catchGameActive) return;
-			const game = document.getElementById('catchGameArea');
-			const catcher = document.getElementById('catcher');
-			const rect = game.getBoundingClientRect();
-			catcherX = e.clientX - rect.left - 40;
-			catcherX = Math.max(0, Math.min(catcherX, game.offsetWidth - 80));
-			catcher.style.left = catcherX + 'px';
-		});
-
-		// Touch support for mobile
-		document.getElementById('catchGameArea').addEventListener('touchmove', (e) => {
-			if (!catchGameActive) return;
-			e.preventDefault();
-			const game = document.getElementById('catchGameArea');
-			const catcher = document.getElementById('catcher');
-			const rect = game.getBoundingClientRect();
-			const touch = e.touches[0];
-			catcherX = touch.clientX - rect.left - 40;
-			catcherX = Math.max(0, Math.min(catcherX, game.offsetWidth - 80));
-			catcher.style.left = catcherX + 'px';
-		});
-
-		// ===== MEMORY GAME =====
-		const emojis = ['🎮', '🕹️', '👾', '🎯', '🎲', '🃏', '🎰', '🏆'];
-		let memoryCards = [];
-		let flippedCards = [];
-		let moves = 0;
-		let pairs = 0;
-		let memoryGameActive = false;
-		let memoryStartTime = 0;
-		let memoryTimer;
-
-		function initMemoryGame() {
-			if (!currentUser) return;
-			
-			const gameContainer = document.getElementById('memoryGrid');
-			gameContainer.innerHTML = '';
-			memoryCards = [...emojis, ...emojis].sort(() => Math.random() - 0.5);
-			flippedCards = [];
-			moves = 0;
-			pairs = 0;
-			memoryGameActive = true;
-			memoryStartTime = Date.now();
-			
-			document.getElementById('memoryMoves').textContent = moves;
-			document.getElementById('memoryPairs').textContent = `${pairs}/8`;
-
-			memoryCards.forEach((emoji, index) => {
-				const card = document.createElement('div');
-				card.className = 'memory-card';
-				card.dataset.emoji = emoji;
-				card.dataset.index = index;
-				card.addEventListener('click', flipCard);
-				gameContainer.appendChild(card);
-			});
-		}
-
-		function flipCard() {
-			if (!memoryGameActive) return;
-			if (flippedCards.length === 2 || this.classList.contains('flipped') || this.classList.contains('matched')) {
-				return;
-			}
-
-			this.textContent = this.dataset.emoji;
-			this.classList.add('flipped');
-			flippedCards.push(this);
-
-			if (flippedCards.length === 2) {
-				moves++;
-				document.getElementById('memoryMoves').textContent = moves;
-				
-				setTimeout(async () => {
-					if (flippedCards[0].dataset.emoji === flippedCards[1].dataset.emoji) {
-						flippedCards[0].classList.add('matched');
-						flippedCards[1].classList.add('matched');
-						pairs++;
-						document.getElementById('memoryPairs').textContent = `${pairs}/8`;
-						
-						if (pairs === 8) {
-							memoryGameActive = false;
-							clearInterval(memoryTimer);
-							setTimeout(async () => {
-								// Mostrar el nuevo modal personalizado
-								document.getElementById('finalMoves').textContent = moves;
-								document.getElementById('memoryVictoryAlert').classList.add('active');
-								await saveScore('memory', moves);
-							}, 300);
-						}
-					} else {
-						flippedCards[0].textContent = '';
-						flippedCards[1].textContent = '';
-						flippedCards[0].classList.remove('flipped');
-						flippedCards[1].classList.remove('flipped');
-					}
-					flippedCards = [];
-				}, 800);
-			}
-		}
-
-		// Add shake and fall animations
-		const style = document.createElement('style');
-		style.textContent = `
-			@keyframes shake {
-				0%, 100% { transform: translateX(0); }
-				25% { transform: translateX(-10px); }
-				75% { transform: translateX(10px); }
-			}
-			@keyframes fall {
-				to { transform: translateY(550px); }
-			}
-		`;
-		document.head.appendChild(style);
-
-		// Load leaderboards on page load
-		window.addEventListener('load', async () => {
-			// Esperar a que storage esté disponible
-			let attempts = 0;
-			const checkStorage = setInterval(async () => {
-				attempts++;
-				if (isStorageAvailable()) {
-					clearInterval(checkStorage);
-					await loadLeaderboards();
-				} else if (attempts > 20) {
-					clearInterval(checkStorage);
-					console.log('Storage not available after 2 seconds');
-					document.getElementById('catchLeaderboard').innerHTML = '<li class="no-scores">Storage not available</li>';
-					document.getElementById('memoryLeaderboard').innerHTML = '<li class="no-scores">Storage not available</li>';
-				}
-			}, 100);
-		});
-	</script>
 </body>
 </html>
